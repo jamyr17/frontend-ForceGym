@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --color-yellow: #CFAD04;
+}
+
+option:checked {
+  background-color: #CFAD04;
+  color: white;
+}
