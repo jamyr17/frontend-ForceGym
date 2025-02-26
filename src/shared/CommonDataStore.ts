@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { ActivityType, TypeClient, MeanOfPayment, Role, ClientOptions } from "./types";
+import { ActivityType, TypeClient, MeanOfPayment, Role, Gender, ClientOptions} from "./types";
 import { getData } from "./services/gym";
 
 type CommonDataStore = {
@@ -8,20 +8,23 @@ type CommonDataStore = {
     activityTypes: ActivityType[]
     meansOfPayment: MeanOfPayment[]
     typesClient: TypeClient[]
+    genders: Gender[]
     allClients: ClientOptions[]
     fetchRoles: () => Promise<any>
     fetchMeansOfPayment: () => Promise<any>
     fetchActivityTypes: () => Promise<any>
     fetchTypesClient: () => Promise<any>
+    fetchGenders: () => Promise<any>
     fetchAllClients: () => Promise<any>
 }
 
 export const useCommonDataStore = create<CommonDataStore>()(
     devtools((set) => ({
         roles: [],
-        meansOfPament: [],
+        meansOfPayment: [],
         activityTypes: [],
         typesClient: [],
+        genders: [],
         allClients: [],
 
         fetchRoles: async () => {
@@ -45,6 +48,12 @@ export const useCommonDataStore = create<CommonDataStore>()(
         fetchTypesClient: async () => {
             const result = await getData(`${import.meta.env.VITE_URL_API}typeClient/list`)
             set(() => ({ typesClient: result.data.typesClient }))
+            return result
+        },
+
+        fetchGenders: async () => {
+            const result = await getData(`${import.meta.env.VITE_URL_API}gender/list`)
+            set(() => ({ genders: result.data }))
             return result
         },
 

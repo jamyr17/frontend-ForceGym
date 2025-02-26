@@ -18,6 +18,11 @@ export type ActivityType = {
     name: string
 }
 
+export type Gender = {
+    idGender: number,
+    name: string
+}
+
 export type TypeClient = {
     idTypeClient: number
     name: string
@@ -39,7 +44,7 @@ export type Person = {
     identificationNumber: string
     email: string
     phoneNumber: string
-    gender: string
+    gender: Gender
 }
 
 export type User = {
@@ -51,7 +56,8 @@ export type User = {
     token: string
 }
 
-export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Person & {
+export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Omit<Person, 'gender'> & {
+    idGender: number
     password: string
     confirmPassword: string
 }
@@ -94,7 +100,6 @@ export type ProductInventory = {
 }
 
 export type ProductInventoryDataForm = Omit<ProductInventory, 'user'> & Pick<User, 'idUser'>
-
 // --------------------------------------------------------
 export type HealthQuestionnaire = Pick<Client, 'idClient'> & {
     idHealthQuestionnaire: number
@@ -120,10 +125,11 @@ export type Client = {
     isDeleted: number
 }
 
+export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
+    idGender: number
+}
+
 export type ClientOptions = {
     value: number
     label: string
 }
-
-export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Person & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'>
-
