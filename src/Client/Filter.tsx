@@ -21,7 +21,7 @@ export function FilterButton() {
     const filteringStyles = (
         filterByStatus!='' || filterByBalanceLoss!=null || filterByBoneJointIssues!=null || filterByBreathingIssues!=null || filterByCardiovascularDisease!=null
         || filterByDiabetes!=null || filterByMuscleInjuries!=null || filterByHypertension!=null || filterByBirthDateRangeMax!=null || filterByBirthDateRangeMin!=null
-        || filterByClientType!=0
+        || filterByClientType!=-1
     ) && ' bg-white outline-none'
 
     return (
@@ -63,7 +63,7 @@ export function FilterSelect() {
 
     const filteredStatusSelectStyles = filterByStatus !== '' && ' px-0.5 border-yellow text-yellow';
     const filteredBirthDateRangeStyles = (filterByBirthDateRangeMin !== null && filterByBirthDateRangeMax !== null)  && ' px-0.5 border-yellow text-yellow';
-    const filteredClientTypeSelectStyles = filterByClientType !== 0 && ' px-0.5 border-yellow text-yellow';
+    const filteredClientTypeSelectStyles = filterByClientType !== -1 && ' px-0.5 border-yellow text-yellow';
 
     const { typesClient } = useCommonDataStore();
     const filters = [
