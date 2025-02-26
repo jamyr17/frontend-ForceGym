@@ -31,7 +31,6 @@ function Form() {
         const loggedUser = getAuthUser()
         const reqUser = {
             ...data, 
-            gender: 'Masculino', 
             paramLoggedIdUser: loggedUser?.idUser
         }
         

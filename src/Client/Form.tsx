@@ -19,7 +19,7 @@ const MAXLENGTH_EMAIL = 100
 
 function Form() {
     const navigate = useNavigate();
-    const { genders } = useCommonDataStore();
+    const { genders, typesClient } = useCommonDataStore();
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<ClientDataForm>();
     const { clients, activeEditingId, fetchClients, addClient, updateClient, closeModalForm } = useClientStore();
 
@@ -28,7 +28,7 @@ function Form() {
         const loggedUser = getAuthUser()
         const reqUser = {
             ...data, 
-            idUser: 7, 
+            idUser: loggedUser?.idUser, 
             paramLoggedIdUser: loggedUser?.idUser
         }
         
@@ -129,12 +129,6 @@ function Form() {
                 {...register('idClient')}
             />
             <input  
-                id="idTypeClient" 
-                type="hidden" 
-                value={1}
-                {...register('idTypeClient')}
-            />
-            <input  
                 id="isDeleted" 
                 type="hidden" 
                 {...register('isDeleted')}
@@ -146,24 +140,22 @@ function Form() {
                 {...register('signatureImage')}
             />
 
-            {/* Se debe hacer un select para tipo de cliente
             <div className="my-5">
-                <label htmlFor="idMeanOfPayment" className="text-sm uppercase font-bold">
-                    Medio de Pago 
+                <label htmlFor="idTypeClient" className="text-sm uppercase font-bold">
+                    Tipo de Cliente
                 </label>
                 <select
-                    id="idMeanOfPayment"
+                    id="idTypeClient"
                     className="w-full p-3 border border-gray-100" 
-                    {...register("idMeanOfPayment")}  
+                    {...register("idTypeClient")}  
                 >
-                    {meansOfPayment.map((meanOfPayment)=> (
-                        <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
-                            {meanOfPayment.name}
+                    {typesClient.map((type)=> (
+                        <option key={type.idTypeClient} value={type.idTypeClient}>
+                            {type.name}
                         </option>
                     ))}
                 </select>
             </div>   
-            */}
 
             <div className="mb-5">
                 <label htmlFor="identificationNumber" className="text-sm uppercase font-bold">
