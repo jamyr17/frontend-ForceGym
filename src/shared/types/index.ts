@@ -60,7 +60,7 @@ export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pic
 
 export type EconomicIncome = {
     idEconomicIncome: number
-    user: User
+    client: Client
     registrationDate: Date
     voucherNumber: string
     detail: string
@@ -70,7 +70,7 @@ export type EconomicIncome = {
     isDeleted: number
 }
 
-export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType'> & Pick<User, 'idUser'> & {
+export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType'> & Pick<Client, 'idClient'> & {
     idMeanOfPayment: MeanOfPayment['idMeanOfPayment']
     idActivityType: ActivityType['idActivityType']
 }
@@ -118,6 +118,11 @@ export type Client = {
     emergencyContact: string
     signatureImage: string
     isDeleted: number
+}
+
+export type ClientOptions = {
+    value: number
+    label: string
 }
 
 export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Person & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'>
