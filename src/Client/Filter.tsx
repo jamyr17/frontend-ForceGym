@@ -106,8 +106,8 @@ export function FilterSelect() {
                     value={filterByClientType}
                     onChange={(e) => changeFilterByClientType(+e.target.value)}
                 >
-                    <option value={0}>Todos</option>
-                    
+                    <option value={-1}>Todos</option>
+
                     {typesClient.map((type)=> (
                         <option key={type.idTypeClient} value={type.idTypeClient}>
                             {type.name}
@@ -115,7 +115,7 @@ export function FilterSelect() {
                     ))}
                 </select>
                 {filterByClientType!=0 && 
-                    <button className="text-2xl text-yellow" onClick={() => changeFilterByClientType(0)}>
+                    <button className="text-2xl text-yellow" onClick={() => changeFilterByClientType(-1)}>
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>
                 }

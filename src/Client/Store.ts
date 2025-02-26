@@ -86,7 +86,7 @@ export const useClientStore = create<ClientStore>()(
         filterByBreathingIssues: null,
         filterByBirthDateRangeMax: null,
         filterByBirthDateRangeMin: null,
-        filterByClientType: 0,
+        filterByClientType: -1,
 
         fetchClients: async () => {
             const state = useClientStore.getState();
