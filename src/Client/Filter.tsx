@@ -114,7 +114,7 @@ export function FilterSelect() {
                         </option>
                     ))}
                 </select>
-                {filterByClientType!=0 && 
+                {filterByClientType!=-1 && 
                     <button className="text-2xl text-yellow" onClick={() => changeFilterByClientType(-1)}>
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>
