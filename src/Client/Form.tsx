@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { formatDate } from "../shared/utils/format";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 const MAXLENGTH_IDENTIFICATIONUMBER = 20
 const MAXLENGTH_NAME = 50
@@ -18,6 +19,7 @@ const MAXLENGTH_EMAIL = 100
 
 function Form() {
     const navigate = useNavigate();
+    const { genders } = useCommonDataStore();
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<ClientDataForm>();
     const { clients, activeEditingId, fetchClients, addClient, updateClient, closeModalForm } = useClientStore();
 
@@ -98,7 +100,7 @@ function Form() {
                 setValue('firstLastName', activeClient.person.firstLastName);
                 setValue('secondLastName', activeClient.person.secondLastName);
                 setValue('birthday', activeClient.person.birthday);
-                setValue('gender', activeClient.person.gender);
+                setValue('idGender', activeClient.person.gender.idGender);
                 setValue('email', activeClient.person.email);
                 setValue('phoneNumber', activeClient.person.phoneNumber);
             }
@@ -131,12 +133,6 @@ function Form() {
                 type="hidden" 
                 value={1}
                 {...register('idTypeClient')}
-            />
-            <input  
-                id="gender" 
-                type="hidden" 
-                value={'Masculino'}
-                {...register('gender')}
             />
             <input  
                 id="isDeleted" 
@@ -297,6 +293,23 @@ function Form() {
                     </ErrorForm>
                 }
             </div>
+
+            <div className="my-5">
+                <label htmlFor="idGender" className="text-sm uppercase font-bold">
+                    Género 
+                </label>
+                <select
+                    id="idGender"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idGender")}  
+                >
+                    {genders.map((gender)=> (
+                        <option key={gender.idGender} value={gender.idGender}>
+                            {gender.name}
+                        </option>
+                    ))}
+                </select>
+            </div>   
 
             <div className="mb-5">
                 <label htmlFor="phoneNumber" className="text-sm uppercase font-bold">
