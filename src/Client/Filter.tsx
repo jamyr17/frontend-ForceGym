@@ -106,6 +106,8 @@ export function FilterSelect() {
                     value={filterByClientType}
                     onChange={(e) => changeFilterByClientType(+e.target.value)}
                 >
+                    <option value={0}>Todos</option>
+                    
                     {typesClient.map((type)=> (
                         <option key={type.idTypeClient} value={type.idTypeClient}>
                             {type.name}
