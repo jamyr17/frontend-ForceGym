@@ -1,6 +1,7 @@
 import { IoFilterOutline } from "react-icons/io5";
 import useClientStore from "./Store";
 import { MdOutlineCancel } from "react-icons/md";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 export function FilterButton() {
     const { 
@@ -46,6 +47,7 @@ export function FilterSelect() {
         filterByHypertension,
         filterByBirthDateRangeMax,
         filterByBirthDateRangeMin,
+        filterByClientType,
         changeFilterByBalanceLoss,
         changeFilterByBirthDateRangeMax,
         changeFilterByBirthDateRangeMin,
@@ -56,11 +58,14 @@ export function FilterSelect() {
         changeFilterByHypertension,
         changeFilterByMuscleInjuries,
         changeFilterByStatus,
+        changeFilterByClientType
     } = useClientStore();
 
     const filteredStatusSelectStyles = filterByStatus !== '' && ' px-0.5 border-yellow text-yellow';
     const filteredBirthDateRangeStyles = (filterByBirthDateRangeMin !== null && filterByBirthDateRangeMax !== null)  && ' px-0.5 border-yellow text-yellow';
+    const filteredClientTypeSelectStyles = filterByClientType !== 0 && ' px-0.5 border-yellow text-yellow';
 
+    const { typesClient } = useCommonDataStore();
     const filters = [
         { label: "Diabetes", state: filterByDiabetes, changeState: changeFilterByDiabetes },
         { label: "Hipertensión", state: filterByHypertension, changeState: changeFilterByHypertension },
@@ -88,6 +93,27 @@ export function FilterSelect() {
                 </select>
                 {filterByStatus && 
                     <button className="text-2xl text-yellow" onClick={() => changeFilterByStatus('')}>
+                        <MdOutlineCancel className="hover:cursor-pointer" />
+                    </button>
+                }
+            </div>
+
+            <div className="flex items-center gap-4">
+                <label htmlFor="idTypeClient" className="w-20">Tipo de Cliente</label>
+                <select
+                    id="idTypeClient"
+                    className={"border rounded-md p-2 w-78 text-center" + filteredClientTypeSelectStyles}
+                    value={filterByClientType}
+                    onChange={(e) => changeFilterByClientType(+e.target.value)}
+                >
+                    {typesClient.map((type)=> (
+                        <option key={type.idTypeClient} value={type.idTypeClient}>
+                            {type.name}
+                        </option>
+                    ))}
+                </select>
+                {filterByClientType!=0 && 
+                    <button className="text-2xl text-yellow" onClick={() => changeFilterByClientType(0)}>
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>
                 }
