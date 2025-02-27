@@ -61,7 +61,7 @@ function PrivateRoutes () {
                 }
             />
             <Route 
-                path="cliente" 
+                path="clientes" 
                 element={
                     <ClientManagement/>
                 }
