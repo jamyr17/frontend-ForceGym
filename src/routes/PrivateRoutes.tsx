@@ -20,9 +20,9 @@ function PrivateRoutes () {
             const resultMeansOfPayment = await fetchMeansOfPayment()
             const resultActivityTypes = await fetchActivityTypes()
             const resultGenders = await fetchGenders()
-            //const resultTypesClient = await fetchTypesClient()
+            const resultTypesClient = await fetchTypesClient()
 
-            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout || resultGenders.logout ){
+            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout || resultGenders.logout || resultTypesClient.logout){
                 setAuthHeader(null)
                 setAuthUser(null)
                 navigate('/login', {replace: true})
