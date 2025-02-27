@@ -1,6 +1,7 @@
 import { IoFilterOutline } from "react-icons/io5";
 import useClientStore from "./Store";
 import { MdOutlineCancel } from "react-icons/md";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 export function FilterButton() {
     const { 
@@ -20,7 +21,7 @@ export function FilterButton() {
     const filteringStyles = (
         filterByStatus!='' || filterByBalanceLoss!=null || filterByBoneJointIssues!=null || filterByBreathingIssues!=null || filterByCardiovascularDisease!=null
         || filterByDiabetes!=null || filterByMuscleInjuries!=null || filterByHypertension!=null || filterByBirthDateRangeMax!=null || filterByBirthDateRangeMin!=null
-        || filterByClientType!=0
+        || filterByClientType!=-1
     ) && ' bg-white outline-none'
 
     return (
@@ -46,6 +47,7 @@ export function FilterSelect() {
         filterByHypertension,
         filterByBirthDateRangeMax,
         filterByBirthDateRangeMin,
+        filterByClientType,
         changeFilterByBalanceLoss,
         changeFilterByBirthDateRangeMax,
         changeFilterByBirthDateRangeMin,
@@ -56,11 +58,14 @@ export function FilterSelect() {
         changeFilterByHypertension,
         changeFilterByMuscleInjuries,
         changeFilterByStatus,
+        changeFilterByClientType
     } = useClientStore();
 
     const filteredStatusSelectStyles = filterByStatus !== '' && ' px-0.5 border-yellow text-yellow';
     const filteredBirthDateRangeStyles = (filterByBirthDateRangeMin !== null && filterByBirthDateRangeMax !== null)  && ' px-0.5 border-yellow text-yellow';
+    const filteredClientTypeSelectStyles = filterByClientType !== -1 && ' px-0.5 border-yellow text-yellow';
 
+    const { typesClient } = useCommonDataStore();
     const filters = [
         { label: "Diabetes", state: filterByDiabetes, changeState: changeFilterByDiabetes },
         { label: "Hipertensión", state: filterByHypertension, changeState: changeFilterByHypertension },
@@ -88,6 +93,29 @@ export function FilterSelect() {
                 </select>
                 {filterByStatus && 
                     <button className="text-2xl text-yellow" onClick={() => changeFilterByStatus('')}>
+                        <MdOutlineCancel className="hover:cursor-pointer" />
+                    </button>
+                }
+            </div>
+
+            <div className="flex items-center gap-4">
+                <label htmlFor="idTypeClient" className="w-20">Tipo de Cliente</label>
+                <select
+                    id="idTypeClient"
+                    className={"border rounded-md p-2 w-78 text-center" + filteredClientTypeSelectStyles}
+                    value={filterByClientType}
+                    onChange={(e) => changeFilterByClientType(+e.target.value)}
+                >
+                    <option value={-1}>Todos</option>
+
+                    {typesClient.map((type)=> (
+                        <option key={type.idTypeClient} value={type.idTypeClient}>
+                            {type.name}
+                        </option>
+                    ))}
+                </select>
+                {filterByClientType!=-1 && 
+                    <button className="text-2xl text-yellow" onClick={() => changeFilterByClientType(-1)}>
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>
                 }
