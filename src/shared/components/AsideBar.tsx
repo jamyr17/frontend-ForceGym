@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { IoMdMenu } from 'react-icons/io';
-import { FaRegUser, FaMoneyBillAlt, FaMoneyBillWaveAlt, FaSignOutAlt } from 'react-icons/fa';
+import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
 import { GiWeightLiftingUp } from "react-icons/gi";
-import { MdOutlineInventory } from 'react-icons/md';
+import { MdOutlineInventory, MdOutlineTrendingUp , MdTrendingDown   } from 'react-icons/md';
 import { Link } from 'react-router';
 import { getAuthUser } from '../utils/authentication';
 
@@ -46,18 +46,18 @@ function AsideBar() {
           {isOpen && <p>Usuarios</p>}
         </Link>
 
-        <Link  to={'/gestion/cliente'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link  to={'/gestion/clientes'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
           <GiWeightLiftingUp />
           {isOpen && <p>Clientes</p>}
         </Link>
 
         <Link to={'/gestion/ingresos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
-          <FaMoneyBillAlt />
+          <MdOutlineTrendingUp />
           {isOpen && <p>Ingresos</p>}
         </Link>
 
         <Link to={'/gestion/gastos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
-          <FaMoneyBillWaveAlt />
+          <MdTrendingDown />
           {isOpen && <p>Gastos</p>}
         </Link>
 
