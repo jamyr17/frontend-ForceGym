@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { EconomicExpense, EconomicExpenseDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
-import { formatDateForParam } from "../shared/utils/format";
+import { format } from 'date-fns';
+import { isCompleteDate } from "../shared/utils/validation";
 
 type EconomicExpenseStore = {
     economicExpenses: EconomicExpense[];
@@ -92,8 +93,13 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
             if (state.filterByAmountRangeMax !== 0 && state.filterByAmountRangeMin !== 0) {
                 filters += `&filterByAmountRangeMax=${state.filterByAmountRangeMax}&filterByAmountRangeMin=${state.filterByAmountRangeMin}`;
             }
-            if (state.filterByDateRangeMax !== null && state.filterByDateRangeMin !== null) {
-                filters += `&filterByDateRangeMax=${formatDateForParam(state.filterByDateRangeMax)}&filterByDateRangeMin=${formatDateForParam(state.filterByDateRangeMin)}`;
+            if (
+                isCompleteDate(state.filterByDateRangeMax) &&
+                isCompleteDate(state.filterByDateRangeMin)
+            ) {
+                const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
+                const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
             }
             if (state.filterByMeanOfPayment != 0){
                 filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`
