@@ -34,6 +34,7 @@ function AsideBar() {
     >
       <div
         className=" flex items-center gap-2 p-2 text-lg hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Menu"
         onClick={() => setIsOpen(!isOpen)}
       >
         <IoMdMenu />
@@ -41,27 +42,32 @@ function AsideBar() {
       </div>
 
       <div className="flex flex-col gap-6 text-lg">
-        <Link to={'/gestion/usuarios'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link to={'/gestion/usuarios'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Usuarios">
           <FaRegUser />
           {isOpen && <p>Usuarios</p>}
         </Link>
 
-        <Link  to={'/gestion/clientes'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link  to={'/gestion/clientes'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Clientes">
           <GiWeightLiftingUp />
           {isOpen && <p>Clientes</p>}
         </Link>
 
-        <Link to={'/gestion/ingresos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link to={'/gestion/ingresos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Ingresos">
           <MdOutlineTrendingUp />
           {isOpen && <p>Ingresos</p>}
         </Link>
 
-        <Link to={'/gestion/gastos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link to={'/gestion/gastos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Gastos">
           <MdTrendingDown />
           {isOpen && <p>Gastos</p>}
         </Link>
 
-        <Link  to={'/gestion/inventario'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link  to={'/gestion/inventario'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Inventario">
           <MdOutlineInventory />
           {isOpen && <p>Inventario</p>}
         </Link>
@@ -72,7 +78,8 @@ function AsideBar() {
           {isOpen && <p className="text-center text-lg">{loggedUser?.username}</p>}
         </div>
 
-        <Link to={'/login'} className="flex items-center text-lg gap-2 my-4 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer">
+        <Link to={'/login'} className="flex items-center text-lg gap-2 my-4 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Cerrar sesión">
           <FaSignOutAlt />
           {isOpen && <p>Cerrar sesión</p>}
         </Link>
