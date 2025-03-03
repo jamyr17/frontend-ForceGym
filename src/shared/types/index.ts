@@ -19,7 +19,12 @@ export type ActivityType = {
 }
 
 export type Gender = {
-    idGender: number,
+    idGender: number
+    name: string
+}
+
+export type Category = {
+    idCategory: number
     name: string
 }
 
@@ -83,6 +88,7 @@ export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPaymen
 
 export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome"> & {
     idEconomicExpense: number
+    category: Category
 }
 
 export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome"> & Pick<EconomicExpense, 'idEconomicExpense'>
