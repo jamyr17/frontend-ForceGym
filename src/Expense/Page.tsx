@@ -111,7 +111,7 @@ function EconomicExpenseManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('voucherNumber')}}
                                 >
                                     VOUCHER  
@@ -182,16 +182,18 @@ function EconomicExpenseManagement() {
                                         getEconomicExpenseById(economicExpense.idEconomicExpense);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {economicExpense.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapEconomicExpenseToDataForm(economicExpense))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapEconomicExpenseToDataForm(economicExpense))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(economicExpense)} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleDelete(economicExpense)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Eliminar">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}

@@ -109,7 +109,7 @@ function UserManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('identificationNumber')}}
                                 >
                                     CÉDULA  
@@ -165,7 +165,8 @@ function UserManagement() {
                                                 getUserById(user.idUser);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                            title="Ver detalles"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -180,12 +181,13 @@ function UserManagement() {
                                         getUserById(user.idUser);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {user.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapUserToDataForm(user))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapUserToDataForm(user))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : ( 
@@ -193,7 +195,8 @@ function UserManagement() {
                                         onClick={() => handleDelete(user)} 
                                         disabled={user.idUser === authUser?.idUser}
                                         className={`p-2 rounded-sm hover:cursor-pointer bg-black
-                                        ${user.idUser === authUser?.idUser ? ' opacity-50 cursor-not-allowed' : 'hover:bg-slate-300'}`}
+                                        ${user.idUser === authUser?.idUser ? ' opacity-50 cursor-not-allowed' : 'hover:bg-gray-700'}`}
+                                        title="Eliminar"
                                     >
                                     <MdOutlineDelete className={`text-white  ${user.idUser === authUser?.idUser && ' cursor-not-allowed'}`} />
                                     </button>
