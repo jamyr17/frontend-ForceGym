@@ -28,6 +28,11 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>GÉNERO</strong></p>
+                    <p>{activeEditingUser.person.gender.name}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
                     <p><strong>FECHA DE NACIMIENTO</strong></p>
                     <p>{formatDate(new Date(activeEditingUser.person.birthday))}</p>
                 </div>

@@ -145,7 +145,7 @@ function UserManagement() {
                             <tr key={user.idUser} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
                                 <td className="py-2">{user.person.identificationNumber}</td>
-                                <td className="py-2">{user.person.name}</td>
+                                <td className="py-2">{user.person.name + ' ' + user.person.firstLastName + ' ' + user.person.secondLastName}</td> 
                                 <td className="py-2">{user.username}</td>
                                 <td className="py-2">{user.role.name}</td>
                                 {filterByStatus && (

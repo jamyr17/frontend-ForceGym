@@ -117,13 +117,19 @@ function Form() {
                 </label>
                 <Select
                     id="idClient"
-                    className="w-full" 
+                    className="w-full"
                     onChange={(selectedOption) => {
-                        setValue("idClient", selectedOption?.value);
+                        setValue("idClient", selectedOption?.value, { shouldValidate: true });
                     }}
                     options={allClients}
-                    {...rest} 
                 />
+
+                {/* mostrar errores de cliente */}
+                {errors.idClient && 
+                    <ErrorForm>
+                        {errors.idClient.message}
+                    </ErrorForm>
+                }
             </div>
 
             <div className="mb-5">
