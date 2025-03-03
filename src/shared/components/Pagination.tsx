@@ -10,7 +10,7 @@ type PaginationProps = {
 }
 
 function Pagination({ page, size, totalRecords, onSizeChange, onPageChange } : PaginationProps) {
-    const totalPages = useMemo(() => Math.trunc(totalRecords/size) + 1, [totalRecords, size])
+    const totalPages = useMemo(() => Math.ceil(totalRecords/size) , [totalRecords, size])
 
     return ( 
         (totalRecords > 0) ? 
@@ -21,7 +21,7 @@ function Pagination({ page, size, totalRecords, onSizeChange, onPageChange } : P
                     {totalRecords === 1 ? (
                         `${totalRecords} registro`
                     ) : (
-                        `${size * (page - 1) + 1}-${Math.min(size * page, totalRecords)} de ${totalRecords} registros`
+                        `${size * (page - 1) +1 }-${Math.min(size * page, totalRecords)} de ${totalRecords} registros`
                     )}
                 </span>
             </div>
