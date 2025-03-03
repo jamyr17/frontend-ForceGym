@@ -81,17 +81,22 @@ export type EconomicIncome = {
     isDeleted: number
 }
 
-export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType'> & Pick<Client, 'idClient'> & {
+export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType' | "client"> & Pick<Client, 'idClient'> & {
     idMeanOfPayment: MeanOfPayment['idMeanOfPayment']
     idActivityType: ActivityType['idActivityType']
 }
 
-export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome"> & {
+export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client"> & {
+    user: User
     idEconomicExpense: number
     category: Category
 }
 
-export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome"> & Pick<EconomicExpense, 'idEconomicExpense'>
+export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome" | "idClient"> & Omit<EconomicExpense, "meanOfPayment" | "category" | "user">
+    & Pick<EconomicExpense, 'idEconomicExpense'> & {
+        idUser: number
+        idCategory: number
+    }
 
 // -----------------------------------------------------
 
@@ -126,6 +131,7 @@ export type Client = {
     typeClient: TypeClient
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
+    expirationMembershipDate: Date
     emergencyContact: string
     signatureImage: string
     isDeleted: number
