@@ -23,6 +23,7 @@ type EconomicIncomeStore = {
     filterByDateRangeMax: Date | null;
     filterByDateRangeMin: Date | null;
     filterByMeanOfPayment: number;
+    filterByClientType: number;
 
     fetchEconomicIncomes: () => Promise<any>;
     getEconomicIncomeById: (id: number) => void;
@@ -42,6 +43,7 @@ type EconomicIncomeStore = {
     changeFilterByDateRangeMax: (newFilter: Date | null) => void;
     changeFilterByDateRangeMin: (newFilter: Date | null) => void;
     changeFilterByMeanOfPayment: (newFilter: number) => void;
+    changeFilterByClientType: (newFilter : number) => void;
 
     showModalForm: () => void;
     closeModalForm: () => void;
@@ -71,6 +73,7 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         filterByDateRangeMax: null,
         filterByDateRangeMin: null,
         filterByMeanOfPayment: 0,
+        filterByClientType: -1,
 
         fetchEconomicIncomes: async () => {
             const state = useEconomicIncomeStore.getState();
@@ -94,6 +97,9 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
             }
             if (state.filterByMeanOfPayment != 0){
                 filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`
+            }
+            if (state.filterByClientType != -1){
+                filters += `&filterByTypeClient=${state.filterByClientType}`
             }
 
             const result = await getData(
@@ -142,6 +148,7 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         changeFilterByDateRangeMax: (newFilter) => set(() => ({ filterByDateRangeMax: newFilter })),
         changeFilterByDateRangeMin: (newFilter) => set(() => ({ filterByDateRangeMin: newFilter })),
         changeFilterByMeanOfPayment: (newFilter) => set(() => ({ filterByMeanOfPayment: newFilter })),
+        changeFilterByClientType: (newFilter) => set(() => ({ filterByClientType: newFilter })),
 
         showModalForm: () => set(() => ({ modalForm: true })),
         closeModalForm: () => set(() => ({ modalForm: false })),

@@ -36,6 +36,7 @@ function EconomicIncomeManagement() {
         filterByDateRangeMin,
         filterByDateRangeMax,
         filterByMeanOfPayment,
+        filterByClientType,
         fetchEconomicIncomes,
         getEconomicIncomeById,
         changePage,
@@ -66,7 +67,7 @@ function EconomicIncomeManagement() {
         }
         
         fetchData()
-    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment,])
+    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByClientType])
 
     return ( 
         <div className="bg-black h-full w-full">
@@ -75,6 +76,7 @@ function EconomicIncomeManagement() {
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Voucher</option>
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Detalle</option>
+                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={3} defaultChecked={searchType===3}>Cliente</option>
                 </SearchInput>
                 <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
