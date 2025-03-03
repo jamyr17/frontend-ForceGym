@@ -24,13 +24,24 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>MEDIO DE PAGO</strong></p>
+                    <p>{economicIncome.meanOfPayment.name}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
                     <p><strong>FECHA DE REGISTRO</strong></p>
                     <p>{formatDate(new Date(economicIncome.registrationDate))}</p>
                 </div>
+
             </div>
 
             <div className="flex flex-col gap-2">
                 <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Cliente</h1>
+                
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>CÉDULA</strong></p>
+                    <p>{economicIncome.client.person.identificationNumber}</p>
+                </div>
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE</strong></p>
@@ -61,10 +72,6 @@ function DataInfo() {
                     <p>{formatAmountToCRC(economicIncome.amount)}</p>
                 </div>
 
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>MEDIO DE PAGO</strong></p>
-                    <p>{economicIncome.meanOfPayment.name}</p>
-                </div>
             </div>
         </div>
     );

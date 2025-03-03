@@ -120,6 +120,7 @@ function EconomicIncomeManagement() {
                                     {(orderBy==='voucherNumber' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
                                     {(orderBy==='voucherNumber' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
+                                <th>CLIENTE</th>
                                 <th><button
                                     className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('registrationDate')}}
@@ -149,6 +150,7 @@ function EconomicIncomeManagement() {
                             <tr key={economicIncome.idEconomicIncome} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
                                 <td className="py-2">{economicIncome.voucherNumber!='' ? economicIncome.voucherNumber : 'No adjunto'}</td>
+                                <td className="py-2">{economicIncome.client.person.name + ' ' + economicIncome.client.person.firstLastName + ' ' + economicIncome.client.person.secondLastName}</td>
                                 <td className="py-2">{formatDate(new Date(economicIncome.registrationDate))}</td>
                                 <td className="py-2">{formatAmountToCRC(economicIncome.amount)}</td>
                                 <td className="py-2">{economicIncome.meanOfPayment.name}</td>
