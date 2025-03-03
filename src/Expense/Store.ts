@@ -23,6 +23,7 @@ type EconomicExpenseStore = {
     filterByDateRangeMax: Date | null;
     filterByDateRangeMin: Date | null;
     filterByMeanOfPayment: number;
+    filterByCategory: number;
 
     fetchEconomicExpenses: () => Promise<any>;
     getEconomicExpenseById: (id: number) => void;
@@ -42,6 +43,7 @@ type EconomicExpenseStore = {
     changeFilterByDateRangeMax: (newFilter: Date | null) => void;
     changeFilterByDateRangeMin: (newFilter: Date | null) => void;
     changeFilterByMeanOfPayment: (newFilter: number) => void;
+    changeFilterByCategory: (newFilter: number) => void;
 
     showModalForm: () => void;
     closeModalForm: () => void;
@@ -71,6 +73,7 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
         filterByDateRangeMax: null,
         filterByDateRangeMin: null ,
         filterByMeanOfPayment: 0,
+        filterByCategory: -1,
 
         fetchEconomicExpenses: async () => {
             const state = useEconomicExpenseStore.getState();
@@ -94,6 +97,9 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
             }
             if (state.filterByMeanOfPayment != 0){
                 filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`
+            }
+            if(state.filterByCategory != -1){
+                filters += `&filterByCategory=${state.filterByCategory}`
             }
 
             const result = await getData(
@@ -142,6 +148,7 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
         changeFilterByDateRangeMax: (newFilter) => set(() => ({ filterByDateRangeMax: newFilter })),
         changeFilterByDateRangeMin: (newFilter) => set(() => ({ filterByDateRangeMin: newFilter })),
         changeFilterByMeanOfPayment: (newFilter) => set(() => ({ filterByMeanOfPayment: newFilter })),
+        changeFilterByCategory: (newFilter) => set(() => ({ filterByCategory: newFilter })),
 
         showModalForm: () => set(() => ({ modalForm: true })),
         closeModalForm: () => set(() => ({ modalForm: false })),

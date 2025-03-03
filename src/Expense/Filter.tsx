@@ -4,9 +4,9 @@ import { MdOutlineCancel } from "react-icons/md";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 
 export function FilterButton() {
-    const { filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, showModalFilter } = useEconomicExpenseStore()
+    const { filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByCategory, showModalFilter } = useEconomicExpenseStore()
     const filteringStyles = (
-        filterByStatus!='' || filterByAmountRangeMin!=0 || filterByAmountRangeMax!=0 || filterByDateRangeMin!=null || filterByDateRangeMax!=null || filterByMeanOfPayment!=0
+        filterByStatus!='' || filterByAmountRangeMin!=0 || filterByAmountRangeMax!=0 || filterByDateRangeMin!=null || filterByDateRangeMax!=null || filterByMeanOfPayment!=0 || filterByCategory!=-1
     ) && ' bg-white outline-none'
 
     return (
@@ -28,18 +28,21 @@ export function FilterSelect() {
         filterByDateRangeMin, 
         filterByDateRangeMax, 
         filterByMeanOfPayment,
+        filterByCategory,
         changeFilterByStatus, 
         changeFilterByAmountRangeMin,
         changeFilterByAmountRangeMax,
         changeFilterByDateRangeMin, 
         changeFilterByDateRangeMax,
-        changeFilterByMeanOfPayment
+        changeFilterByMeanOfPayment,
+        changeFilterByCategory
     } = useEconomicExpenseStore()
     const filteredStatusSelectStyles = filterByStatus!='' && ' px-0.5 border-yellow text-yellow'
     const filteredMeanOfPaymentStyles = filterByMeanOfPayment!=0 && ' px-0.5 border-yellow text-yellow'
+    const filteredCategoryStyles = filterByCategory!=-1 && ' px-0.5 border-yellow text-yellow'
     const filteredAmountRangeStyles = (filterByAmountRangeMin!=0 && filterByAmountRangeMax!=0)  && ' px-0.5 border-yellow text-yellow'
     const filteredDateRangeStyles = (filterByDateRangeMin !=null && filterByDateRangeMax!=null)  && ' px-0.5 border-yellow text-yellow'
-    const { meansOfPayment } = useCommonDataStore()
+    const { meansOfPayment, categories } = useCommonDataStore()
 
     return (
         <div className="flex flex-col gap-4">
@@ -94,6 +97,33 @@ export function FilterSelect() {
                     <button
                         className="text-2xl text-yellow"
                         onClick={() => { changeFilterByMeanOfPayment(0) }}
+                    >
+                        <MdOutlineCancel className="hover:cursor-pointer" />
+                    </button>
+                }
+            </div>
+
+            {/* Filtro por categoría */}
+            <div className="flex items-center gap-4">
+                <label htmlFor="idCategory" className="w-20">
+                    Categoría
+                </label>
+                <select
+                    id="idCategory"
+                    value={filterByCategory} 
+                    className={'border rounded-md p-2 w-78 text-center' + filteredCategoryStyles}
+                    onChange={(e) => {changeFilterByCategory(+e.target.value)}}
+                >
+                    {categories.map((category)=> (
+                        <option key={category.idCategory} value={category.idCategory}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+                { filterByCategory!=-1 && 
+                    <button
+                        className="text-2xl text-yellow"
+                        onClick={() => { changeFilterByCategory(-1) }}
                     >
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>

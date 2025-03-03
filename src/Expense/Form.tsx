@@ -15,7 +15,7 @@ const MAXDATE = new Date().toUTCString()
 
 function Form() {
     const navigate = useNavigate();
-    const { meansOfPayment } = useCommonDataStore();
+    const { meansOfPayment, categories } = useCommonDataStore();
     const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<EconomicExpenseDataForm>();
     const { economicExpenses, activeEditingId, fetchEconomicExpenses, addEconomicExpense, updateEconomicExpense, closeModalForm } = useEconomicExpenseStore();
     const idMeanOfPayment = watch("idMeanOfPayment") ? Number(watch("idMeanOfPayment")) : null;
@@ -79,6 +79,7 @@ function Form() {
                 setValue('detail', activeIncome.detail)
                 setValue('voucherNumber', activeIncome.voucherNumber)
                 setValue('idMeanOfPayment', activeIncome.meanOfPayment.idMeanOfPayment)
+                setValue('idCategory', activeIncome.category.idCategory)
             }
         }
     }, [activeEditingId]);
@@ -109,6 +110,23 @@ function Form() {
                 type="hidden" 
                 {...register('isDeleted')}
             />
+
+            <div className="my-5">
+                <label htmlFor="idCategory" className="text-sm uppercase font-bold">
+                    Categoría
+                </label>
+                <select
+                    id="idCategory"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idCategory")}  
+                >
+                    {categories.map((category)=> (
+                        <option key={category.idCategory} value={category.idCategory}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
             <div className="mb-5">
                 <label htmlFor="registrationDate" className="text-sm uppercase font-bold">

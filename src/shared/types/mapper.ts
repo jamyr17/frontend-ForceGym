@@ -12,18 +12,18 @@ export function mapUserToDataForm(user: User): UserDataForm {
         identificationNumber: user.person.identificationNumber,
         email: user.person.email,
         phoneNumber: user.person.phoneNumber,
-        gender: user.person.gender,
+        idGender: user.person.gender.idGender,
         username: user.username,
         isDeleted: user.isDeleted,
         password: "",
         confirmPassword: ""
-    }
+    };
 }
 
 export function mapEconomicIncomeToDataForm(economicIncome: EconomicIncome): EconomicIncomeDataForm {
     return {
         idEconomicIncome: economicIncome.idEconomicIncome,
-        idUser: economicIncome.user.idUser,
+        idClient: economicIncome.client.idClient,
         registrationDate: economicIncome.registrationDate,
         voucherNumber: economicIncome.voucherNumber,
         detail: economicIncome.detail,
@@ -31,12 +31,13 @@ export function mapEconomicIncomeToDataForm(economicIncome: EconomicIncome): Eco
         amount: economicIncome.amount,
         idActivityType: economicIncome.activityType.idActivityType,
         isDeleted: economicIncome.isDeleted
-    }
+    };
 }
 
 export function mapEconomicExpenseToDataForm(economicExpense: EconomicExpense): EconomicExpenseDataForm {
     return {
         idEconomicExpense: economicExpense.idEconomicExpense,
+        idCategory: economicExpense.category.idCategory,
         idUser: economicExpense.user.idUser,
         registrationDate: economicExpense.registrationDate,
         voucherNumber: economicExpense.voucherNumber,
@@ -44,10 +45,10 @@ export function mapEconomicExpenseToDataForm(economicExpense: EconomicExpense): 
         idMeanOfPayment: economicExpense.meanOfPayment.idMeanOfPayment,
         amount: economicExpense.amount,
         isDeleted: economicExpense.isDeleted
-    }
+    };
 }
 
-export function mapProductInventoryToDataForm(product : ProductInventory) : ProductInventoryDataForm {
+export function mapProductInventoryToDataForm(product: ProductInventory): ProductInventoryDataForm {
     return {
         idProductInventory: product.idProductInventory,
         idUser: product.user.idUser,
@@ -56,24 +57,35 @@ export function mapProductInventoryToDataForm(product : ProductInventory) : Prod
         cost: product.cost,
         quantity: product.quantity,
         isDeleted: product.isDeleted
-    }
+    };
 }
 
 export function mapClientToDataForm(client: Client): ClientDataForm {
-    const { idClient, ...healthData } = client.healthQuestionnaire;
-
     return {
         idClient: client.idClient,
         idUser: client.user.idUser,
         idTypeClient: client.typeClient.idTypeClient,
         registrationDate: client.registrationDate,
+        expirationMembershipDate: client.expirationMembershipDate,
         emergencyContact: client.emergencyContact,
         signatureImage: client.signatureImage,
-
-        // HealthQuestionaire
-        ...healthData,
-
-        // Person 
-        ...client.person,
+        idHealthQuestionnaire: client.healthQuestionnaire.idHealthQuestionnaire,
+        diabetes: client.healthQuestionnaire.diabetes,
+        hypertension: client.healthQuestionnaire.hypertension,
+        muscleInjuries: client.healthQuestionnaire.muscleInjuries,
+        boneJointIssues: client.healthQuestionnaire.boneJointIssues,
+        balanceLoss: client.healthQuestionnaire.balanceLoss,
+        cardiovascularDisease: client.healthQuestionnaire.cardiovascularDisease,
+        breathingIssues: client.healthQuestionnaire.breathingIssues,
+        isDeleted: client.isDeleted,
+        idPerson: client.person.idPerson,
+        name: client.person.name,
+        firstLastName: client.person.firstLastName,
+        secondLastName: client.person.secondLastName,
+        birthday: client.person.birthday,
+        identificationNumber: client.person.identificationNumber,
+        email: client.person.email,
+        phoneNumber: client.person.phoneNumber,
+        idGender: client.person.gender.idGender
     };
 }

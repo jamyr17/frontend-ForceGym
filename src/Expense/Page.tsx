@@ -36,6 +36,7 @@ function EconomicExpenseManagement() {
         filterByDateRangeMin,
         filterByDateRangeMax,
         filterByMeanOfPayment,
+        filterByCategory,
         fetchEconomicExpenses,
         getEconomicExpenseById,
         changePage,
@@ -66,7 +67,7 @@ function EconomicExpenseManagement() {
             }
             
             fetchData()
-        }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment ])
+        }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByCategory ])
 
     return ( 
         <div className="bg-black h-full w-full">
@@ -136,6 +137,7 @@ function EconomicExpenseManagement() {
                                 </button></th>
 
                                 <th>MÉTODO DE PAGO</th>
+                                <th>CATEGORÍA</th>
                                 {filterByStatus && <th>ESTADO</th>}
 
                                 <th>ACCIONES</th>
@@ -150,6 +152,7 @@ function EconomicExpenseManagement() {
                                 <td className="py-2">{formatDate(new Date(economicExpense.registrationDate))}</td>
                                 <td className="py-2">{formatAmountToCRC(economicExpense.amount)}</td>
                                 <td className="py-2">{economicExpense.meanOfPayment.name}</td>
+                                <td className="py-2">{economicExpense.category.name}</td>
                                 {filterByStatus && (
                                 <td>
                                     {economicExpense.isDeleted ? (
