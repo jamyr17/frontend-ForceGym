@@ -5,6 +5,7 @@ import UserManagement from "../User/Page";
 import EconomicIncomeManagement from "../Income/Page";
 import EconomicExpenseManagement from "../Expense/Page";
 import ProductInventoryManagement from "../Product/Page";
+import MeasurementManagement from "../Measurement/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
@@ -65,6 +66,12 @@ function PrivateRoutes () {
                 path="clientes" 
                 element={
                     <ClientManagement/>
+                }
+            />
+            <Route 
+                path="medidas" 
+                element={
+                    <MeasurementManagement/>
                 }
             />
         </Routes>

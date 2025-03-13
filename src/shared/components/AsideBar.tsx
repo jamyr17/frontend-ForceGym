@@ -71,6 +71,12 @@ function AsideBar() {
           <MdOutlineInventory />
           {isOpen && <p>Inventario</p>}
         </Link>
+
+        <Link  to={'/gestion/medidas'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Medidas">
+          <MdOutlineInventory />
+          {isOpen && <p>Medidas</p>}
+        </Link>
       </div>
 
       <div>

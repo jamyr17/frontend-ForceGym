@@ -1,4 +1,4 @@
-import { Client, ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm } from ".";
+import { Client, ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, ProductInventory, ProductInventoryDataForm, Measurement, MeasurementDataForm, User, UserDataForm } from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -57,6 +57,30 @@ export function mapProductInventoryToDataForm(product: ProductInventory): Produc
         cost: product.cost,
         quantity: product.quantity,
         isDeleted: product.isDeleted
+    };
+}
+
+export function mapMeasurementToDataForm(measurement: Measurement): MeasurementDataForm {
+    return {
+        idMeasurement: measurement.idMeasurement,
+        idClient: measurement.client.idClient,
+        idUser: measurement.user.idUser,
+        measurementDate: measurement.measurementDate,
+        weight: measurement.weight,
+        height: measurement.height,
+        bmi: measurement.bmi,
+        bodyFatPercentage: measurement.bodyFatPercentage,
+        muscleMass: measurement.muscleMass,
+        visceralFatPercentage: measurement.visceralFatPercentage,
+        neckSize: measurement.neckSize,
+        shoulderSize: measurement.shoulderSize,
+        chestSize: measurement.chestSize,
+        waistSize: measurement.waistSize,
+        thighSize: measurement.thighSize,
+        calfSize: measurement.calfSize,
+        forearmSize: measurement.forearmSize,
+        armSize: measurement.armSize,
+        isDeleted: measurement.isDeleted
     };
 }
 
