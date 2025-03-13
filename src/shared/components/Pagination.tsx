@@ -31,6 +31,7 @@ function Pagination({ page, size, totalRecords, onSizeChange, onPageChange } : P
                     <span>Filas por página: </span>
                     <select
                         className="text-center hover:cursor-pointer hover:outline hover:text-slate-400"
+                        value={size}
                         onChange={(e) => {
                             onSizeChange(Number(e.target.value))
                             onPageChange(1) 
