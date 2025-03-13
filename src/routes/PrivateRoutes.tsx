@@ -9,6 +9,7 @@ import MeasurementManagement from "../Measurement/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
+import NotificationTemplateManagement from "../TemplateNotification/Page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -69,9 +70,9 @@ function PrivateRoutes () {
                 }
             />
             <Route 
-                path="medidas" 
+                path="plantillas-notificacion" 
                 element={
-                    <MeasurementManagement/>
+                    <NotificationTemplateManagement/>
                 }
             />
         </Routes>

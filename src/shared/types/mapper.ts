@@ -1,4 +1,4 @@
-import { Client, ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, ProductInventory, ProductInventoryDataForm, Measurement, MeasurementDataForm, User, UserDataForm } from ".";
+import { Client, ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm } from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -91,7 +91,8 @@ export function mapClientToDataForm(client: Client): ClientDataForm {
         idTypeClient: client.typeClient.idTypeClient,
         registrationDate: client.registrationDate,
         expirationMembershipDate: client.expirationMembershipDate,
-        emergencyContact: client.emergencyContact,
+        phoneNumberContactEmergency: client.phoneNumberContactEmergency,
+        nameEmergencyContact: client.nameEmergencyContact,
         signatureImage: client.signatureImage,
         idHealthQuestionnaire: client.healthQuestionnaire.idHealthQuestionnaire,
         diabetes: client.healthQuestionnaire.diabetes,
@@ -111,5 +112,15 @@ export function mapClientToDataForm(client: Client): ClientDataForm {
         email: client.person.email,
         phoneNumber: client.person.phoneNumber,
         idGender: client.person.gender.idGender
+    };
+}
+
+export function mapNotificationTemplateToDataForm(notificationTemplate: NotificationTemplate): NotificationTemplateDataForm {
+    return {
+        idNotificationTemplate: notificationTemplate.idNotificationTemplate,
+        message: notificationTemplate.message,
+        idNotificationType: notificationTemplate.notificationType.idNotificationType,
+        idUser: notificationTemplate.user.idUser,
+        isDeleted: notificationTemplate.isDeleted
     };
 }

@@ -38,6 +38,10 @@ export type TypeClient = {
     isDeleted: number
 }
 
+export type NotificationType = {
+    idNotificationType: number
+    name: string
+}
 // -----------------------------------------------------
 
 export type Person = {
@@ -132,7 +136,8 @@ export type Client = {
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
     expirationMembershipDate: Date
-    emergencyContact: string
+    phoneNumberContactEmergency: string
+    nameEmergencyContact: string
     signatureImage: string
     isDeleted: number
 }
@@ -172,3 +177,13 @@ export type ClientOptions = {
     value: number
     label: string
 }
+// --------------------------------------------------------
+export type NotificationTemplate = {
+    idNotificationTemplate: number
+    user: User
+    message: string
+    notificationType: NotificationType
+    isDeleted: number
+}
+
+export type NotificationTemplateDataForm = Omit<NotificationTemplate, 'user' | 'notificationType'> & Pick<NotificationType, 'idNotificationType'> & Pick<User, 'idUser'>

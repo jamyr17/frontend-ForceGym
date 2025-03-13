@@ -50,8 +50,14 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>EMERGENCIA</strong></p>
-                    <p>{client.emergencyContact}</p>
+                    <p><strong>NÚMERO DEL CONTACTO DE EMERGENCIA</strong></p>
+                    <p>{client.phoneNumberContactEmergency}</p>
+                </div>
+
+                
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>NOMBRE DEL CONTACTO EMERGENCIA</strong></p>
+                    <p>{client.nameEmergencyContact}</p>
                 </div>
                 
             </div>
