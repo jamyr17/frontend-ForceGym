@@ -369,7 +369,7 @@ function Form() {
                         required: 'El nombre del contacto de emergencia es obligatorio',
                         maxLength: {
                             value: MAXLENGTH_NAME,
-                            message: `Debe ingresar un nomrbe de contacto de emergencia de máximo ${MAXLENGTH_NAME} carácteres`
+                            message: `Debe ingresar un nombre de contacto de emergencia de máximo ${MAXLENGTH_NAME} carácteres`
                         }
                     })}
                 />
