@@ -79,6 +79,7 @@ function Form() {
                 setValue('idTypeClient', activeClient.typeClient.idTypeClient)
                 setValue('registrationDate', activeClient.registrationDate);
                 setValue('emergencyContact', activeClient.emergencyContact);
+                setValue('nameEmergencyContact', activeClient.nameEmergencyContact);
                 setValue('signatureImage', activeClient.signatureImage);
                 setValue('isDeleted', activeClient.isDeleted);
 
@@ -351,6 +352,32 @@ function Form() {
                 {errors.emergencyContact && 
                     <ErrorForm>
                         {errors.emergencyContact.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="nameEmergencyContact" className="text-sm uppercase font-bold">
+                    Nombre del contacto de emergencia
+                </label>
+                <input  
+                    id="nameEmergencyContact"
+                    className="w-full p-3 border border-gray-100"  
+                    type="text" 
+                    placeholder="Ingrese el nombre del contacto de emergencia" 
+                    {...register("nameEmergencyContact", {
+                        required: 'El nombre del contacto de emergencia es obligatorio',
+                        maxLength: {
+                            value: MAXLENGTH_NAME,
+                            message: `Debe ingresar un nombre de contacto de emergencia de máximo ${MAXLENGTH_NAME} carácteres`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del contacto de emergencia */}
+                {errors.nameEmergencyContact && 
+                    <ErrorForm>
+                        {errors.nameEmergencyContact.message}
                     </ErrorForm>
                 }
             </div>

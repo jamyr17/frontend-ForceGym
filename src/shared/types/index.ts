@@ -133,6 +133,7 @@ export type Client = {
     registrationDate: Date
     expirationMembershipDate: Date
     emergencyContact: string
+    nameEmergencyContact: string
     signatureImage: string
     isDeleted: number
 }
