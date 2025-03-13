@@ -141,6 +141,33 @@ export type Client = {
     signatureImage: string
     isDeleted: number
 }
+// --------------------------------------------------------
+export type Measurement = {
+    idMeasurement: number
+    client: Client
+    user: User
+    measurementDate: Date
+    weight: number
+    height: number
+    bmi: number
+    bodyFatPercentage: number
+    muscleMass: number
+    visceralFatPercentage: number
+    neckSize: number
+    shoulderSize: number
+    chestSize: number
+    waistSize: number
+    thighSize: number
+    calfSize: number
+    forearmSize: number
+    armSize: number
+    isDeleted: number
+}
+
+export type MeasurementDataForm = Omit<Measurement, 'client' | 'user'> & {
+    idClient: number
+    idUser: number
+}
 
 export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
     idGender: number
