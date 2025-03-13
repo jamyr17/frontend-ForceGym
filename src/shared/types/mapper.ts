@@ -67,7 +67,7 @@ export function mapClientToDataForm(client: Client): ClientDataForm {
         idTypeClient: client.typeClient.idTypeClient,
         registrationDate: client.registrationDate,
         expirationMembershipDate: client.expirationMembershipDate,
-        emergencyContact: client.emergencyContact,
+        phoneNumberContactEmergency: client.phoneNumberContactEmergency,
         nameEmergencyContact: client.nameEmergencyContact,
         signatureImage: client.signatureImage,
         idHealthQuestionnaire: client.healthQuestionnaire.idHealthQuestionnaire,

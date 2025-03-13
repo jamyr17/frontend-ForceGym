@@ -132,7 +132,7 @@ export type Client = {
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
     expirationMembershipDate: Date
-    emergencyContact: string
+    phoneNumberContactEmergency: string
     nameEmergencyContact: string
     signatureImage: string
     isDeleted: number
