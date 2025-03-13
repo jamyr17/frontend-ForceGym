@@ -44,7 +44,7 @@ function DataInfo() {
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>GRASA VISCERAL (%)</strong></p>
-                    <p>{measurement.bmi} %</p>
+                    <p>{measurement.visceralFatPercentage} %</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">

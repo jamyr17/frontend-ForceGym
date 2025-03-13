@@ -96,7 +96,7 @@ function Form() {
             onSubmit={handleSubmit(submitForm)}
         >
             <legend className="uppercase text-center text-yellow text-2xl font-black border-b-2 py-2 border-yellow">
-                {activeEditingId ? 'Actualizar medida' : 'Registrar medida'}
+                {activeEditingId ? 'Actualizar medida corporal' : 'Registrar medida corporal'}
             </legend>
 
             {/* inputs ocultos para la funcionalidad de actualizar */}
@@ -107,7 +107,7 @@ function Form() {
             />
             <input  
                 id="idClient" 
-                type="hidden" 
+                type="hidden"
                 {...register('idClient')}
             />
             <input  
@@ -151,8 +151,8 @@ function Form() {
                     type="text" 
                     placeholder="Ingrese el peso" 
                     {...register('weight', {
-                        required: 'El voucher es obligatorio',
-                        maxLength: {
+                        required: 'El peso es obligatorio',
+                        min: {
                             value: 1,
                             message: `Debe ingresar un peso valido`
                         }
@@ -178,7 +178,7 @@ function Form() {
                     placeholder="Ingrese la Altura" 
                     {...register('height', {
                         required: 'La altura es obligatoria',
-                        maxLength: {
+                        min: {
                             value: 1,
                             message: `Debe ingresar un valor valido`
                         }
@@ -282,7 +282,7 @@ function Form() {
                     type="neckSize" 
                     placeholder="Ingrese la medida del cuello" 
                     {...register('neckSize', {
-                        required: 'La la medida del cuello es obligatoria', 
+                        required: 'La medida del cuello es obligatoria', 
                         min: {
                             value: 1,
                             message: `Debe ingresar un valor válido`
@@ -360,7 +360,7 @@ function Form() {
                     type="waistSize" 
                     placeholder="Ingrese la medida de la cintura" 
                     {...register('waistSize', {
-                        required: 'La medidad de la cintura es obligatoria', 
+                        required: 'La medida de la cintura es obligatoria', 
                         min: {
                             value: 1,
                             message: `Debe ingresar un valor válido`

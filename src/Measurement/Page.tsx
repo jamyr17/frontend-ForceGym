@@ -118,7 +118,7 @@ function MeasurementManagement() {
                                         <td className="py-2">{formatDate(new Date(measurement.measurementDate))}</td>
                                         <td className="py-2">{measurement.weight}</td>
                                         <td className="py-2">{measurement.height}</td>
-                                        <td className="py-2">{measurement.bmi}</td>
+                                        <td className="py-2">{measurement.muscleMass}</td>
                                         <td className="py-2">{measurement.bodyFatPercentage}</td>
                                         <td className="py-2">{measurement.visceralFatPercentage}</td>
                                         <td className="flex gap-4 justify-center py-2">

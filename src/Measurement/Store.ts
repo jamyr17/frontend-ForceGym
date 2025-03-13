@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Measurement, MeasurementDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
+import { format } from 'date-fns';
+import { isCompleteDate } from "../shared/utils/validation";
 
 type MeasurementStore = {
     measurements: Measurement[];
@@ -17,6 +19,8 @@ type MeasurementStore = {
     searchType: number;
     searchTerm: string;
     filterByStatus: string;
+    filterByDateRangeMax: Date | null;
+    filterByDateRangeMin: Date | null;
 
     fetchMeasurements: () => Promise<any>;
     getMeasurementById: (id: number) => void;
@@ -31,6 +35,8 @@ type MeasurementStore = {
     changeSearchType: (newSearchType: number) => void;
     changeSearchTerm: (newSearchTerm: string) => void;
     changeFilterByStatus: (newFilterByStatus: string) => void;
+    changeFilterByDateRangeMax: (newFilter: Date | null) => void;
+    changeFilterByDateRangeMin: (newFilter: Date | null) => void;
 
     showModalForm: () => void;
     closeModalForm: () => void;
@@ -55,6 +61,8 @@ export const useMeasurementStore = create<MeasurementStore>()(
         searchType: 1,
         searchTerm: '',
         filterByStatus: '',
+        filterByDateRangeMax: null,
+        filterByDateRangeMin: null ,
 
         fetchMeasurements: async () => {
             const state = useMeasurementStore.getState();
@@ -68,6 +76,13 @@ export const useMeasurementStore = create<MeasurementStore>()(
             }
             if (state.filterByStatus !== '') {
                 filters += `&filterByStatus=${state.filterByStatus}`;
+            }if (
+                    isCompleteDate(state.filterByDateRangeMax) &&
+                    isCompleteDate(state.filterByDateRangeMin)
+                ) {
+                    const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
+                    const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                    filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
             }
 
             const result = await getData(
@@ -104,6 +119,8 @@ export const useMeasurementStore = create<MeasurementStore>()(
         changeSearchType: (newSearchType) => set(() => ({ searchType: newSearchType })),
         changeSearchTerm: (newSearchTerm) => set(() => ({ searchTerm: newSearchTerm })),
         changeFilterByStatus: (newFilterByStatus) => set(() => ({ filterByStatus: newFilterByStatus })),
+        changeFilterByDateRangeMax: (newFilter) => set(() => ({ filterByDateRangeMax: newFilter })),
+        changeFilterByDateRangeMin: (newFilter) => set(() => ({ filterByDateRangeMin: newFilter })),
 
         showModalForm: () => set(() => ({ modalForm: true })),
         closeModalForm: () => set(() => ({ modalForm: false })),
