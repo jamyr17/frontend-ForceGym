@@ -8,6 +8,7 @@ import ProductInventoryManagement from "../Product/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
+import NotificationTemplateManagement from "../TemplateNotification/Page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -65,6 +66,12 @@ function PrivateRoutes () {
                 path="clientes" 
                 element={
                     <ClientManagement/>
+                }
+            />
+            <Route 
+                path="plantillas-notificacion" 
+                element={
+                    <NotificationTemplateManagement/>
                 }
             />
         </Routes>
