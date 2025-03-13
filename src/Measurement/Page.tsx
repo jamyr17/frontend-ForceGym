@@ -14,6 +14,8 @@ import { useNavigate } from "react-router";
 import { useMeasurement } from "./useMeasurement";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
+import { mapMeasurementToDataForm } from "../shared/types/mapper";
+import { FilterButton, FilterSelect } from "./Filter";
 
 function MeasurementManagement() {
     const {
@@ -58,15 +60,9 @@ function MeasurementManagement() {
     return (
         <div className="bg-black h-full w-full">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
-                <h1 className="text-4xl uppercase">MEDICIONES</h1>
-                <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={function (newSearchType: number): void {
-                    throw new Error("Function not implemented.");
-                } } children={undefined} />
-                <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={function (): JSX.Element {
-                    throw new Error("Function not implemented.");
-                } } FilterSelect={function (): JSX.Element {
-                    throw new Error("Function not implemented.");
-                } } />
+                <h1 className="text-4xl uppercase">MEDIDAS</h1>
+                
+                <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
 
             <main className="justify-items-center ml-12 p-4">
@@ -141,7 +137,7 @@ function MeasurementManagement() {
                                                 <MdModeEdit className="text-white" />
                                             </button>
                                             {measurement.isDeleted ? (
-                                                <button onClick={() => handleRestore(measurement)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
+                                                <button onClick={() => handleRestore(mapMeasurementToDataForm(measurement))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                                 </button>
                                             ) : (
