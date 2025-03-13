@@ -3,6 +3,7 @@ import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp , MdTrendingDown   } from 'react-icons/md';
+import { TbBellCog } from "react-icons/tb";
 import { Link } from 'react-router';
 import { getAuthUser } from '../utils/authentication';
 
@@ -70,6 +71,12 @@ function AsideBar() {
         title="Inventario">
           <MdOutlineInventory />
           {isOpen && <p>Inventario</p>}
+        </Link>
+
+        <Link  to={'/gestion/plantillas-notificacion'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
+        title="Plantillas de Notificaciones">
+          <TbBellCog />
+          {isOpen && <p>Plantillas</p>}
         </Link>
       </div>
 
