@@ -8,11 +8,12 @@ import { useClientStore } from './Store'
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { formatDate } from "../shared/utils/format";
 import { IoIosMore } from "react-icons/io";
+import { LuPencilRuler } from "react-icons/lu";
 import { mapClientToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useClient } from "./useClient";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
@@ -53,6 +54,7 @@ function ClientManagement() {
         closeModalInfo,
     } = useClientStore()
 
+    
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useClient()
     const navigate = useNavigate()
 
@@ -184,6 +186,7 @@ function ClientManagement() {
                                     closeModal={closeModalInfo}
                                     Content={DataInfo}
                                 />
+                                
                                 <button
                                     onClick={() => {
                                         getClientById(client.idClient);
@@ -194,6 +197,21 @@ function ClientManagement() {
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
+
+                                   
+
+                                                                
+                                <Link 
+                                    to={{
+                                        pathname: '/gestion/medidas',
+                                        state: { idClient: client.idClient }
+                                    }}
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Ver medidas"
+                                >
+                                    <LuPencilRuler className="text-white" />
+                                </Link>
+
                                 {client.isDeleted ? (
                                     <button onClick={() => handleRestore(mapClientToDataForm(client))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
