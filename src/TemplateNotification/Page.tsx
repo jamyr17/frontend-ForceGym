@@ -30,6 +30,7 @@ function NotificationTemplateManagement() {
         searchType,
         searchTerm,
         filterByStatus,
+        filterByNotificationType,
         fetchNotificationTemplates,
         getNotificationTemplateById,
         changePage,
@@ -42,7 +43,7 @@ function NotificationTemplateManagement() {
         closeModalInfo,
     } = useNotificationTemplateStore();
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useNotificationTemplate()
+    //const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useNotificationTemplate()
     const navigate = useNavigate()
 
     useEffect(() => {}, [notificationTemplates])
@@ -60,7 +61,7 @@ function NotificationTemplateManagement() {
         }
         
         fetchData()
-    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus])
+    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByNotificationType])
 
     return (
         <div className="bg-black h-full w-full">
