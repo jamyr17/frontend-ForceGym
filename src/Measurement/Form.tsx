@@ -4,7 +4,7 @@ import { MeasurementDataForm } from "../shared/types";
 import ErrorForm from "../shared/components/ErrorForm";
 import useMeasurementStore from "./Store";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { formatDate } from "../shared/utils/format";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 
@@ -12,7 +12,9 @@ const MAXDATE = new Date().toUTCString()
 
 function Form() {
     const navigate = useNavigate();
-    const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<MeasurementDataForm>();
+    const location = useLocation(); 
+    const idClient = location.state?.idClient;
+    const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<MeasurementDataForm>();
     const { measurements, activeEditingId, fetchMeasurements, addMeasurement, updateMeasurement, closeModalForm } = useMeasurementStore();
     
     const submitForm = async (data: MeasurementDataForm) => {
@@ -108,6 +110,7 @@ function Form() {
             <input  
                 id="idClient" 
                 type="hidden"
+                value={idClient}
                 {...register('idClient')}
             />
             <input  

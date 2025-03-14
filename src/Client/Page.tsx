@@ -197,15 +197,10 @@ function ClientManagement() {
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
-
-                                   
-
-                                                                
+                           
                                 <Link 
-                                    to={{
-                                        pathname: '/gestion/medidas',
-                                        state: { idClient: client.idClient }
-                                    }}
+                                    to="/gestion/medidas"
+                                    state={{ idClient: client.idClient }}
                                     className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
                                     title="Ver medidas"
                                 >

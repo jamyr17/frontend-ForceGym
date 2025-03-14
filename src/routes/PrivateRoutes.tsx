@@ -9,6 +9,7 @@ import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
 import NotificationTemplateManagement from "../TemplateNotification/Page";
+import MeasurementManagement from "../Measurement/Page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -67,6 +68,12 @@ function PrivateRoutes () {
                 path="clientes" 
                 element={
                     <ClientManagement/>
+                }
+            />
+            <Route 
+                path="medidas" 
+                element={
+                    <MeasurementManagement/>
                 }
             />
             <Route 
