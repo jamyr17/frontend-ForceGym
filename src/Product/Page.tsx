@@ -16,6 +16,9 @@ import Form from "./Form";
 import { useProductInventory } from "./useProduct";
 import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 function ProductInventoryManagement() {
     const {
@@ -49,6 +52,27 @@ function ProductInventoryManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useProductInventory()
     const navigate = useNavigate()
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.text("Inventario de Productos", 14, 10);
+    
+        const tableColumn = ["#", "CÓDIGO", "NOMBRE", "CANTIDAD", "COSTO"];
+        const tableRows = productsInventory.map((product, index) => [
+            index + 1,
+            product.code,
+            product.name,
+            product.quantity,
+            formatAmountToCRC(product.cost),
+        ]);
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+    
+    
+        doc.save("Inventario.pdf");
+    };
 
     useEffect(() => {}, [productsInventory])
     
@@ -98,9 +122,10 @@ function ProductInventoryManagement() {
                         />
 
                         {productsInventory?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
-                        </button>
+                         <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                         <MdOutlineFileDownload /> Descargar
+                         </button>
+             
                         }
                     </div>
                     
