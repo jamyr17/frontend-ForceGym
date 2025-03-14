@@ -12,7 +12,7 @@ import NotificationTemplateManagement from "../TemplateNotification/Page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
-    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories } = useCommonDataStore()
+    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes } = useCommonDataStore()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -23,8 +23,9 @@ function PrivateRoutes () {
             const resultGenders = await fetchGenders()
             const resultTypesClient = await fetchTypesClient()
             const resultCategories = await fetchCategories()
+            const resultNotificationTypes = await fetchNotificationTypes()
 
-            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout || resultGenders.logout || resultTypesClient.logout || resultCategories.logout){
+            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout || resultGenders.logout || resultTypesClient.logout || resultCategories.logout || resultNotificationTypes.logout){
                 setAuthHeader(null)
                 setAuthUser(null)
                 navigate('/login', {replace: true})
