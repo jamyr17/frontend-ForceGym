@@ -16,6 +16,8 @@ import { useNavigate } from "react-router";
 import { useEconomicExpense } from "./useExpense";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function EconomicExpenseManagement() {
     const {
@@ -51,6 +53,28 @@ function EconomicExpenseManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicExpense()
     const navigate = useNavigate()
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.setFont("helvetica");
+        doc.text("Reporte de Gastos", 14, 10);
+
+        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
+        const tableRows = economicExpenses.map((expense, index) => [
+            index + 1,
+            expense.voucherNumber || "No adjunto",
+            formatDate(new Date(expense.registrationDate)),
+            formatAmountToCRC(expense.amount), 
+            expense.meanOfPayment.name,
+            expense.category.name
+        ]);
+        autoTable(doc, { 
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+
+        doc.save("gastos.pdf");
+    };
 
     useEffect(() => {}, [economicExpenses])
     
@@ -100,9 +124,11 @@ function EconomicExpenseManagement() {
                         />
 
                         {economicExpenses?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
-                        </button>
+                     <button 
+                          onClick={exportToPDF} 
+                          className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                          <MdOutlineFileDownload /> Descargar
+                      </button>
                         }
                     </div>
                     
