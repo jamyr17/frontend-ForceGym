@@ -17,6 +17,8 @@ import { useNavigate, Link } from "react-router";
 import { useClient } from "./useClient";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function ClientManagement() {
     const {
@@ -57,7 +59,28 @@ function ClientManagement() {
     
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useClient()
     const navigate = useNavigate()
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.text("Reporte de Clientes", 14, 10);
 
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha de Registro", "Tipo de Cliente"];
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name,
+        ]);
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+
+        doc.save("Clientes.pdf");
+    };
+    
     useEffect(() => {}, [clients])
     
         useEffect(() => {
@@ -106,11 +129,12 @@ function ClientManagement() {
                             Content={Form}
                         />
 
-                        {clients?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+
+                        {clients?.length > 0 && (
+                        <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
                             <MdOutlineFileDownload /> Descargar
                         </button>
-                        }
+                        )}
                     </div>
                     
                     {clients?.length>0 ? (
