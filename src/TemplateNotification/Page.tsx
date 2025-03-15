@@ -43,7 +43,7 @@ function NotificationTemplateManagement() {
         closeModalInfo,
     } = useNotificationTemplateStore();
 
-    //const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useNotificationTemplate()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useNotificationTemplate()
     const navigate = useNavigate()
 
     useEffect(() => {}, [notificationTemplates])
@@ -66,10 +66,10 @@ function NotificationTemplateManagement() {
     return (
         <div className="bg-black h-full w-full">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
-                <h1 className="text-4xl uppercase">Plantillas de Notificación</h1>
+                <h1 className="text-4xl uppercase">Plantillas</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Mensaje</option>
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Usuario creador</option>
+                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Usuario</option>
                 </SearchInput>
                 <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>

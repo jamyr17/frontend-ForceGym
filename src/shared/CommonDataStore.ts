@@ -77,7 +77,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
 
         fetchNotificationTypes: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}notificationType/list`)
-            set(() => ({ notificationTypes: result.data }))
+            set(() => ({ notificationTypes: result.data.notificationTypes }))
             return result
         }
     })

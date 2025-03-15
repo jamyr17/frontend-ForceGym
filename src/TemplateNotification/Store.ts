@@ -62,7 +62,7 @@ export const useNotificationTemplateStore = create<NotificationTemplateStore>()(
         filterByDateRangeMax: null,
         filterByDateRangeMin: null ,
         filterByMeanOfPayment: 0,
-        filterByCategory: -1,
+        filterByNotificationType: 0,
 
         fetchNotificationTemplates: async () => {
             const state = useNotificationTemplateStore.getState();
@@ -78,7 +78,7 @@ export const useNotificationTemplateStore = create<NotificationTemplateStore>()(
             if (state.filterByStatus !== '') {
                 filters += `&filterByStatus=${state.filterByStatus}`;
             }
-            if (state.filterByNotificationType !== -1) {
+            if (state.filterByNotificationType !== 0) {
                 filters += `&filterByNotificationType=${state.filterByNotificationType}`;
             }
 
