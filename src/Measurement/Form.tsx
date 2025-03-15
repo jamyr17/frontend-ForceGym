@@ -146,13 +146,13 @@ function Form() {
 
             <div className="mb-5">
                 <label htmlFor="weight" className="text-sm uppercase font-bold">
-                    Peso
+                    Peso (KG)
                 </label>
                 <input  
                     id="weight"
                     className="w-full p-3 border border-gray-100"  
-                    type="text" 
-                    placeholder="Ingrese el peso" 
+                    type="number" 
+                    placeholder="Ingrese el peso en kilogramos (KG)" 
                     {...register('weight', {
                         required: 'El peso es obligatorio',
                         min: {
@@ -172,13 +172,13 @@ function Form() {
 
             <div className="mb-5">
                 <label htmlFor="height" className="text-sm uppercase font-bold">
-                    Altura
+                    Altura (CM)
                 </label>
                 <input  
                     id="height"
                     className="w-full p-3 border border-gray-100"  
-                    type="text" 
-                    placeholder="Ingrese la Altura" 
+                    type="number" 
+                    placeholder="Ingrese la Altura en centimetros (CM)" 
                     {...register('height', {
                         required: 'La altura es obligatoria',
                         min: {
@@ -204,7 +204,7 @@ function Form() {
                 <input  
                     id="muscleMass"
                     className="w-full p-3 border border-gray-100"  
-                    type="muscleMass" 
+                    type="number" 
                     placeholder="Ingrese la masa muscular" 
                     {...register('muscleMass', {
                         required: 'La masa muscular es obligatoria', 
@@ -230,7 +230,7 @@ function Form() {
                 <input  
                     id="bodyFatPercentage"
                     className="w-full p-3 border border-gray-100"  
-                    type="bodyFatPercentage" 
+                    type="number" 
                     placeholder="Ingrese la el porcentaje de grasa" 
                     {...register('bodyFatPercentage', {
                         required: 'El porcentaje de grasa es obligatorio', 
@@ -256,7 +256,7 @@ function Form() {
                 <input  
                     id="visceralFatPercentage"
                     className="w-full p-3 border border-gray-100"  
-                    type="visceralFatPercentage" 
+                    type="number" 
                     placeholder="Ingresar el porcentaje de grasa viceral" 
                     {...register('visceralFatPercentage', {
                         required: 'El porcentaje de grasa viceral es obligatorio', 
@@ -282,7 +282,7 @@ function Form() {
                 <input  
                     id="neckSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="neckSize" 
+                    type="number" 
                     placeholder="Ingrese la medida del cuello" 
                     {...register('neckSize', {
                         required: 'La medida del cuello es obligatoria', 
@@ -308,7 +308,7 @@ function Form() {
                 <input  
                     id="shoulderSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="shoulderSize" 
+                    type="number" 
                     placeholder="Ingrese la medida de los hombros" 
                     {...register('shoulderSize', {
                         required: 'La medida de los hombros es obligatoria', 
@@ -334,7 +334,7 @@ function Form() {
                 <input  
                     id="chestSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="chestSize" 
+                    type="number" 
                     placeholder="Ingrese la medida del pecho" 
                     {...register('chestSize', {
                         required: 'La medida del pecho es obligatoria', 
@@ -360,7 +360,7 @@ function Form() {
                 <input  
                     id="waistSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="waistSize" 
+                    type="number" 
                     placeholder="Ingrese la medida de la cintura" 
                     {...register('waistSize', {
                         required: 'La medida de la cintura es obligatoria', 
@@ -386,7 +386,7 @@ function Form() {
                 <input  
                     id="thighSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="thighSize" 
+                    type="number" 
                     placeholder="Ingrese la medida del muslo" 
                     {...register('thighSize', {
                         required: 'La medida del muslo es obligatoria', 
@@ -412,7 +412,7 @@ function Form() {
                 <input  
                     id="calfSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="calfSize" 
+                    type="number" 
                     placeholder="Ingrese la medida de la pantorrilla" 
                     {...register('calfSize', {
                         required: 'La medida de la pantorrilla es obligatoria', 
@@ -438,7 +438,7 @@ function Form() {
                 <input  
                     id="forearmSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="forearmSize" 
+                    type="number" 
                     placeholder="Ingrese la medida del antebrazo" 
                     {...register('forearmSize', {
                         required: 'La medida del antebrazo es obligatoria', 
@@ -464,7 +464,7 @@ function Form() {
                 <input  
                     id="armSize"
                     className="w-full p-3 border border-gray-100"  
-                    type="armSize" 
+                    type="number" 
                     placeholder="Ingrese la medida del brazo" 
                     {...register('armSize', {
                         required: 'La medida del brazo es obligatoria', 
