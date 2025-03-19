@@ -30,10 +30,11 @@ function Form() {
         let action = '', result
         const loggedUser = getAuthUser()
         const reqUser = {
-            ...data, 
+            ...data,
+            password: data.password ? data.password : null, 
             paramLoggedIdUser: loggedUser?.idUser
-        }
-        
+        };
+    
         // si el editingId está en 0 significa que se está agregando 
         if(activeEditingId==0){
             result = await addUser(reqUser)
@@ -379,7 +380,7 @@ function Form() {
                     type="password" 
                     placeholder="Ingrese la contraseña" 
                     {...register('password', {
-                        required: 'La contraseña es obligatoria'
+                        required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false
                     })}
                 />
 
