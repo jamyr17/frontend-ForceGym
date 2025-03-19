@@ -53,6 +53,7 @@ function EconomicExpenseManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicExpense()
     const navigate = useNavigate()
+    
     const exportToPDF = () => {
         const doc = new jsPDF();
         doc.setFont("helvetica");
