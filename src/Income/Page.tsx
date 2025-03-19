@@ -55,8 +55,7 @@ function EconomicIncomeManagement() {
     const navigate = useNavigate()
 
     const exportToPDF = () => {
-        const doc = new jsPDF();
-    
+        const doc = new jsPDF();   
         doc.setFont("helvetica");
         doc.text("Reporte de Ingresos Económicos", 14, 10);
     
@@ -129,7 +128,7 @@ function EconomicIncomeManagement() {
                             Content={Form}
                         />
 
-                        {economicIncomes?.length>0 &&
+                       {economicIncomes?.length>0 &&
                          <button 
                          onClick={exportToPDF} 
                          className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
