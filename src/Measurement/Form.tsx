@@ -66,12 +66,12 @@ function Form() {
 
     useEffect(() => {
         if (activeEditingId) {
-            const activeMeasurement = measurements.find(m => m.idMeasurement === activeEditingId)
+            const activeMeasurement = measurements.find(m => m.idClient === activeEditingId)
             if (activeMeasurement) {
                 
 
                 setValue('idMeasurement', activeMeasurement.idMeasurement)
-                setValue('idClient', activeMeasurement.client.idClient)
+                setValue('idClient', activeMeasurement.idClient)
                 setValue('isDeleted', activeMeasurement.isDeleted)
                 setValue('measurementDate', activeMeasurement.measurementDate)
                 setValue('weight', activeMeasurement.weight)

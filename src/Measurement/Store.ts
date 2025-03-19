@@ -6,11 +6,13 @@ import { format } from 'date-fns';
 import { isCompleteDate } from "../shared/utils/validation";
 
 type MeasurementStore = {
+    idClient: number;
+    setIdClient: (id: number) => void;
     measurements: Measurement[];
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
-    activeEditingId: Measurement['idMeasurement'];
+    activeEditingId: Measurement['idClient'];
     size: number;
     page: number;
     totalRecords: number;
@@ -23,7 +25,7 @@ type MeasurementStore = {
     filterByDateRangeMin: Date | null;
 
     fetchMeasurements: () => Promise<any>;
-    getMeasurementById: (id: number) => void;
+    getMeasurementById: (idClient: number) => void;
     addMeasurement: (data: MeasurementDataForm) => Promise<any>;
     updateMeasurement: (data: MeasurementDataForm) => Promise<any>;
     deleteMeasurement: (id: number, loggedIdUser: number) => Promise<any>;
@@ -47,7 +49,10 @@ type MeasurementStore = {
 };
 
 export const useMeasurementStore = create<MeasurementStore>()(
+    
     devtools((set) => ({
+        idClient: 0,
+        setIdClient: (id) => set(() => ({ idClient: id })),
         measurements: [],
         modalForm: false,
         modalFilter: false,
@@ -67,7 +72,6 @@ export const useMeasurementStore = create<MeasurementStore>()(
         fetchMeasurements: async () => {
             const state = useMeasurementStore.getState();
             let filters = `&searchType=${state.searchType}`;
-
             if (state.searchTerm !== '') {
                 filters += `&searchTerm=${state.searchTerm}`;
             }
@@ -86,7 +90,7 @@ export const useMeasurementStore = create<MeasurementStore>()(
             }
 
             const result = await getData(
-                `${import.meta.env.VITE_URL_API}measurement/list?size=${state.size}&page=${state.page}${filters}`
+                `${import.meta.env.VITE_URL_API}measurement/list?idClient=${state.idClient}&size=${state.size}&page=${state.page}${filters}`
             );
 
             set({ measurements: result.data?.measurements ?? [], totalRecords: result.data?.totalRecords ?? 0 });
