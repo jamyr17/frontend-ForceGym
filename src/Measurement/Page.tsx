@@ -16,6 +16,8 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import { mapMeasurementToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function MeasurementManagement() {
     const {
@@ -42,6 +44,31 @@ function MeasurementManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useMeasurement();
     const navigate = useNavigate();
+    
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.text("Medidas Corporales", 14, 10);
+
+        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
+
+        const tableRows = measurements.map((measurement, index) => [
+            index + 1,
+            formatDate(new Date(measurement.measurementDate)),
+            measurement.weight,
+            measurement.height,
+            measurement.muscleMass,
+            measurement.bodyFatPercentage,
+            measurement.visceralFatPercentage,
+        ]);
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+
+        doc.save("Medidas_Corporales.pdf");
+    };
 
     useEffect(() => {}, [measurements]);
     
@@ -85,9 +112,9 @@ function MeasurementManagement() {
                         />
 
                         {measurements?.length > 0 && (
-                            <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                                <MdOutlineFileDownload /> Descargar
-                            </button>
+                         <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                         <MdOutlineFileDownload /> Descargar
+                         </button>
                         )}
                     </div>
                     
