@@ -75,24 +75,29 @@ function ProductInventoryManagement() {
     
         doc.save("Inventario.pdf");
     };
+    
     const exportToExcel = () => {
-        // Formatear los datos
-        const formattedData = productsInventory.map((product, index) => ({
-            '#': index + 1,
-            'Código': product.code,
-            'Nombre': product.name,
-            'Cantidad': product.quantity,
-            'Costo': formatAmountToCRC(product.cost),
-        }));
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
     
-        // Crear la hoja
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos Inventario');
+        // Mapeo de los datos
+        const tableRows = productsInventory.map((product, index) => [
+            index + 1,
+            product.code,
+            product.name,
+            product.quantity,
+            product.cost 
+        ]);
     
-        // Descargar el archivo Excel
-        XLSX.writeFile(workbook, 'Inventario_Productos.xlsx');
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Productos Inventario");
+    
+        // Descargar
+        XLSX.writeFile(wb, "Inventario_Productos.xlsx");
     };
+    
 
     useEffect(() => {}, [productsInventory])
     

@@ -18,6 +18,8 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+
 
 function EconomicExpenseManagement() {
     const {
@@ -77,6 +79,30 @@ function EconomicExpenseManagement() {
         doc.save("gastos.pdf");
     };
 
+    const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
+
+        // Mapeo de los datos
+        const tableRows = economicExpenses.map((expense, index) => [
+            index + 1,
+            expense.voucherNumber !== '' ? expense.voucherNumber : "No adjunto",
+            formatDate(new Date(expense.registrationDate)),
+            expense.amount, 
+            expense.meanOfPayment.name,
+            expense.category.name,
+        ]);
+
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Gastos Económicos");
+
+        // Descargar
+        XLSX.writeFile(wb, "gastos.xlsx");
+    };
+
+
     useEffect(() => {}, [economicExpenses])
     
         useEffect(() => {
@@ -124,13 +150,20 @@ function EconomicExpenseManagement() {
                             Content={Form}
                         />
 
-                        {economicExpenses?.length>0 &&
-                     <button 
-                          onClick={exportToPDF} 
-                          className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                          <MdOutlineFileDownload /> Descargar
-                      </button>
-                        }
+                     {economicExpenses?.length > 0 && (
+                            <div className="flex gap-2">
+                            <button 
+                                onClick={exportToPDF} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                         <MdOutlineFileDownload /> Descargar PDF
+                            </button>
+                            <button 
+                                onClick={exportToExcel} 
+                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar Excel
+                                </button>
+                            </div>
+                           )} 
                     </div>
                     
                     {economicExpenses?.length>0 ? (
