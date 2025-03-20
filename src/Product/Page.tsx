@@ -18,6 +18,8 @@ import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
+
 
 
 function ProductInventoryManagement() {
@@ -73,6 +75,24 @@ function ProductInventoryManagement() {
     
         doc.save("Inventario.pdf");
     };
+    const exportToExcel = () => {
+        // Formatear los datos
+        const formattedData = productsInventory.map((product, index) => ({
+            '#': index + 1,
+            'Código': product.code,
+            'Nombre': product.name,
+            'Cantidad': product.quantity,
+            'Costo': formatAmountToCRC(product.cost),
+        }));
+    
+        // Crear la hoja
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos Inventario');
+    
+        // Descargar el archivo Excel
+        XLSX.writeFile(workbook, 'Inventario_Productos.xlsx');
+    };
 
     useEffect(() => {}, [productsInventory])
     
@@ -120,13 +140,22 @@ function ProductInventoryManagement() {
                             closeModal={closeModalForm}
                             Content={Form}
                         />
+                        
+            {productsInventory?.length > 0 && (
+            <div className="flex gap-2">
+                <button 
+                    onClick={exportToPDF} 
+                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                    <MdOutlineFileDownload /> Descargar PDF
+                </button>
+                <button 
+                    onClick={exportToExcel} 
+                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                    <MdOutlineFileDownload /> Descargar Excel
+                </button>
+            </div>
+            )}          
 
-                        {productsInventory?.length>0 &&
-                         <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                         <MdOutlineFileDownload /> Descargar
-                         </button>
-             
-                        }
                     </div>
                     
                     {productsInventory?.length>0 ? (
