@@ -19,6 +19,7 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 function ClientManagement() {
     const {
@@ -80,6 +81,25 @@ function ClientManagement() {
 
         doc.save("Clientes.pdf");
     };
+
+    const exportToExcel = () => {
+        // Formatear los datos
+        const formattedData = clients.map((client, index) => ({
+            '#': index + 1,
+            'Cédula':  client.person.identificationNumber,
+            'Nombre': `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            'Fecha de Registro': formatDate(new Date(client.registrationDate)),
+            'Tipo de Cliente': client.typeClient.name,
+        }));
+    
+        // Crear la hoja
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos Inventario');
+    
+        // Descargar el archivo Excel
+        XLSX.writeFile(workbook, 'Clientes.xlsx');
+    };
     
     useEffect(() => {}, [clients])
     
@@ -130,12 +150,22 @@ function ClientManagement() {
                         />
 
 
-                        {clients?.length > 0 && (
-                        <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
+                    {clients?.length > 0 && (
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={exportToPDF} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar PDF
                         </button>
-                        )}
+                        <button 
+                            onClick={exportToExcel} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar Excel
+                        </button>
                     </div>
+                      )}          
+
+                    </div>     
                     
                     {clients?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
