@@ -61,46 +61,47 @@ function ClientManagement() {
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useClient()
     const navigate = useNavigate()
     const exportToPDF = () => {
-        const doc = new jsPDF();
+        const doc = new jsPDF();   
+        doc.setFont("helvetica");
         doc.text("Reporte de Clientes", 14, 10);
-
-        const tableColumn = ["#", "Cédula", "Nombre", "Fecha de Registro", "Tipo de Cliente"];
+    
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        
         const tableRows = clients.map((client, index) => [
             index + 1,
             client.person.identificationNumber,
             `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
             formatDate(new Date(client.registrationDate)),
-            client.typeClient.name,
+            client.typeClient.name
         ]);
-
-        autoTable(doc, {
+    
+        autoTable(doc, { 
             head: [tableColumn],
             body: tableRows,
             startY: 20,
         });
 
-        doc.save("Clientes.pdf");
+        doc.save("clientes.pdf");
     };
 
     const exportToExcel = () => {
-        // Formatear los datos
-        const formattedData = clients.map((client, index) => ({
-            '#': index + 1,
-            'Cédula':  client.person.identificationNumber,
-            'Nombre': `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
-            'Fecha de Registro': formatDate(new Date(client.registrationDate)),
-            'Tipo de Cliente': client.typeClient.name,
-        }));
-    
-        // Crear la hoja
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos Inventario');
-    
-        // Descargar el archivo Excel
-        XLSX.writeFile(workbook, 'Clientes.xlsx');
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name
+        ]);
+
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+
+        XLSX.writeFile(wb, "clientes.xlsx");
     };
     
+        
     useEffect(() => {}, [clients])
     
         useEffect(() => {
