@@ -16,6 +16,9 @@ import { FilterButton, FilterSelect } from "./Filter";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 function EconomicIncomeManagement() {
     const {
@@ -51,6 +54,54 @@ function EconomicIncomeManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicIncome()
     const navigate = useNavigate()
+
+    const exportToPDF = () => {
+        const doc = new jsPDF();   
+        doc.setFont("helvetica");
+        doc.text("Reporte de Ingresos Económicos", 14, 10);
+    
+        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago"];
+        
+        const tableRows = economicIncomes.map((income, index) => [
+            index + 1,
+            income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
+            `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
+            formatDate(new Date(income.registrationDate)),
+            formatAmountToCRC(income.amount),  // Aquí formateas con ₡
+            income.meanOfPayment.name,
+        ]);
+    
+         autoTable(doc, { 
+             head: [tableColumn],
+             body: tableRows,
+             startY: 20,
+         });
+
+        doc.save("ingresos.pdf");
+    };
+    const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago"];
+    
+        // Mapeo de los datos
+        const tableRows = economicIncomes.map((income, index) => [
+            index + 1,
+            income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
+            `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
+            formatDate(new Date(income.registrationDate)),
+            income.amount, 
+            income.meanOfPayment.name,
+        ]);
+    
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Ingresos Económicos");
+    
+        // Descargar
+        XLSX.writeFile(wb, "ingresos.xlsx");
+    };
+    
 
     useEffect(() => {}, [economicIncomes])
     
@@ -100,12 +151,22 @@ function EconomicIncomeManagement() {
                             Content={Form}
                         />
 
-                        {economicIncomes?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
+                                        
+                    {economicIncomes?.length > 0 && (
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={exportToPDF} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar PDF
                         </button>
-                        }
+                        <button 
+                            onClick={exportToExcel} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar Excel
+                        </button>
                     </div>
+                    )} 
+                </div>
                     
                     {economicIncomes?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
