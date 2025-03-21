@@ -19,6 +19,7 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 function ClientManagement() {
     const {
@@ -60,27 +61,47 @@ function ClientManagement() {
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useClient()
     const navigate = useNavigate()
     const exportToPDF = () => {
-        const doc = new jsPDF();
+        const doc = new jsPDF();   
+        doc.setFont("helvetica");
         doc.text("Reporte de Clientes", 14, 10);
-
-        const tableColumn = ["#", "Cédula", "Nombre", "Fecha de Registro", "Tipo de Cliente"];
+    
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        
         const tableRows = clients.map((client, index) => [
             index + 1,
             client.person.identificationNumber,
             `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
             formatDate(new Date(client.registrationDate)),
-            client.typeClient.name,
+            client.typeClient.name
         ]);
-
-        autoTable(doc, {
+    
+        autoTable(doc, { 
             head: [tableColumn],
             body: tableRows,
             startY: 20,
         });
 
-        doc.save("Clientes.pdf");
+        doc.save("clientes.pdf");
+    };
+
+    const exportToExcel = () => {
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name
+        ]);
+
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+
+        XLSX.writeFile(wb, "clientes.xlsx");
     };
     
+        
     useEffect(() => {}, [clients])
     
         useEffect(() => {
@@ -130,12 +151,22 @@ function ClientManagement() {
                         />
 
 
-                        {clients?.length > 0 && (
-                        <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
+                    {clients?.length > 0 && (
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={exportToPDF} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar PDF
                         </button>
-                        )}
+                        <button 
+                            onClick={exportToExcel} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar Excel
+                        </button>
                     </div>
+                      )}          
+
+                    </div>     
                     
                     {clients?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
