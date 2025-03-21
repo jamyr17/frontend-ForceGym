@@ -35,6 +35,9 @@ function MeasurementManagement() {
         orderBy,
         directionOrderBy,
         searchTerm,
+        filterByStatus,
+        filterByDateRangeMin,
+        filterByDateRangeMax,
         fetchMeasurements,
         getMeasurementById,
         changePage,
@@ -53,7 +56,7 @@ function MeasurementManagement() {
         }
     }, [idClient]);
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useMeasurement();
+    const { handleDelete, handleOrderByChange, handleRestore } = useMeasurement();
     
     const exportToPDF = () => {
         const doc = new jsPDF();
@@ -94,7 +97,7 @@ function MeasurementManagement() {
         if (idClient) {  // Solo traer datos si hay un idClient seleccionado
             fetchData();
         }
-    }, [idClient, page, size, searchTerm, orderBy, directionOrderBy]);
+    }, [idClient, page, size, searchTerm, orderBy, filterByStatus, filterByDateRangeMin, filterByDateRangeMax, directionOrderBy]);
 
     return (
         <div className="bg-black h-full w-full">
@@ -163,7 +166,14 @@ function MeasurementManagement() {
                                         <td className="flex gap-4 justify-center py-2">
                                             <Modal
                                                 Button={() => (
-                                                    <button onClick={() => { getMeasurementById(measurement.idClient); showModalInfo(); }} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                                    <button
+                                                        onClick={() => {
+                                                            getMeasurementById(measurement.idMeasurement);
+                                                            showModalInfo();
+                                                        }}
+                                                        className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                        title="Ver detalles"
+                                                    >
                                                         <IoIosMore className="text-white" />
                                                     </button>
                                                 )}
@@ -172,9 +182,16 @@ function MeasurementManagement() {
                                                 closeModal={closeModalInfo}
                                                 Content={DataInfo}
                                             />
-                                            <button onClick={() => { getMeasurementById(measurement.idClient); showModalForm(); }} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer" title="Editar">
-                                                <MdModeEdit className="text-white" />
-                                            </button>
+                                            <button
+                                    onClick={() => {
+                                        getMeasurementById(measurement.idMeasurement);
+                                        showModalForm();
+                                    }}
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
+                                >
+                                    <MdModeEdit className="text-white" />
+                                </button>
                                             {measurement.isDeleted ? (
                                                 <button onClick={() => handleRestore(mapMeasurementToDataForm(measurement))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                                     <MdOutlineSettingsBackupRestore className="text-white" />
