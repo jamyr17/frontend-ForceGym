@@ -5,7 +5,7 @@ function DataInfo() {
     const { measurements, activeEditingId } = useMeasurementStore();
     if (!activeEditingId) return <></>;
 
-    const measurement = measurements.find(m => m.idClient === activeEditingId);
+    const measurement = measurements.find(m => m.idMeasurement === activeEditingId);
     if (!measurement) return <></>;
 
     return (
