@@ -144,14 +144,12 @@ export type Client = {
 // --------------------------------------------------------
 export type Measurement = {
     idMeasurement: number
-    client: Client
-    user: User
+    idClient: number
     measurementDate: Date
     weight: number
     height: number
-    bmi: number
-    bodyFatPercentage: number
     muscleMass: number
+    bodyFatPercentage: number 
     visceralFatPercentage: number
     neckSize: number
     shoulderSize: number
@@ -164,9 +162,8 @@ export type Measurement = {
     isDeleted: number
 }
 
-export type MeasurementDataForm = Omit<Measurement, 'client' | 'user'> & {
+export type MeasurementDataForm = Omit<Measurement, 'client'> & {
     idClient: number
-    idUser: number
 }
 
 export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {

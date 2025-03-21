@@ -10,7 +10,7 @@ import { formatDate } from "../shared/utils/format";
 import { IoIosMore } from "react-icons/io";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useMeasurement } from "./useMeasurement";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
@@ -20,6 +20,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 function MeasurementManagement() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    
+    const idClient = location.state?.idClient;
     const {
         measurements,
         modalForm,
@@ -40,10 +44,16 @@ function MeasurementManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
+        setIdClient
     } = useMeasurementStore();
 
+    useEffect(() => {
+        if (idClient) {
+            setIdClient(idClient); // Guardamos idClient en la store
+        }
+    }, [idClient]);
+
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useMeasurement();
-    const navigate = useNavigate();
     
     const exportToPDF = () => {
         const doc = new jsPDF();
@@ -81,8 +91,10 @@ function MeasurementManagement() {
                 navigate('/login', { replace: true });
             }
         };
-        fetchData();
-    }, [page, size, searchTerm, orderBy, directionOrderBy]);
+        if (idClient) {  // Solo traer datos si hay un idClient seleccionado
+            fetchData();
+        }
+    }, [idClient, page, size, searchTerm, orderBy, directionOrderBy]);
 
     return (
         <div className="bg-black h-full w-full">
@@ -151,7 +163,7 @@ function MeasurementManagement() {
                                         <td className="flex gap-4 justify-center py-2">
                                             <Modal
                                                 Button={() => (
-                                                    <button onClick={() => { getMeasurementById(measurement.idMeasurement); showModalInfo(); }} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                                    <button onClick={() => { getMeasurementById(measurement.idClient); showModalInfo(); }} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
                                                         <IoIosMore className="text-white" />
                                                     </button>
                                                 )}
@@ -160,7 +172,7 @@ function MeasurementManagement() {
                                                 closeModal={closeModalInfo}
                                                 Content={DataInfo}
                                             />
-                                            <button onClick={() => { getMeasurementById(measurement.idMeasurement); showModalForm(); }} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer" title="Editar">
+                                            <button onClick={() => { getMeasurementById(measurement.idClient); showModalForm(); }} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer" title="Editar">
                                                 <MdModeEdit className="text-white" />
                                             </button>
                                             {measurement.isDeleted ? (
