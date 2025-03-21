@@ -59,8 +59,9 @@ function MeasurementManagement() {
     const { handleDelete, handleOrderByChange, handleRestore } = useMeasurement();
     
     const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text("Medidas Corporales", 14, 10);
+        const doc = new jsPDF(); 
+        doc.setFont("helvetica");
+        doc.text("Reporte de Medidas Corporales", 14, 10);
 
         const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
 
@@ -81,6 +82,10 @@ function MeasurementManagement() {
         });
 
         doc.save("Medidas_Corporales.pdf");
+    };
+
+        
+    const exportToExcel = () => {
     };
 
     useEffect(() => {}, [measurements]);
@@ -127,10 +132,19 @@ function MeasurementManagement() {
                         />
 
                         {measurements?.length > 0 && (
-                         <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                         <MdOutlineFileDownload /> Descargar
-                         </button>
-                        )}
+                            <div className="flex gap-2">
+                            <button 
+                                onClick={exportToPDF} 
+                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                <MdOutlineFileDownload /> Descargar PDF
+                            </button>
+                            <button 
+                                onClick={exportToExcel} 
+                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                <MdOutlineFileDownload /> Descargar Excel
+                            </button>
+                        </div>
+                        )}    
                     </div>
                     
                     {measurements?.length > 0 ? (
