@@ -4,10 +4,14 @@ import { ProductInventory, ProductInventoryDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useProductInventoryStore from "./Store"
 import { useNavigate } from "react-router"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
+import { formatAmountToCRC } from "../shared/utils/format"
 
 export const useProductInventory = () => {
     const navigate = useNavigate()
-    const { fetchProductsInventory, deleteProductInventory, updateProductInventory, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useProductInventoryStore()
+    const { productsInventory, fetchProductsInventory, deleteProductInventory, updateProductInventory, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useProductInventoryStore()
 
     const handleDelete = async ({ idProductInventory, name } : ProductInventory) => {
         await Swal.fire({
@@ -109,10 +113,56 @@ export const useProductInventory = () => {
         })
     }
 
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.text("Inventario de Productos", 14, 10);
+    
+        const tableColumn = ["#", "CÓDIGO", "NOMBRE", "CANTIDAD", "COSTO"];
+        const tableRows = productsInventory.map((product, index) => [
+            index + 1,
+            product.code,
+            product.name,
+            product.quantity,
+            formatAmountToCRC(product.cost),
+        ]);
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+    
+    
+        doc.save("Inventario.pdf");
+    };
+    
+    const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
+    
+        // Mapeo de los datos
+        const tableRows = productsInventory.map((product, index) => [
+            index + 1,
+            product.code,
+            product.name,
+            product.quantity,
+            product.cost 
+        ]);
+    
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Productos Inventario");
+    
+        // Descargar
+        XLSX.writeFile(wb, "Inventario_Productos.xlsx");
+    };
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore,
+        exportToPDF,
+        exportToExcel
     }
 }

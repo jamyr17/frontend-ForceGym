@@ -16,11 +16,7 @@ import Form from "./Form";
 import { useProductInventory } from "./useProduct";
 import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from 'xlsx';
-
-
+import FileTypeDecision from "../shared/components/ModalFileType";
 
 function ProductInventoryManagement() {
     const {
@@ -28,6 +24,7 @@ function ProductInventoryManagement() {
         modalForm,
         modalFilter,
         modalInfo,
+        modalFileTypeDecision,
         page,
         size,
         totalRecords,
@@ -50,55 +47,13 @@ function ProductInventoryManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
+        showModalFileType, 
+        closeModalFileType
     } = useProductInventoryStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useProductInventory()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useProductInventory()
     const navigate = useNavigate()
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text("Inventario de Productos", 14, 10);
     
-        const tableColumn = ["#", "CÓDIGO", "NOMBRE", "CANTIDAD", "COSTO"];
-        const tableRows = productsInventory.map((product, index) => [
-            index + 1,
-            product.code,
-            product.name,
-            product.quantity,
-            formatAmountToCRC(product.cost),
-        ]);
-        autoTable(doc, {
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-    
-    
-        doc.save("Inventario.pdf");
-    };
-    
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
-    
-        // Mapeo de los datos
-        const tableRows = productsInventory.map((product, index) => [
-            index + 1,
-            product.code,
-            product.name,
-            product.quantity,
-            product.cost 
-        ]);
-    
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Productos Inventario");
-    
-        // Descargar
-        XLSX.writeFile(wb, "Inventario_Productos.xlsx");
-    };
-    
-
     useEffect(() => {}, [productsInventory])
     
     useEffect(() => {
@@ -148,16 +103,24 @@ function ProductInventoryManagement() {
                         
             {productsInventory?.length > 0 && (
             <div className="flex gap-2">
-                <button 
-                    onClick={exportToPDF} 
-                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                    <MdOutlineFileDownload /> Descargar PDF
-                </button>
-                <button 
-                    onClick={exportToExcel} 
-                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                    <MdOutlineFileDownload /> Descargar Excel
-                </button>
+                <Modal
+                    Button={() => (
+                        <button 
+                            onClick={showModalFileType}
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar
+                        </button>
+                    )}
+                    modal={modalFileTypeDecision}
+                    getDataById={getProductInventoryById}
+                    closeModal={closeModalFileType}
+                    Content={() => <FileTypeDecision 
+                                        modulo="Gastos económicos" 
+                                        closeModal={closeModalFileType} 
+                                        exportToPDF={exportToPDF}
+                                        exportToExcel={exportToExcel}
+                    />}
+                />  
             </div>
             )}          
 
