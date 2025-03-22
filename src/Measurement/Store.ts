@@ -12,6 +12,7 @@ type MeasurementStore = {
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
+    modalFileTypeDecision: boolean;
     activeEditingId: Measurement['idClient'];
     size: number;
     page: number;
@@ -46,6 +47,8 @@ type MeasurementStore = {
     closeModalFilter: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    showModalFileType: () => void;
+    closeModalFileType: () => void;
 };
 
 export const useMeasurementStore = create<MeasurementStore>()(
@@ -57,6 +60,7 @@ export const useMeasurementStore = create<MeasurementStore>()(
         modalForm: false,
         modalFilter: false,
         modalInfo: false,
+        modalFileTypeDecision: false,
         activeEditingId: 0,
         size: 5,
         page: 1,
@@ -131,7 +135,9 @@ export const useMeasurementStore = create<MeasurementStore>()(
         showModalFilter: () => set(() => ({ modalFilter: true })),
         closeModalFilter: () => set(() => ({ modalFilter: false })),
         showModalInfo: () => set(() => ({ modalInfo: true })),
-        closeModalInfo: () => set(() => ({ modalInfo: false }))
+        closeModalInfo: () => set(() => ({ modalInfo: false })),
+        showModalFileType: () => set(() => ({ modalFileTypeDecision: true })),
+        closeModalFileType: () => set(() => ({ modalFileTypeDecision: false }))
     }))
 );
 

@@ -1,7 +1,6 @@
 import { MdModeEdit, MdOutlineDelete, MdOutlineFileDownload, MdOutlineSettingsBackupRestore } from "react-icons/md";
 import Modal from "../shared/components/Modal";
 import ModalFilter from "../shared/components/ModalFilter";
-import SearchInput from "../shared/components/SearchInput";
 import NoData from "../shared/components/NoData";
 import Pagination from "../shared/components/Pagination";
 import { useMeasurementStore } from './Store';
@@ -16,9 +15,7 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import { mapMeasurementToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from 'xlsx';
+import FileTypeDecision from "../shared/components/ModalFileType";
 
 function MeasurementManagement() {
     const location = useLocation();
@@ -30,6 +27,7 @@ function MeasurementManagement() {
         modalForm,
         modalFilter,
         modalInfo,
+        modalFileTypeDecision,
         page,
         size,
         totalRecords,
@@ -48,7 +46,9 @@ function MeasurementManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
-        setIdClient
+        setIdClient,
+        showModalFileType,
+        closeModalFileType
     } = useMeasurementStore();
 
     useEffect(() => {
@@ -57,59 +57,8 @@ function MeasurementManagement() {
         }
     }, [idClient]);
 
-    const { handleDelete, handleOrderByChange, handleRestore } = useMeasurement();
+    const { handleDelete, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useMeasurement();
     
-    const exportToPDF = () => {
-        const doc = new jsPDF(); 
-        doc.setFont("helvetica");
-        doc.text("Reporte de Medidas Corporales", 14, 10);
-
-        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
-
-        const tableRows = measurements.map((measurement, index) => [
-            index + 1,
-            formatDate(new Date(measurement.measurementDate)),
-            measurement.weight,
-            measurement.height,
-            measurement.muscleMass,
-            measurement.bodyFatPercentage,
-            measurement.visceralFatPercentage,
-        ]);
-
-        autoTable(doc, {
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-
-        doc.save("Medidas_Corporales.pdf");
-    };
-
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
-    
-        // Mapeo de los datos
-        const tableRows = measurements.map((measurement, index) => [
-            index + 1,
-            formatDate(new Date(measurement.measurementDate)),
-            measurement.weight,
-            measurement.height,
-            measurement.muscleMass,
-            measurement.bodyFatPercentage,
-            measurement.visceralFatPercentage,
-        ]);
-    
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Medidas Corporales");
-    
-        // Descargar
-        XLSX.writeFile(wb, "Medidas_Corporales.xlsx");
-    };
-    
-
     useEffect(() => {}, [measurements]);
     
     useEffect(() => {
@@ -154,17 +103,25 @@ function MeasurementManagement() {
                         />
 
                         {measurements?.length > 0 && (
-                            <div className="flex gap-2">
-                            <button 
-                                onClick={exportToPDF} 
-                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                                <MdOutlineFileDownload /> Descargar PDF
-                            </button>
-                            <button 
-                                onClick={exportToExcel} 
-                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                                <MdOutlineFileDownload /> Descargar Excel
-                            </button>
+                        <div className="flex gap-2">
+                            <Modal
+                                Button={() => (
+                                    <button 
+                                        onClick={showModalFileType}
+                                        className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                        <MdOutlineFileDownload /> Descargar
+                                    </button>
+                                )}
+                                modal={modalFileTypeDecision}
+                                getDataById={getMeasurementById}
+                                closeModal={closeModalFileType}
+                                Content={() => <FileTypeDecision 
+                                                    modulo="Gastos económicos" 
+                                                    closeModal={closeModalFileType} 
+                                                    exportToPDF={exportToPDF}
+                                                    exportToExcel={exportToExcel}
+                                />}
+                            />
                         </div>
                         )}    
                     </div>

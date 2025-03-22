@@ -4,10 +4,14 @@ import { Measurement, MeasurementDataForm } from "../shared/types";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import useMeasurementStore from "./Store";
 import { useNavigate } from "react-router";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
+import { formatDate } from "../shared/utils/format";
 
 export const useMeasurement = () => {
     const navigate = useNavigate();
-    const { fetchMeasurements, deleteMeasurement, updateMeasurement, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useMeasurementStore();
+    const { measurements, fetchMeasurements, deleteMeasurement, updateMeasurement, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useMeasurementStore();
 
     const handleDelete = async ({ idMeasurement }: Measurement) => {
         await Swal.fire({
@@ -107,10 +111,62 @@ export const useMeasurement = () => {
         });
     };
 
+    const exportToPDF = () => {
+        const doc = new jsPDF(); 
+        doc.setFont("helvetica");
+        doc.text("Reporte de Medidas Corporales", 14, 10);
+
+        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
+
+        const tableRows = measurements.map((measurement, index) => [
+            index + 1,
+            formatDate(new Date(measurement.measurementDate)),
+            measurement.weight,
+            measurement.height,
+            measurement.muscleMass,
+            measurement.bodyFatPercentage,
+            measurement.visceralFatPercentage,
+        ]);
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+
+        doc.save("Medidas_Corporales.pdf");
+    };
+
+    const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
+    
+        // Mapeo de los datos
+        const tableRows = measurements.map((measurement, index) => [
+            index + 1,
+            formatDate(new Date(measurement.measurementDate)),
+            measurement.weight,
+            measurement.height,
+            measurement.muscleMass,
+            measurement.bodyFatPercentage,
+            measurement.visceralFatPercentage,
+        ]);
+    
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Medidas Corporales");
+    
+        // Descargar
+        XLSX.writeFile(wb, "Medidas_Corporales.xlsx");
+    };
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore,
+        exportToPDF,
+        exportToExcel
     };
 };
