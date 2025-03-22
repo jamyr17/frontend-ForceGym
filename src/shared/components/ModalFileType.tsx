@@ -32,7 +32,7 @@ function FileTypeDecision ({ modulo, closeModal, exportToPDF, exportToExcel } : 
         if(!filePDF && !fileExcel){
             await Swal.fire({
                 title: `Advertencia`,
-                text: `Debe escoger 1 de las opciones realizar la exportación`,
+                text: `Debe escoger 1 de las opciones para realizar la exportación`,
                 icon: 'warning',
                 confirmButtonText: 'OK',
                 timer: 3000,
