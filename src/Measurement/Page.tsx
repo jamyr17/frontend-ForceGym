@@ -18,6 +18,7 @@ import { mapMeasurementToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 function MeasurementManagement() {
     const location = useLocation();
@@ -84,9 +85,30 @@ function MeasurementManagement() {
         doc.save("Medidas_Corporales.pdf");
     };
 
-        
     const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
+    
+        // Mapeo de los datos
+        const tableRows = measurements.map((measurement, index) => [
+            index + 1,
+            formatDate(new Date(measurement.measurementDate)),
+            measurement.weight,
+            measurement.height,
+            measurement.muscleMass,
+            measurement.bodyFatPercentage,
+            measurement.visceralFatPercentage,
+        ]);
+    
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Medidas Corporales");
+    
+        // Descargar
+        XLSX.writeFile(wb, "Medidas_Corporales.xlsx");
     };
+    
 
     useEffect(() => {}, [measurements]);
     
