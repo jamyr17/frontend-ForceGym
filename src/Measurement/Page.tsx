@@ -18,6 +18,7 @@ import { mapMeasurementToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 function MeasurementManagement() {
     const location = useLocation();
@@ -59,8 +60,9 @@ function MeasurementManagement() {
     const { handleDelete, handleOrderByChange, handleRestore } = useMeasurement();
     
     const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text("Medidas Corporales", 14, 10);
+        const doc = new jsPDF(); 
+        doc.setFont("helvetica");
+        doc.text("Reporte de Medidas Corporales", 14, 10);
 
         const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
 
@@ -82,6 +84,31 @@ function MeasurementManagement() {
 
         doc.save("Medidas_Corporales.pdf");
     };
+
+    const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
+    
+        // Mapeo de los datos
+        const tableRows = measurements.map((measurement, index) => [
+            index + 1,
+            formatDate(new Date(measurement.measurementDate)),
+            measurement.weight,
+            measurement.height,
+            measurement.muscleMass,
+            measurement.bodyFatPercentage,
+            measurement.visceralFatPercentage,
+        ]);
+    
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Medidas Corporales");
+    
+        // Descargar
+        XLSX.writeFile(wb, "Medidas_Corporales.xlsx");
+    };
+    
 
     useEffect(() => {}, [measurements]);
     
@@ -127,10 +154,19 @@ function MeasurementManagement() {
                         />
 
                         {measurements?.length > 0 && (
-                         <button onClick={exportToPDF} className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                         <MdOutlineFileDownload /> Descargar
-                         </button>
-                        )}
+                            <div className="flex gap-2">
+                            <button 
+                                onClick={exportToPDF} 
+                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                <MdOutlineFileDownload /> Descargar PDF
+                            </button>
+                            <button 
+                                onClick={exportToExcel} 
+                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                <MdOutlineFileDownload /> Descargar Excel
+                            </button>
+                        </div>
+                        )}    
                     </div>
                     
                     {measurements?.length > 0 ? (
