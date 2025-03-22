@@ -165,7 +165,7 @@ function ClientManagement() {
                                 modal={modalFileTypeDecision}
                                 getDataById={getClientById}
                                 closeModal={closeModalFileType}
-                                Content={FileTypeDecision}
+                                Content={() => <FileTypeDecision modulo="Clientes" closeModal={closeModalFileType} />}
                             />
                         </div>
                         )}          
