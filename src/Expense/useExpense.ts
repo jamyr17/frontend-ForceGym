@@ -4,10 +4,14 @@ import { EconomicExpense, EconomicExpenseDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicExpenseStore from "./Store"
 import { useNavigate } from "react-router"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
 export const useEconomicExpense = () => {
     const navigate = useNavigate()
-    const { fetchEconomicExpenses, deleteEconomicExpense, updateEconomicExpense, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicExpenseStore()
+    const { economicExpenses, fetchEconomicExpenses, deleteEconomicExpense, updateEconomicExpense, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicExpenseStore()
 
     const handleDelete = async ({ idEconomicExpense, voucherNumber } : EconomicExpense) => {
         await Swal.fire({
@@ -109,10 +113,58 @@ export const useEconomicExpense = () => {
         })
     }
 
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.setFont("helvetica");
+        doc.text("Reporte de Gastos", 14, 10);
+
+        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
+        const tableRows = economicExpenses.map((expense, index) => [
+            index + 1,
+            expense.voucherNumber || "No adjunto",
+            formatDate(new Date(expense.registrationDate)),
+            formatAmountToCRC(expense.amount), 
+            expense.meanOfPayment.name,
+            expense.category.name
+        ]);
+        autoTable(doc, { 
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+
+        doc.save("gastos.pdf");
+    };
+
+    const exportToExcel = () => {
+        // Encabezados de la tabla
+        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
+
+        // Mapeo de los datos
+        const tableRows = economicExpenses.map((expense, index) => [
+            index + 1,
+            expense.voucherNumber !== '' ? expense.voucherNumber : "No adjunto",
+            formatDate(new Date(expense.registrationDate)),
+            expense.amount, 
+            expense.meanOfPayment.name,
+            expense.category.name,
+        ]);
+
+        // Crear worksheet y workbook
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Gastos Económicos");
+
+        // Descargar
+        XLSX.writeFile(wb, "gastos.xlsx");
+    };
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore,
+        exportToPDF,
+        exportToExcel
     }
 }
