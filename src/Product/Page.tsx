@@ -115,7 +115,7 @@ function ProductInventoryManagement() {
                     getDataById={getProductInventoryById}
                     closeModal={closeModalFileType}
                     Content={() => <FileTypeDecision 
-                                        modulo="Gastos económicos" 
+                                        modulo="Inventario" 
                                         closeModal={closeModalFileType} 
                                         exportToPDF={exportToPDF}
                                         exportToExcel={exportToExcel}

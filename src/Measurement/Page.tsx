@@ -116,7 +116,7 @@ function MeasurementManagement() {
                                 getDataById={getMeasurementById}
                                 closeModal={closeModalFileType}
                                 Content={() => <FileTypeDecision 
-                                                    modulo="Gastos económicos" 
+                                                    modulo="Medidas corporales" 
                                                     closeModal={closeModalFileType} 
                                                     exportToPDF={exportToPDF}
                                                     exportToExcel={exportToExcel}

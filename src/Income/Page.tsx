@@ -119,7 +119,7 @@ function EconomicIncomeManagement() {
                             getDataById={getEconomicIncomeById}
                             closeModal={closeModalFileType}
                             Content={() => <FileTypeDecision 
-                                                modulo="Gastos económicos" 
+                                                modulo="Ingresos económicos" 
                                                 closeModal={closeModalFileType} 
                                                 exportToPDF={exportToPDF}
                                                 exportToExcel={exportToExcel}
