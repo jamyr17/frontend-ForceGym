@@ -10,6 +10,7 @@ type EconomicIncomeStore = {
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
+    modalFileTypeDecision: boolean;
     activeEditingId: EconomicIncome['idEconomicIncome'];
     size: number;
     page: number;
@@ -52,6 +53,8 @@ type EconomicIncomeStore = {
     closeModalFilter: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    showModalFileType: () => void;
+    closeModalFileType: () => void;
 };
 
 export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
@@ -60,6 +63,7 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         modalForm: false,
         modalFilter: false,
         modalInfo: false,
+        modalFileTypeDecision: false,
         activeEditingId: 0,
         size: 5,
         page: 1,
@@ -161,7 +165,9 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         showModalFilter: () => set(() => ({ modalFilter: true })),
         closeModalFilter: () => set(() => ({ modalFilter: false })),
         showModalInfo: () => set(() => ({ modalInfo: true })),
-        closeModalInfo: () => set(() => ({ modalInfo: false }))
+        closeModalInfo: () => set(() => ({ modalInfo: false })),
+        showModalFileType: () => set(() => ({ modalFileTypeDecision: true })),
+        closeModalFileType: () => set(() => ({ modalFileTypeDecision: false }))
     }))
 );
 
