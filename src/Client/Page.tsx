@@ -18,9 +18,6 @@ import { useNavigate, Link } from "react-router";
 import { useClient } from "./useClient";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from 'xlsx';
 
 function ClientManagement() {
     const {
@@ -61,48 +58,8 @@ function ClientManagement() {
         closeModalFileType
     } = useClientStore()
     
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useClient()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useClient()
     const navigate = useNavigate()
-    const exportToPDF = () => {
-        const doc = new jsPDF();   
-        doc.setFont("helvetica");
-        doc.text("Reporte de Clientes", 14, 10);
-    
-        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
-        
-        const tableRows = clients.map((client, index) => [
-            index + 1,
-            client.person.identificationNumber,
-            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
-            formatDate(new Date(client.registrationDate)),
-            client.typeClient.name
-        ]);
-    
-        autoTable(doc, { 
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-
-        doc.save("clientes.pdf");
-    };
-
-    const exportToExcel = () => {
-        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
-        const tableRows = clients.map((client, index) => [
-            index + 1,
-            client.person.identificationNumber,
-            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
-            formatDate(new Date(client.registrationDate)),
-            client.typeClient.name
-        ]);
-
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Clientes");
-
-        XLSX.writeFile(wb, "clientes.xlsx");
-    };
     
     useEffect(() => {}, [clients])
     
@@ -165,7 +122,12 @@ function ClientManagement() {
                                 modal={modalFileTypeDecision}
                                 getDataById={getClientById}
                                 closeModal={closeModalFileType}
-                                Content={() => <FileTypeDecision modulo="Clientes" closeModal={closeModalFileType} />}
+                                Content={() => <FileTypeDecision 
+                                                    modulo="Clientes" 
+                                                    closeModal={closeModalFileType} 
+                                                    exportToPDF={exportToPDF}
+                                                    exportToExcel={exportToExcel}
+                                />}
                             />
                         </div>
                         )}          

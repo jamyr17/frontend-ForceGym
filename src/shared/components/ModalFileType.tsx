@@ -1,11 +1,14 @@
 import { useState } from "react"
+import Swal from 'sweetalert2';
 
 type FileTypeDecisionProps = {
-    closeModal: () => void
     modulo: string
+    closeModal: () => void
+    exportToPDF: () => void
+    exportToExcel: () => void
 }
 
-function FileTypeDecision ({ modulo, closeModal } : FileTypeDecisionProps) {
+function FileTypeDecision ({ modulo, closeModal, exportToPDF, exportToExcel } : FileTypeDecisionProps) {
     const [filePDF, setFilePDF] = useState(false)
     const [fileExcel, setFileExcel] = useState(false)
 
@@ -22,6 +25,31 @@ function FileTypeDecision ({ modulo, closeModal } : FileTypeDecisionProps) {
 
         if(filePDF){
             setFilePDF(false)
+        }
+    }
+
+    const handleSubmit = async () => {
+        if(!filePDF && !fileExcel){
+            await Swal.fire({
+                title: `Advertencia`,
+                text: `Debe escoger 1 de las opciones realizar la exportación`,
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                timerProgressBar: true,
+                width: 500,
+                confirmButtonColor: '#CFAD04'
+            })
+
+            return
+        }
+
+        if(filePDF){
+            exportToPDF()
+            return
+        }else{
+            exportToExcel()
+            return
         }
     }
 
@@ -62,7 +90,10 @@ function FileTypeDecision ({ modulo, closeModal } : FileTypeDecisionProps) {
                 > 
                     Cancelar 
                 </button>
-                <button className="rounded-lg px-6 py-2 bg-yellow hover:opacity-75 cursor-pointer"> 
+                <button 
+                    className="rounded-lg px-6 py-2 bg-yellow hover:opacity-75 cursor-pointer"
+                    onClick={handleSubmit}
+                > 
                     Confirmar 
                 </button>
             </div>
