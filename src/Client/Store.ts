@@ -3,6 +3,8 @@ import { devtools } from "zustand/middleware";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
 import { Client, ClientDataForm } from "../shared/types";
 import { formatDateForParam } from "../shared/utils/format";
+import { format } from 'date-fns';
+import { isCompleteDate } from "../shared/utils/validation";
 
 type ClientStore = {
     clients: Client[];
@@ -85,7 +87,7 @@ export const useClientStore = create<ClientStore>()(
         filterByBreathingIssues: null,
         filterByBirthDateRangeMax: null,
         filterByBirthDateRangeMin: null,
-        filterByClientType: 0,
+        filterByClientType: -1,
 
         fetchClients: async () => {
             const state = useClientStore.getState();
@@ -124,6 +126,17 @@ export const useClientStore = create<ClientStore>()(
             }
             if (state.filterByBirthDateRangeMax !== null && state.filterByBirthDateRangeMin !== null) {
                 filters += `&filterByDateBirthStart=${formatDateForParam(state.filterByBirthDateRangeMin)}&filterByDateBirthEnd=${formatDateForParam(state.filterByBirthDateRangeMax)}`;
+            }
+            if (
+                isCompleteDate(state.filterByBirthDateRangeMax) &&
+                isCompleteDate(state.filterByBirthDateRangeMin)
+            ) {
+                const formattedDateMax = format(state.filterByBirthDateRangeMax!, 'yyyy-MM-dd');
+                const formattedDateMin = format(state.filterByBirthDateRangeMin!, 'yyyy-MM-dd');
+                filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
+            }
+            if(state.filterByClientType != 0){
+                filters += `&filterByTypeClient=${state.filterByClientType}`;
             }
 
             const result = await getData(

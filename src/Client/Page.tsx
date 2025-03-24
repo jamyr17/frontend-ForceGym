@@ -8,14 +8,18 @@ import { useClientStore } from './Store'
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { formatDate } from "../shared/utils/format";
 import { IoIosMore } from "react-icons/io";
+import { LuPencilRuler } from "react-icons/lu";
 import { mapClientToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useClient } from "./useClient";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
 
 function ClientManagement() {
     const {
@@ -53,9 +57,51 @@ function ClientManagement() {
         closeModalInfo,
     } = useClientStore()
 
+    
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useClient()
     const navigate = useNavigate()
+    const exportToPDF = () => {
+        const doc = new jsPDF();   
+        doc.setFont("helvetica");
+        doc.text("Reporte de Clientes", 14, 10);
+    
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name
+        ]);
+    
+        autoTable(doc, { 
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
 
+        doc.save("clientes.pdf");
+    };
+
+    const exportToExcel = () => {
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name
+        ]);
+
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+
+        XLSX.writeFile(wb, "clientes.xlsx");
+    };
+    
+        
     useEffect(() => {}, [clients])
     
         useEffect(() => {
@@ -104,12 +150,23 @@ function ClientManagement() {
                             Content={Form}
                         />
 
-                        {clients?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
+
+                    {clients?.length > 0 && (
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={exportToPDF} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar PDF
                         </button>
-                        }
+                        <button 
+                            onClick={exportToExcel} 
+                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar Excel
+                        </button>
                     </div>
+                      )}          
+
+                    </div>     
                     
                     {clients?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
@@ -117,7 +174,7 @@ function ClientManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('identificationNumber')}}
                                 >
                                     CÉDULA  
@@ -153,7 +210,7 @@ function ClientManagement() {
                             <tr key={client.idClient} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
                                 <td className="py-2">{client.person.identificationNumber}</td>
-                                <td className="py-2">{client.person.name}</td>
+                                <td className="py-2">{client.person.name + ' ' + client.person.firstLastName + ' ' + client.person.secondLastName}</td> 
                                 <td className="py-2">{formatDate(new Date(client.registrationDate))}</td>
                                 <td className="py-2">{client.typeClient.name}</td>
                                 {filterByStatus && (
@@ -173,7 +230,8 @@ function ClientManagement() {
                                                 getClientById(client.idClient);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                            title="Ver detalles"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -183,21 +241,34 @@ function ClientManagement() {
                                     closeModal={closeModalInfo}
                                     Content={DataInfo}
                                 />
+                                
                                 <button
                                     onClick={() => {
                                         getClientById(client.idClient);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
+                           
+                                <Link 
+                                    to="/gestion/medidas"
+                                    state={{ idClient: client.idClient }}
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Ver medidas"
+                                >
+                                    <LuPencilRuler className="text-white" />
+                                </Link>
+
                                 {client.isDeleted ? (
                                     <button onClick={() => handleRestore(mapClientToDataForm(client))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(client)} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleDelete(client)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Eliminar">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}

@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { EconomicIncome, EconomicIncomeDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
-import { formatDateForParam } from "../shared/utils/format";
+import { format } from 'date-fns';
+import { isCompleteDate } from "../shared/utils/validation";
 
 type EconomicIncomeStore = {
     economicIncomes: EconomicIncome[];
@@ -23,6 +24,7 @@ type EconomicIncomeStore = {
     filterByDateRangeMax: Date | null;
     filterByDateRangeMin: Date | null;
     filterByMeanOfPayment: number;
+    filterByClientType: number;
 
     fetchEconomicIncomes: () => Promise<any>;
     getEconomicIncomeById: (id: number) => void;
@@ -42,6 +44,7 @@ type EconomicIncomeStore = {
     changeFilterByDateRangeMax: (newFilter: Date | null) => void;
     changeFilterByDateRangeMin: (newFilter: Date | null) => void;
     changeFilterByMeanOfPayment: (newFilter: number) => void;
+    changeFilterByClientType: (newFilter : number) => void;
 
     showModalForm: () => void;
     closeModalForm: () => void;
@@ -71,6 +74,7 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         filterByDateRangeMax: null,
         filterByDateRangeMin: null,
         filterByMeanOfPayment: 0,
+        filterByClientType: -1,
 
         fetchEconomicIncomes: async () => {
             const state = useEconomicIncomeStore.getState();
@@ -89,11 +93,19 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
             if (state.filterByAmountRangeMax !== 0 && state.filterByAmountRangeMin !== 0) {
                 filters += `&filterByAmountRangeMax=${state.filterByAmountRangeMax}&filterByAmountRangeMin=${state.filterByAmountRangeMin}`;
             }
-            if (state.filterByDateRangeMax !== null && state.filterByDateRangeMin !== null) {
-                filters += `&filterByDateRangeMax=${formatDateForParam(state.filterByDateRangeMax)}&filterByDateRangeMin=${formatDateForParam(state.filterByDateRangeMin)}`;
+            if (
+                isCompleteDate(state.filterByDateRangeMax) &&
+                isCompleteDate(state.filterByDateRangeMin)
+            ) {
+                const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
+                const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
             }
             if (state.filterByMeanOfPayment != 0){
                 filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`
+            }
+            if (state.filterByClientType != -1){
+                filters += `&filterByTypeClient=${state.filterByClientType}`
             }
 
             const result = await getData(
@@ -142,6 +154,7 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         changeFilterByDateRangeMax: (newFilter) => set(() => ({ filterByDateRangeMax: newFilter })),
         changeFilterByDateRangeMin: (newFilter) => set(() => ({ filterByDateRangeMin: newFilter })),
         changeFilterByMeanOfPayment: (newFilter) => set(() => ({ filterByMeanOfPayment: newFilter })),
+        changeFilterByClientType: (newFilter) => set(() => ({ filterByClientType: newFilter })),
 
         showModalForm: () => set(() => ({ modalForm: true })),
         closeModalForm: () => set(() => ({ modalForm: false })),

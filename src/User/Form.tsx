@@ -21,7 +21,7 @@ const MAXLENGTH_USERNAME = 50
 
 function Form() {
     const navigate = useNavigate()
-    const { roles } = useCommonDataStore()
+    const { roles, genders } = useCommonDataStore()
     const passwordRef = useRef<HTMLInputElement | null>(null);
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<UserDataForm>()
     const { users, activeEditingId, fetchUsers, addUser, updateUser, closeModalForm } = useUserStore()
@@ -30,11 +30,11 @@ function Form() {
         let action = '', result
         const loggedUser = getAuthUser()
         const reqUser = {
-            ...data, 
-            gender: 'Masculino', 
+            ...data,
+            password: data.password ? data.password : null, 
             paramLoggedIdUser: loggedUser?.idUser
-        }
-        
+        };
+    
         // si el editingId está en 0 significa que se está agregando 
         if(activeEditingId==0){
             result = await addUser(reqUser)
@@ -80,6 +80,7 @@ function Form() {
             const activeEditingUser = users.filter(users => users.idUser === activeEditingId)[0]
             setValue('idUser', activeEditingUser.idUser)
             setValue('idRole', activeEditingUser.role.idRole)
+            setValue('idGender', activeEditingUser.person.gender.idGender)
             setValue('idPerson', activeEditingUser.person.idPerson)
             setValue('identificationNumber', activeEditingUser.person.identificationNumber)
             setValue('name', activeEditingUser.person.name)
@@ -270,6 +271,23 @@ function Form() {
                 }
             </div>
 
+            <div className="my-5">
+                <label htmlFor="idGender" className="text-sm uppercase font-bold">
+                    Género 
+                </label>
+                <select
+                    id="idGender"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idGender")}  
+                >
+                    {genders.map((gender)=> (
+                        <option key={gender.idGender} value={gender.idGender}>
+                            {gender.name}
+                        </option>
+                    ))}
+                </select>
+            </div>   
+
             <div className="mb-5">
                 <label htmlFor="phoneNumber" className="text-sm uppercase font-bold">
                     Teléfono
@@ -362,7 +380,7 @@ function Form() {
                     type="password" 
                     placeholder="Ingrese la contraseña" 
                     {...register('password', {
-                        required: 'La contraseña es obligatoria'
+                        required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false
                     })}
                 />
 
