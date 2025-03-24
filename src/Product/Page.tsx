@@ -16,11 +16,6 @@ import Form from "./Form";
 import { useProductInventory } from "./useProduct";
 import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from 'xlsx';
-
-
 
 function ProductInventoryManagement() {
     const {
@@ -54,50 +49,6 @@ function ProductInventoryManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useProductInventory()
     const navigate = useNavigate()
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text("Inventario de Productos", 14, 10);
-    
-        const tableColumn = ["#", "CÓDIGO", "NOMBRE", "CANTIDAD", "COSTO"];
-        const tableRows = productsInventory.map((product, index) => [
-            index + 1,
-            product.code,
-            product.name,
-            product.quantity,
-            formatAmountToCRC(product.cost),
-        ]);
-        autoTable(doc, {
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-    
-    
-        doc.save("Inventario.pdf");
-    };
-    
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
-    
-        // Mapeo de los datos
-        const tableRows = productsInventory.map((product, index) => [
-            index + 1,
-            product.code,
-            product.name,
-            product.quantity,
-            product.cost 
-        ]);
-    
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Productos Inventario");
-    
-        // Descargar
-        XLSX.writeFile(wb, "Inventario_Productos.xlsx");
-    };
-    
 
     useEffect(() => {}, [productsInventory])
     
@@ -145,22 +96,12 @@ function ProductInventoryManagement() {
                             closeModal={closeModalForm}
                             Content={Form}
                         />
-                        
-            {productsInventory?.length > 0 && (
-            <div className="flex gap-2">
-                <button 
-                    onClick={exportToPDF} 
-                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                    <MdOutlineFileDownload /> Descargar PDF
-                </button>
-                <button 
-                    onClick={exportToExcel} 
-                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                    <MdOutlineFileDownload /> Descargar Excel
-                </button>
-            </div>
-            )}          
 
+                        {productsInventory?.length>0 &&
+                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar
+                        </button>
+                        }
                     </div>
                     
                     {productsInventory?.length>0 ? (
@@ -169,7 +110,7 @@ function ProductInventoryManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('code')}}
                                 >
                                     CÓDIGO  
@@ -177,7 +118,7 @@ function ProductInventoryManagement() {
                                     {(orderBy==='code' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('name')}}
                                 >
                                     NOMBRE  
@@ -185,7 +126,7 @@ function ProductInventoryManagement() {
                                     {(orderBy==='name' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('quantity')}}
                                 >
                                     CANTIDAD  
@@ -232,8 +173,7 @@ function ProductInventoryManagement() {
                                                 getProductInventoryById(product.idProductInventory);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                            title="Ver detalles"
+                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -248,8 +188,7 @@ function ProductInventoryManagement() {
                                         getProductInventoryById(product.idProductInventory);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                    title="Editar"
+                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
@@ -258,8 +197,7 @@ function ProductInventoryManagement() {
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(product)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                    title="Eliminar">
+                                    <button onClick={() => handleDelete(product)} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}

@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { formatDate } from "../shared/utils/format";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
-import { useCommonDataStore } from "../shared/CommonDataStore";
 
 const MAXLENGTH_IDENTIFICATIONUMBER = 20
 const MAXLENGTH_NAME = 50
@@ -19,7 +18,6 @@ const MAXLENGTH_EMAIL = 100
 
 function Form() {
     const navigate = useNavigate();
-    const { genders, typesClient } = useCommonDataStore();
     const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<ClientDataForm>();
     const { clients, activeEditingId, fetchClients, addClient, updateClient, closeModalForm } = useClientStore();
 
@@ -28,7 +26,7 @@ function Form() {
         const loggedUser = getAuthUser()
         const reqUser = {
             ...data, 
-            idUser: loggedUser?.idUser, 
+            idUser: 7, 
             paramLoggedIdUser: loggedUser?.idUser
         }
         
@@ -78,8 +76,7 @@ function Form() {
                 setValue('idUser', activeClient.user.idUser)
                 setValue('idTypeClient', activeClient.typeClient.idTypeClient)
                 setValue('registrationDate', activeClient.registrationDate);
-                setValue('phoneNumberContactEmergency', activeClient.phoneNumberContactEmergency);
-                setValue('nameEmergencyContact', activeClient.nameEmergencyContact);
+                setValue('emergencyContact', activeClient.emergencyContact);
                 setValue('signatureImage', activeClient.signatureImage);
                 setValue('isDeleted', activeClient.isDeleted);
 
@@ -101,7 +98,7 @@ function Form() {
                 setValue('firstLastName', activeClient.person.firstLastName);
                 setValue('secondLastName', activeClient.person.secondLastName);
                 setValue('birthday', activeClient.person.birthday);
-                setValue('idGender', activeClient.person.gender.idGender);
+                setValue('gender', activeClient.person.gender);
                 setValue('email', activeClient.person.email);
                 setValue('phoneNumber', activeClient.person.phoneNumber);
             }
@@ -130,6 +127,18 @@ function Form() {
                 {...register('idClient')}
             />
             <input  
+                id="idTypeClient" 
+                type="hidden" 
+                value={1}
+                {...register('idTypeClient')}
+            />
+            <input  
+                id="gender" 
+                type="hidden" 
+                value={'Masculino'}
+                {...register('gender')}
+            />
+            <input  
                 id="isDeleted" 
                 type="hidden" 
                 {...register('isDeleted')}
@@ -141,22 +150,24 @@ function Form() {
                 {...register('signatureImage')}
             />
 
+            {/* Se debe hacer un select para tipo de cliente
             <div className="my-5">
-                <label htmlFor="idTypeClient" className="text-sm uppercase font-bold">
-                    Tipo de Cliente
+                <label htmlFor="idMeanOfPayment" className="text-sm uppercase font-bold">
+                    Medio de Pago 
                 </label>
                 <select
-                    id="idTypeClient"
+                    id="idMeanOfPayment"
                     className="w-full p-3 border border-gray-100" 
-                    {...register("idTypeClient")}  
+                    {...register("idMeanOfPayment")}  
                 >
-                    {typesClient.map((type)=> (
-                        <option key={type.idTypeClient} value={type.idTypeClient}>
-                            {type.name}
+                    {meansOfPayment.map((meanOfPayment)=> (
+                        <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
+                            {meanOfPayment.name}
                         </option>
                     ))}
                 </select>
             </div>   
+            */}
 
             <div className="mb-5">
                 <label htmlFor="identificationNumber" className="text-sm uppercase font-bold">
@@ -287,23 +298,6 @@ function Form() {
                 }
             </div>
 
-            <div className="my-5">
-                <label htmlFor="idGender" className="text-sm uppercase font-bold">
-                    Género 
-                </label>
-                <select
-                    id="idGender"
-                    className="w-full p-3 border border-gray-100" 
-                    {...register("idGender")}  
-                >
-                    {genders.map((gender)=> (
-                        <option key={gender.idGender} value={gender.idGender}>
-                            {gender.name}
-                        </option>
-                    ))}
-                </select>
-            </div>   
-
             <div className="mb-5">
                 <label htmlFor="phoneNumber" className="text-sm uppercase font-bold">
                     Teléfono
@@ -331,53 +325,27 @@ function Form() {
             </div>
 
             <div className="mb-5">
-                <label htmlFor="phoneNumberContactEmergency" className="text-sm uppercase font-bold">
-                    Número del contacto de emergencia
+                <label htmlFor="emergencyContact" className="text-sm uppercase font-bold">
+                    Contacto de emergencia
                 </label>
                 <input  
-                    id="phoneNumberContactEmergency"
+                    id="emergencyContact"
                     className="w-full p-3 border border-gray-100"  
                     type="text" 
-                    placeholder="Ingrese el número del contacto de emergencia" 
-                    {...register("phoneNumberContactEmergency", {
-                        required: 'El número del contacto de emergencia es obligatorio',
+                    placeholder="Ingrese el contacto de emergencia" 
+                    {...register("emergencyContact", {
+                        required: 'El contacto de emergencia es obligatorio',
                         maxLength: {
                             value: MAXLENGTH_PHONENUMBER,
-                            message: `Debe ingresar un número de contacto de emergencia de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
+                            message: `Debe ingresar un contacto de emergencia de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
                         }
                     })}
                 />
 
                 {/* mostrar errores del input del contacto de emergencia */}
-                {errors.phoneNumberContactEmergency && 
+                {errors.emergencyContact && 
                     <ErrorForm>
-                        {errors.phoneNumberContactEmergency.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="nameEmergencyContact" className="text-sm uppercase font-bold">
-                    Nombre del contacto de emergencia
-                </label>
-                <input  
-                    id="nameEmergencyContact"
-                    className="w-full p-3 border border-gray-100"  
-                    type="text" 
-                    placeholder="Ingrese el nombre del contacto de emergencia" 
-                    {...register("nameEmergencyContact", {
-                        required: 'El nombre del contacto de emergencia es obligatorio',
-                        maxLength: {
-                            value: MAXLENGTH_NAME,
-                            message: `Debe ingresar un nombre de contacto de emergencia de máximo ${MAXLENGTH_NAME} carácteres`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del contacto de emergencia */}
-                {errors.nameEmergencyContact && 
-                    <ErrorForm>
-                        {errors.nameEmergencyContact.message}
+                        {errors.emergencyContact.message}
                     </ErrorForm>
                 }
             </div>

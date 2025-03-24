@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
-import Select from 'react-select';
 import { EconomicIncomeDataForm } from "../shared/types";
 import ErrorForm from "../shared/components/ErrorForm";
 import useEconomicIncomeStore from "./Store";
@@ -16,9 +15,8 @@ const MAXDATE = new Date().toUTCString()
 
 function Form() {
     const navigate = useNavigate();
+    const { meansOfPayment, activityTypes } = useCommonDataStore();
     const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<EconomicIncomeDataForm>();
-    const { onChange, ...rest } = register('idClient');
-    const { meansOfPayment, activityTypes, allClients, fetchAllClients} = useCommonDataStore();
     const { economicIncomes, activeEditingId, fetchEconomicIncomes, addEconomicIncome, updateEconomicIncome, closeModalForm } = useEconomicIncomeStore();
     const idMeanOfPayment = watch("idMeanOfPayment") ? Number(watch("idMeanOfPayment")) : null;
 
@@ -27,6 +25,7 @@ function Form() {
         const loggedUser = getAuthUser()
         const reqUser = {
             ...data, 
+            idUser: loggedUser?.idUser, 
             paramLoggedIdUser: loggedUser?.idUser
         }
         
@@ -69,15 +68,11 @@ function Form() {
     };
 
     useEffect(() => {
-        fetchAllClients()
-    }, [])
-
-    useEffect(() => {
         if (activeEditingId) {
             const activeIncome = economicIncomes.find(income => income.idEconomicIncome === activeEditingId)
             if (activeIncome) {
                 setValue('idEconomicIncome', activeIncome.idEconomicIncome)
-                setValue('idClient', activeIncome.client.idClient)
+                setValue('idUser', activeIncome.user.idUser)
                 setValue('isDeleted', activeIncome.isDeleted)
                 setValue('registrationDate', activeIncome.registrationDate)
                 setValue('amount', activeIncome.amount)
@@ -101,6 +96,11 @@ function Form() {
 
             {/* inputs ocultos para la funcionalidad de actualizar */}
             <input  
+                id="idUser" 
+                type="hidden" 
+                {...register('idUser')}
+            />
+            <input  
                 id="idEconomicIncome" 
                 type="hidden" 
                 {...register('idEconomicIncome')}
@@ -110,27 +110,6 @@ function Form() {
                 type="hidden" 
                 {...register('isDeleted')}
             />
-
-            <div className="mb-5">
-                <label htmlFor="idClient" className="text-sm uppercase font-bold">
-                    Cliente
-                </label>
-                <Select
-                    id="idClient"
-                    className="w-full"
-                    onChange={(selectedOption) => {
-                        setValue("idClient", selectedOption?.value, { shouldValidate: true });
-                    }}
-                    options={allClients}
-                />
-
-                {/* mostrar errores de cliente */}
-                {errors.idClient && 
-                    <ErrorForm>
-                        {errors.idClient.message}
-                    </ErrorForm>
-                }
-            </div>
 
             <div className="mb-5">
                 <label htmlFor="registrationDate" className="text-sm uppercase font-bold">

@@ -24,38 +24,17 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>MEDIO DE PAGO</strong></p>
-                    <p>{economicIncome.meanOfPayment.name}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
                     <p><strong>FECHA DE REGISTRO</strong></p>
                     <p>{formatDate(new Date(economicIncome.registrationDate))}</p>
                 </div>
-
             </div>
 
             <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Cliente</h1>
-                
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>CÉDULA</strong></p>
-                    <p>{economicIncome.client.person.identificationNumber}</p>
-                </div>
+                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Medio de Pago</h1>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>NOMBRE</strong></p>
-                    <p>{economicIncome.client.person.name + ' ' + economicIncome.client.person.firstLastName + ' ' + economicIncome.client.person.secondLastName}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>TIPO </strong></p>
-                    <p>{economicIncome.client.typeClient.name}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>NÚMERO </strong></p>
-                    <p>{economicIncome.client.person.phoneNumber}</p>
+                    <p><strong>MEDIO DE PAGO</strong></p>
+                    <p>{economicIncome.meanOfPayment.name}</p>
                 </div>
             </div>
 
@@ -71,7 +50,6 @@ function DataInfo() {
                     <p><strong>MONTO</strong></p>
                     <p>{formatAmountToCRC(economicIncome.amount)}</p>
                 </div>
-
             </div>
         </div>
     );

@@ -16,10 +16,6 @@ import { useNavigate } from "react-router";
 import { useEconomicExpense } from "./useExpense";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
-
 
 function EconomicExpenseManagement() {
     const {
@@ -40,7 +36,6 @@ function EconomicExpenseManagement() {
         filterByDateRangeMin,
         filterByDateRangeMax,
         filterByMeanOfPayment,
-        filterByCategory,
         fetchEconomicExpenses,
         getEconomicExpenseById,
         changePage,
@@ -55,53 +50,6 @@ function EconomicExpenseManagement() {
 
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicExpense()
     const navigate = useNavigate()
-    
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.setFont("helvetica");
-        doc.text("Reporte de Gastos", 14, 10);
-
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
-        const tableRows = economicExpenses.map((expense, index) => [
-            index + 1,
-            expense.voucherNumber || "No adjunto",
-            formatDate(new Date(expense.registrationDate)),
-            formatAmountToCRC(expense.amount), 
-            expense.meanOfPayment.name,
-            expense.category.name
-        ]);
-        autoTable(doc, { 
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-
-        doc.save("gastos.pdf");
-    };
-
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
-
-        // Mapeo de los datos
-        const tableRows = economicExpenses.map((expense, index) => [
-            index + 1,
-            expense.voucherNumber !== '' ? expense.voucherNumber : "No adjunto",
-            formatDate(new Date(expense.registrationDate)),
-            expense.amount, 
-            expense.meanOfPayment.name,
-            expense.category.name,
-        ]);
-
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Gastos Económicos");
-
-        // Descargar
-        XLSX.writeFile(wb, "gastos.xlsx");
-    };
-
 
     useEffect(() => {}, [economicExpenses])
     
@@ -118,7 +66,7 @@ function EconomicExpenseManagement() {
             }
             
             fetchData()
-        }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByCategory ])
+        }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment ])
 
     return ( 
         <div className="bg-black h-full w-full">
@@ -150,20 +98,11 @@ function EconomicExpenseManagement() {
                             Content={Form}
                         />
 
-                     {economicExpenses?.length > 0 && (
-                            <div className="flex gap-2">
-                            <button 
-                                onClick={exportToPDF} 
-                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                         <MdOutlineFileDownload /> Descargar PDF
-                            </button>
-                            <button 
-                                onClick={exportToExcel} 
-                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar Excel
-                                </button>
-                            </div>
-                           )} 
+                        {economicExpenses?.length>0 &&
+                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                            <MdOutlineFileDownload /> Descargar
+                        </button>
+                        }
                     </div>
                     
                     {economicExpenses?.length>0 ? (
@@ -172,7 +111,7 @@ function EconomicExpenseManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('voucherNumber')}}
                                 >
                                     VOUCHER  
@@ -197,7 +136,6 @@ function EconomicExpenseManagement() {
                                 </button></th>
 
                                 <th>MÉTODO DE PAGO</th>
-                                <th>CATEGORÍA</th>
                                 {filterByStatus && <th>ESTADO</th>}
 
                                 <th>ACCIONES</th>
@@ -212,7 +150,6 @@ function EconomicExpenseManagement() {
                                 <td className="py-2">{formatDate(new Date(economicExpense.registrationDate))}</td>
                                 <td className="py-2">{formatAmountToCRC(economicExpense.amount)}</td>
                                 <td className="py-2">{economicExpense.meanOfPayment.name}</td>
-                                <td className="py-2">{economicExpense.category.name}</td>
                                 {filterByStatus && (
                                 <td>
                                     {economicExpense.isDeleted ? (
@@ -245,18 +182,16 @@ function EconomicExpenseManagement() {
                                         getEconomicExpenseById(economicExpense.idEconomicExpense);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                    title="Editar"
+                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {economicExpense.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapEconomicExpenseToDataForm(economicExpense))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapEconomicExpenseToDataForm(economicExpense))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(economicExpense)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                    title="Eliminar">
+                                    <button onClick={() => handleDelete(economicExpense)} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}
