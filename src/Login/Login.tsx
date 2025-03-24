@@ -10,10 +10,10 @@ function Login ({credencialUser, setCredencialUser, handleLoginSubmit} : LoginPr
 
     return (
         <div className="flex flex-col justify-center items-center h-screen bg-black">
-            <main className="flex justify-center h-[550px] gap-16 p-12 w-auto bg-white rounded-lg">
-                <section className="flex flex-col h-full gap-12">
+            <main className="flex justify-center h-[650px] gap-16 p-12 w-auto bg-white rounded-lg">
+                <section className="flex flex-col h-ful gap-12">
                     <header className="flex justify-center">
-                        <img src="Logo.jpg" alt="Logo de Force GYM" className="w-64 h-auto"></img>
+                        <img src="Logo.jpg" alt="Logo de Force GYM" className="w-sm h-auto"></img>
                     </header>
 
                     <form className="flex flex-col gap-4" onSubmit={handleLoginSubmit}>

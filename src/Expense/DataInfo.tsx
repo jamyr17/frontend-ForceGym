@@ -9,7 +9,7 @@ function DataInfo() {
     if (!economicExpense) return <></>
 
     return (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
             <div className="flex flex-col gap-2">
                 <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Gasto</h1>
 
@@ -30,24 +30,22 @@ function DataInfo() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">DETALLES</h1>
+                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Medio de Pago</h1>
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>MEDIO DE PAGO</strong></p>
                     <p>{economicExpense.meanOfPayment.name}</p>
                 </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Actividad</h1>
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>MONTO</strong></p>
                     <p>{formatAmountToCRC(economicExpense.amount)}</p>
                 </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>CATEGORÍA</strong></p>
-                    <p>{economicExpense.category.name}</p>
-                </div>
             </div>
-
         </div>
     );
 }

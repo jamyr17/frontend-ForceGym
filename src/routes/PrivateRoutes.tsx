@@ -8,12 +8,10 @@ import ProductInventoryManagement from "../Product/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
-import NotificationTemplateManagement from "../TemplateNotification/Page";
-import MeasurementManagement from "../Measurement/Page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
-    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes } = useCommonDataStore()
+    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchTypesClient } = useCommonDataStore()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -21,12 +19,9 @@ function PrivateRoutes () {
             const resultRoles = await fetchRoles()
             const resultMeansOfPayment = await fetchMeansOfPayment()
             const resultActivityTypes = await fetchActivityTypes()
-            const resultGenders = await fetchGenders()
-            const resultTypesClient = await fetchTypesClient()
-            const resultCategories = await fetchCategories()
-            const resultNotificationTypes = await fetchNotificationTypes()
+            //const resultTypesClient = await fetchTypesClient()
 
-            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout || resultGenders.logout || resultTypesClient.logout || resultCategories.logout || resultNotificationTypes.logout){
+            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout ){
                 setAuthHeader(null)
                 setAuthUser(null)
                 navigate('/login', {replace: true})
@@ -65,21 +60,9 @@ function PrivateRoutes () {
                 }
             />
             <Route 
-                path="clientes" 
+                path="cliente" 
                 element={
                     <ClientManagement/>
-                }
-            />
-            <Route 
-                path="medidas" 
-                element={
-                    <MeasurementManagement/>
-                }
-            />
-            <Route 
-                path="plantillas-notificacion" 
-                element={
-                    <NotificationTemplateManagement/>
                 }
             />
         </Routes>

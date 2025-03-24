@@ -33,6 +33,11 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>COSTO</strong></p>
+                    <p>{productInventory.cost}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
                     <p><strong>PRECIO UNITARIO</strong></p>
                     <p>{formatAmountToCRC(productInventory.cost)}</p>
                 </div>

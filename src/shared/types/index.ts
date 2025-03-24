@@ -18,16 +18,6 @@ export type ActivityType = {
     name: string
 }
 
-export type Gender = {
-    idGender: number
-    name: string
-}
-
-export type Category = {
-    idCategory: number
-    name: string
-}
-
 export type TypeClient = {
     idTypeClient: number
     name: string
@@ -38,10 +28,6 @@ export type TypeClient = {
     isDeleted: number
 }
 
-export type NotificationType = {
-    idNotificationType: number
-    name: string
-}
 // -----------------------------------------------------
 
 export type Person = {
@@ -53,7 +39,7 @@ export type Person = {
     identificationNumber: string
     email: string
     phoneNumber: string
-    gender: Gender
+    gender: string
 }
 
 export type User = {
@@ -65,8 +51,7 @@ export type User = {
     token: string
 }
 
-export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Omit<Person, 'gender'> & {
-    idGender: number
+export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Person & {
     password: string
     confirmPassword: string
 }
@@ -75,7 +60,7 @@ export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pic
 
 export type EconomicIncome = {
     idEconomicIncome: number
-    client: Client
+    user: User
     registrationDate: Date
     voucherNumber: string
     detail: string
@@ -85,22 +70,16 @@ export type EconomicIncome = {
     isDeleted: number
 }
 
-export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType' | "client"> & Pick<Client, 'idClient'> & {
+export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType'> & Pick<User, 'idUser'> & {
     idMeanOfPayment: MeanOfPayment['idMeanOfPayment']
     idActivityType: ActivityType['idActivityType']
 }
 
-export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client"> & {
-    user: User
+export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome"> & {
     idEconomicExpense: number
-    category: Category
 }
 
-export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome" | "idClient"> & Omit<EconomicExpense, "meanOfPayment" | "category" | "user">
-    & Pick<EconomicExpense, 'idEconomicExpense'> & {
-        idUser: number
-        idCategory: number
-    }
+export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome"> & Pick<EconomicExpense, 'idEconomicExpense'>
 
 // -----------------------------------------------------
 
@@ -115,6 +94,7 @@ export type ProductInventory = {
 }
 
 export type ProductInventoryDataForm = Omit<ProductInventory, 'user'> & Pick<User, 'idUser'>
+
 // --------------------------------------------------------
 export type HealthQuestionnaire = Pick<Client, 'idClient'> & {
     idHealthQuestionnaire: number
@@ -135,52 +115,10 @@ export type Client = {
     typeClient: TypeClient
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
-    expirationMembershipDate: Date
-    phoneNumberContactEmergency: string
-    nameEmergencyContact: string
+    emergencyContact: string
     signatureImage: string
     isDeleted: number
 }
-// --------------------------------------------------------
-export type Measurement = {
-    idMeasurement: number
-    idClient: number
-    measurementDate: Date
-    weight: number
-    height: number
-    muscleMass: number
-    bodyFatPercentage: number 
-    visceralFatPercentage: number
-    neckSize: number
-    shoulderSize: number
-    chestSize: number
-    waistSize: number
-    thighSize: number
-    calfSize: number
-    forearmSize: number
-    armSize: number
-    isDeleted: number
-}
 
-export type MeasurementDataForm = Omit<Measurement, 'client'> & {
-    idClient: number
-}
+export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Person & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'>
 
-export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
-    idGender: number
-}
-
-export type ClientOptions = {
-    value: number
-    label: string
-}
-// --------------------------------------------------------
-export type NotificationTemplate = {
-    idNotificationTemplate: number
-    user: User
-    message: string
-    notificationType: NotificationType
-    isDeleted: number
-}
-
-export type NotificationTemplateDataForm = Omit<NotificationTemplate, 'user' | 'notificationType'> & Pick<NotificationType, 'idNotificationType'> & Pick<User, 'idUser'>
