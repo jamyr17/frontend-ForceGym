@@ -25,7 +25,7 @@ type MeasurementStore = {
     filterByDateRangeMin: Date | null;
 
     fetchMeasurements: () => Promise<any>;
-    getMeasurementById: (idClient: number) => void;
+    getMeasurementById: (idMeasurement: number) => void;
     addMeasurement: (data: MeasurementDataForm) => Promise<any>;
     updateMeasurement: (data: MeasurementDataForm) => Promise<any>;
     deleteMeasurement: (id: number, loggedIdUser: number) => Promise<any>;
@@ -98,7 +98,13 @@ export const useMeasurementStore = create<MeasurementStore>()(
         },
 
         getMeasurementById: (id) => {
-            set(() => ({ activeEditingId: id }));
+            const state = useMeasurementStore.getState();
+            const measurement = state.measurements.find(m => m.idMeasurement === id);
+            
+            set(() => ({
+                activeEditingId: id,
+                selectedMeasurement: measurement || null, // Nuevo estado para guardar la medición actual
+            }));
         },
 
         addMeasurement: async (data) => {

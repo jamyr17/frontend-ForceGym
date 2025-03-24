@@ -63,12 +63,10 @@ export function mapProductInventoryToDataForm(product: ProductInventory): Produc
 export function mapMeasurementToDataForm(measurement: Measurement): MeasurementDataForm {
     return {
         idMeasurement: measurement.idMeasurement,
-        idClient: measurement.client.idClient,
-        idUser: measurement.user.idUser,
+        idClient: measurement.idClient,
         measurementDate: measurement.measurementDate,
         weight: measurement.weight,
         height: measurement.height,
-        bmi: measurement.bmi,
         bodyFatPercentage: measurement.bodyFatPercentage,
         muscleMass: measurement.muscleMass,
         visceralFatPercentage: measurement.visceralFatPercentage,

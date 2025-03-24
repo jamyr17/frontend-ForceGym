@@ -1,7 +1,6 @@
 import { MdModeEdit, MdOutlineDelete, MdOutlineFileDownload, MdOutlineSettingsBackupRestore } from "react-icons/md";
 import Modal from "../shared/components/Modal";
 import ModalFilter from "../shared/components/ModalFilter";
-import SearchInput from "../shared/components/SearchInput";
 import NoData from "../shared/components/NoData";
 import Pagination from "../shared/components/Pagination";
 import { useMeasurementStore } from './Store';
@@ -53,7 +52,7 @@ function MeasurementManagement() {
 
     useEffect(() => {
         if (idClient) {
-            setIdClient(idClient); // Guardamos idClient en la store
+            setIdClient(idClient);
         }
     }, [idClient]);
 
@@ -121,7 +120,7 @@ function MeasurementManagement() {
                 navigate('/login', { replace: true });
             }
         };
-        if (idClient) {  // Solo traer datos si hay un idClient seleccionado
+        if (idClient) {
             fetchData();
         }
     }, [idClient, page, size, searchTerm, orderBy, filterByStatus, filterByDateRangeMin, filterByDateRangeMax, directionOrderBy]);
@@ -218,16 +217,17 @@ function MeasurementManagement() {
                                                 closeModal={closeModalInfo}
                                                 Content={DataInfo}
                                             />
-                                            <button
-                                    onClick={() => {
-                                        getMeasurementById(measurement.idMeasurement);
-                                        showModalForm();
-                                    }}
-                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                    title="Editar"
-                                >
-                                    <MdModeEdit className="text-white" />
-                                </button>
+                                                    <button 
+                                                    onClick={async () => {
+                                                        await fetchMeasurements();
+                                                        getMeasurementById(measurement.idMeasurement);
+                                                        showModalForm();
+                                                    }}
+                                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                    title="Editar"
+                                                >
+                                                    <MdModeEdit className="text-white" />
+                                                </button>
                                             {measurement.isDeleted ? (
                                                 <button onClick={() => handleRestore(mapMeasurementToDataForm(measurement))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                                     <MdOutlineSettingsBackupRestore className="text-white" />
