@@ -117,7 +117,7 @@ export const useProductInventory = () => {
         const doc = new jsPDF();
         doc.text("Inventario de Productos", 14, 10);
     
-        const tableColumn = ["#", "CÓDIGO", "NOMBRE", "CANTIDAD", "COSTO"];
+        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
         const tableRows = productsInventory.map((product, index) => [
             index + 1,
             product.code,

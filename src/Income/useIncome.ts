@@ -118,7 +118,7 @@ export const useEconomicIncome = () => {
         doc.setFont("helvetica");
         doc.text("Reporte de Ingresos Económicos", 14, 10);
     
-        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago"];
+        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago", "Tipo de actividad","Detalle"];
         
         const tableRows = economicIncomes.map((income, index) => [
             index + 1,
@@ -127,6 +127,8 @@ export const useEconomicIncome = () => {
             formatDate(new Date(income.registrationDate)),
             formatAmountToCRC(income.amount),  // Aquí formateas con ₡
             income.meanOfPayment.name,
+            income.activityType.name,  // Tipo de actividad
+            income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
         ]);
     
          autoTable(doc, { 
@@ -140,7 +142,7 @@ export const useEconomicIncome = () => {
 
     const exportToExcel = () => {
         // Encabezados de la tabla
-        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago"];
+        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago","Tipo de actividad","Detalle"];
     
         // Mapeo de los datos
         const tableRows = economicIncomes.map((income, index) => [
@@ -150,6 +152,8 @@ export const useEconomicIncome = () => {
             formatDate(new Date(income.registrationDate)),
             income.amount, 
             income.meanOfPayment.name,
+            income.activityType.name, 
+            income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
         ]);
     
         // Crear worksheet y workbook

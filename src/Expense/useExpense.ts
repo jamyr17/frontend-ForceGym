@@ -118,14 +118,15 @@ export const useEconomicExpense = () => {
         doc.setFont("helvetica");
         doc.text("Reporte de Gastos", 14, 10);
 
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
+        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
         const tableRows = economicExpenses.map((expense, index) => [
             index + 1,
             expense.voucherNumber || "No adjunto",
             formatDate(new Date(expense.registrationDate)),
             formatAmountToCRC(expense.amount), 
             expense.meanOfPayment.name,
-            expense.category.name
+            expense.category.name,
+            expense.detail ? expense.detail : 'Sin detalle' // Detalle del ingreso
         ]);
         autoTable(doc, { 
             head: [tableColumn],
@@ -138,7 +139,7 @@ export const useEconomicExpense = () => {
 
     const exportToExcel = () => {
         // Encabezados de la tabla
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
+        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
 
         // Mapeo de los datos
         const tableRows = economicExpenses.map((expense, index) => [
@@ -148,6 +149,7 @@ export const useEconomicExpense = () => {
             expense.amount, 
             expense.meanOfPayment.name,
             expense.category.name,
+            expense.detail ? expense.detail : 'Sin detalle' // Detalle del ingreso
         ]);
 
         // Crear worksheet y workbook
