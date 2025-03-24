@@ -12,20 +12,47 @@ const MAXDATE = new Date().toUTCString()
 
 function Form() {
     const navigate = useNavigate();
-    const location = useLocation(); 
+    const location = useLocation();
     const idClient = location.state?.idClient;
-    const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<MeasurementDataForm>();
-    const { measurements, activeEditingId, fetchMeasurements, addMeasurement, updateMeasurement, closeModalForm } = useMeasurementStore();
     
-    const submitForm = async (data: MeasurementDataForm) => {
-        let action = '', result;
-        const loggedUser = getAuthUser()
-        const reqUser = {
-            ...data, 
-            idUser: loggedUser?.idUser, 
-            paramLoggedIdUser: loggedUser?.idUser
+    const { 
+        register, 
+        handleSubmit, 
+        setValue, 
+        formState: { errors }, 
+        reset 
+    } = useForm<MeasurementDataForm>({
+        defaultValues: {
+            idClient: idClient || undefined,
+            idUser: '',
+            isDeleted: 0
         }
-        
+    });
+
+    const { 
+        measurements, 
+        selectedMeasurement, 
+        activeEditingId, 
+        fetchMeasurements, 
+        addMeasurement, 
+        updateMeasurement, 
+        closeModalForm 
+    } = useMeasurementStore();
+
+    const submitForm = async (data: MeasurementDataForm) => {
+
+        const loggedUser = getAuthUser();
+        const reqUser = {
+            ...data,
+            idClient: data.idClient || idClient,
+            idUser: loggedUser?.idUser,
+            paramLoggedIdUser: loggedUser?.idUser
+        };
+
+        console.log("📤 Datos enviados al backend:", reqUser);
+
+        let action = '', result;
+
         if (activeEditingId === 0) {
             result = await addMeasurement(reqUser);
             action = 'agregado';
@@ -34,17 +61,17 @@ function Form() {
             action = 'editado';
         }
 
-        closeModalForm()
-        reset()
-        
+        closeModalForm();
+        reset();
+
         if (result.ok) {
-            const result2 = await fetchMeasurements()
-            
-            if(result2.logout){
-                setAuthHeader(null)
-                setAuthUser(null)
-                navigate('/login', {replace: true})
-            }else{
+            const result2 = await fetchMeasurements();
+
+            if (result2.logout) {
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', { replace: true });
+            } else {
                 await Swal.fire({
                     title: `Medida ${action}`,
                     text: `Se ha ${action} la medida`,
@@ -54,42 +81,36 @@ function Form() {
                     timerProgressBar: true,
                     width: 500,
                     confirmButtonColor: '#CFAD04'
-                })
+                });
             }
-
-        }else if(result.logout){
-            setAuthHeader(null)
-            setAuthUser(null)
-            navigate('/login')
+        } else if (result.logout) {
+            setAuthHeader(null);
+            setAuthUser(null);
+            navigate('/login');
         }
     };
 
     useEffect(() => {
-        if (activeEditingId) {
-            const activeMeasurement = measurements.find(m => m.idClient === activeEditingId)
-            if (activeMeasurement) {
-                
-
-                setValue('idMeasurement', activeMeasurement.idMeasurement)
-                setValue('idClient', activeMeasurement.idClient)
-                setValue('isDeleted', activeMeasurement.isDeleted)
-                setValue('measurementDate', activeMeasurement.measurementDate)
-                setValue('weight', activeMeasurement.weight)
-                setValue('height', activeMeasurement.height)
-                setValue('muscleMass', activeMeasurement.muscleMass)
-                setValue('bodyFatPercentage', activeMeasurement.bodyFatPercentage)
-                setValue('visceralFatPercentage', activeMeasurement.visceralFatPercentage)
-                setValue('neckSize', activeMeasurement.neckSize)
-                setValue('shoulderSize', activeMeasurement.shoulderSize)
-                setValue('chestSize', activeMeasurement.chestSize)
-                setValue('waistSize', activeMeasurement.waistSize)
-                setValue('thighSize', activeMeasurement.thighSize)
-                setValue('calfSize', activeMeasurement.calfSize)
-                setValue('forearmSize', activeMeasurement.forearmSize)
-                setValue('armSize', activeMeasurement.armSize)              
-            }
+        if (selectedMeasurement) {
+            setValue('idMeasurement', selectedMeasurement.idMeasurement);
+            setValue('idClient', selectedMeasurement.idClient || idClient);
+            setValue('isDeleted', selectedMeasurement.isDeleted);
+            setValue('measurementDate', selectedMeasurement.measurementDate);
+            setValue('weight', selectedMeasurement.weight);
+            setValue('height', selectedMeasurement.height);
+            setValue('muscleMass', selectedMeasurement.muscleMass);
+            setValue('bodyFatPercentage', selectedMeasurement.bodyFatPercentage);
+            setValue('visceralFatPercentage', selectedMeasurement.visceralFatPercentage);
+            setValue('neckSize', selectedMeasurement.neckSize);
+            setValue('shoulderSize', selectedMeasurement.shoulderSize);
+            setValue('chestSize', selectedMeasurement.chestSize);
+            setValue('waistSize', selectedMeasurement.waistSize);
+            setValue('thighSize', selectedMeasurement.thighSize);
+            setValue('calfSize', selectedMeasurement.calfSize);
+            setValue('forearmSize', selectedMeasurement.forearmSize);
+            setValue('armSize', selectedMeasurement.armSize);
         }
-    }, [activeEditingId]);
+    }, [selectedMeasurement]);
 
     return (
         <form 
@@ -121,22 +142,22 @@ function Form() {
 
             <div className="mb-5">
                 <label htmlFor="measurementDate" className="text-sm uppercase font-bold">
-                    Fecha
+                    Fecha de registro
                 </label>
                 <input  
                     id="measurementDate"
                     className="w-full p-3 border border-gray-100"  
                     type="date" 
                     {...register('measurementDate', {
-                        required: 'La fecha es obligatoria',
+                        required: 'La fecha de registro es obligatoria',
                         max: {
                             value: MAXDATE,
-                            message: `Debe ingresar una fecha de máximo ${formatDate(new Date())}`
+                            message: `Debe ingresar una fecha de registro de máximo ${formatDate(new Date())}`
                         }
                     })}
                 />
 
-                {/* mostrar errores del input de la fecha */}
+                {/* mostrar errores del input de la fecha de nacimiento */}
                 {errors.measurementDate && 
                     <ErrorForm>
                         {errors.measurementDate.message}
