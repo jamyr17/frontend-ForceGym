@@ -16,10 +16,7 @@ import { useNavigate } from "react-router";
 import { useEconomicExpense } from "./useExpense";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
-
+import FileTypeDecision from "../shared/components/ModalFileType";
 
 function EconomicExpenseManagement() {
     const {
@@ -27,6 +24,7 @@ function EconomicExpenseManagement() {
         modalForm,
         modalFilter,
         modalInfo,
+        modalFileTypeDecision,
         page,
         size,
         totalRecords,
@@ -51,57 +49,12 @@ function EconomicExpenseManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
+        showModalFileType, 
+        closeModalFileType
     } = useEconomicExpenseStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicExpense()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useEconomicExpense()
     const navigate = useNavigate()
-    
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.setFont("helvetica");
-        doc.text("Reporte de Gastos", 14, 10);
-
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
-        const tableRows = economicExpenses.map((expense, index) => [
-            index + 1,
-            expense.voucherNumber || "No adjunto",
-            formatDate(new Date(expense.registrationDate)),
-            formatAmountToCRC(expense.amount), 
-            expense.meanOfPayment.name,
-            expense.category.name
-        ]);
-        autoTable(doc, { 
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-
-        doc.save("gastos.pdf");
-    };
-
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría"];
-
-        // Mapeo de los datos
-        const tableRows = economicExpenses.map((expense, index) => [
-            index + 1,
-            expense.voucherNumber !== '' ? expense.voucherNumber : "No adjunto",
-            formatDate(new Date(expense.registrationDate)),
-            expense.amount, 
-            expense.meanOfPayment.name,
-            expense.category.name,
-        ]);
-
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Gastos Económicos");
-
-        // Descargar
-        XLSX.writeFile(wb, "gastos.xlsx");
-    };
-
 
     useEffect(() => {}, [economicExpenses])
     
@@ -150,21 +103,29 @@ function EconomicExpenseManagement() {
                             Content={Form}
                         />
 
-                     {economicExpenses?.length > 0 && (
-                            <div className="flex gap-2">
-                            <button 
-                                onClick={exportToPDF} 
-                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                         <MdOutlineFileDownload /> Descargar PDF
-                            </button>
-                            <button 
-                                onClick={exportToExcel} 
-                                className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar Excel
+                    {economicExpenses?.length > 0 && (
+                    <div className="flex gap-2">
+                        <Modal
+                            Button={() => (
+                                <button 
+                                    onClick={showModalFileType}
+                                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                    <MdOutlineFileDownload /> Descargar
                                 </button>
-                            </div>
-                           )} 
+                            )}
+                            modal={modalFileTypeDecision}
+                            getDataById={getEconomicExpenseById}
+                            closeModal={closeModalFileType}
+                            Content={() => <FileTypeDecision 
+                                                modulo="Gastos económicos" 
+                                                closeModal={closeModalFileType} 
+                                                exportToPDF={exportToPDF}
+                                                exportToExcel={exportToExcel}
+                            />}
+                        />  
                     </div>
+                    )} 
+                </div> 
                     
                     {economicExpenses?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">

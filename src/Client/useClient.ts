@@ -4,10 +4,14 @@ import { Client, ClientDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useClientStore from "./Store"
 import { useNavigate } from "react-router"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from 'xlsx';
+import { formatDate } from "../shared/utils/format"
 
 export const useClient = () => {
     const navigate = useNavigate()
-    const { fetchClients, deleteClient, updateClient, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientStore()
+    const { clients, fetchClients, deleteClient, updateClient, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientStore()
 
     const handleDelete = async ({ idClient, person } : Client) => {
         await Swal.fire({
@@ -109,10 +113,53 @@ export const useClient = () => {
         })
     }
 
+    const exportToPDF = () => {
+        const doc = new jsPDF();   
+        doc.setFont("helvetica");
+        doc.text("Reporte de Clientes", 14, 10);
+    
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name
+        ]);
+    
+        autoTable(doc, { 
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+
+        doc.save("clientes.pdf");
+    };
+
+    const exportToExcel = () => {
+        const tableColumn = ["#", "Cédula", "Nombre", "Fecha Registro", "Tipo Cliente"];
+        const tableRows = clients.map((client, index) => [
+            index + 1,
+            client.person.identificationNumber,
+            `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+            formatDate(new Date(client.registrationDate)),
+            client.typeClient.name
+        ]);
+
+        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+
+        XLSX.writeFile(wb, "clientes.xlsx");
+    };
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore,
+        exportToPDF,
+        exportToExcel
     }
 }

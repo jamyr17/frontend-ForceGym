@@ -11,6 +11,7 @@ type ClientStore = {
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
+    modalFileTypeDecision: boolean;
     activeEditingId: Client['idClient'];
     size: number;
     page: number;
@@ -61,6 +62,8 @@ type ClientStore = {
     closeModalFilter: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    showModalFileType: () => void;
+    closeModalFileType: () => void;
 };
 
 export const useClientStore = create<ClientStore>()(
@@ -69,6 +72,7 @@ export const useClientStore = create<ClientStore>()(
         modalForm: false,
         modalFilter: false,
         modalInfo: false,
+        modalFileTypeDecision: false,
         activeEditingId: 0,
         size: 5,
         page: 1,
@@ -196,7 +200,9 @@ export const useClientStore = create<ClientStore>()(
         showModalFilter: () => set(() => ({ modalFilter: true })),
         closeModalFilter: () => set(() => ({ modalFilter: false })),
         showModalInfo: () => set(() => ({ modalInfo: true })),
-        closeModalInfo: () => set(() => ({ modalInfo: false }))
+        closeModalInfo: () => set(() => ({ modalInfo: false })),
+        showModalFileType: () => set(() => ({ modalFileTypeDecision: true })),
+        closeModalFileType: () => set(() => ({ modalFileTypeDecision: false }))
     }))
 );
 
