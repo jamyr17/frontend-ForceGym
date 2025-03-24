@@ -25,7 +25,7 @@ type MeasurementStore = {
     filterByDateRangeMin: Date | null;
 
     fetchMeasurements: () => Promise<any>;
-    getMeasurementById: (idClient: number) => void;
+    getMeasurementById: (idMeasurement: number) => void;
     addMeasurement: (data: MeasurementDataForm) => Promise<any>;
     updateMeasurement: (data: MeasurementDataForm) => Promise<any>;
     deleteMeasurement: (id: number, loggedIdUser: number) => Promise<any>;
@@ -98,8 +98,14 @@ export const useMeasurementStore = create<MeasurementStore>()(
         },
 
         getMeasurementById: (id) => {
-            set(() => ({ activeEditingId: id }));
-        },
+            const state = useMeasurementStore.getState();
+            const measurement = state.measurements.find(m => m.idMeasurement === id);
+            
+            set(() => ({
+                activeEditingId: id,
+                selectedMeasurement: measurement || null,
+            }));
+        },
 
         addMeasurement: async (data) => {
             const result = await postData(`${import.meta.env.VITE_URL_API}measurement/add`, data);
