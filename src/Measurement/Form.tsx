@@ -23,7 +23,7 @@ function Form() {
         reset 
     } = useForm<MeasurementDataForm>({
         defaultValues: {
-            idClient: idClient || undefined, // ✅ Se registra idClient correctamente
+            idClient: idClient || undefined,
             idUser: '',
             isDeleted: 0
         }
@@ -40,17 +40,15 @@ function Form() {
     } = useMeasurementStore();
 
     const submitForm = async (data: MeasurementDataForm) => {
-        console.log("🔍 Datos originales del formulario:", data);
 
         const loggedUser = getAuthUser();
         const reqUser = {
             ...data,
-            idClient: data.idClient || idClient, // ✅ Se asegura que idClient no sea undefined
+            idClient: data.idClient || idClient,
             idUser: loggedUser?.idUser,
             paramLoggedIdUser: loggedUser?.idUser
         };
 
-        console.log("📤 Datos enviados al backend:", reqUser);
 
         let action = '', result;
 
@@ -94,7 +92,7 @@ function Form() {
     useEffect(() => {
         if (selectedMeasurement) {
             setValue('idMeasurement', selectedMeasurement.idMeasurement);
-            setValue('idClient', selectedMeasurement.idClient || idClient); // ✅ Se mantiene idClient
+            setValue('idClient', selectedMeasurement.idClient || idClient);
             setValue('isDeleted', selectedMeasurement.isDeleted);
             setValue('measurementDate', selectedMeasurement.measurementDate);
             setValue('weight', selectedMeasurement.weight);
