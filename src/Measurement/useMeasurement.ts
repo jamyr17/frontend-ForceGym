@@ -115,9 +115,25 @@ export const useMeasurement = () => {
         const doc = new jsPDF(); 
         doc.setFont("helvetica");
         doc.text("Reporte de Medidas Corporales", 14, 10);
-
-        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
-
+    
+        const tableColumn = [
+            "#", 
+            "Fecha", 
+            "Peso (kg)", 
+            "Altura (cm)", 
+            "Músculo (%)", 
+            "Grasa Corporal (%)", 
+            "Grasa Visceral (%)",
+            "Cuello (cm)",
+            "Hombros (cm)",
+            "Pecho (cm)",
+            "Cintura (cm)",
+            "Muslo (cm)",
+            "Pantorrilla (cm)",
+            "Antebrazo (cm)",
+            "Brazo (cm)"
+        ];
+    
         const tableRows = measurements.map((measurement, index) => [
             index + 1,
             formatDate(new Date(measurement.measurementDate)),
@@ -126,22 +142,46 @@ export const useMeasurement = () => {
             measurement.muscleMass,
             measurement.bodyFatPercentage,
             measurement.visceralFatPercentage,
+            measurement.neckSize,
+            measurement.shoulderSize,
+            measurement.chestSize,
+            measurement.waistSize,
+            measurement.thighSize,
+            measurement.calfSize,
+            measurement.forearmSize,
+            measurement.armSize
         ]);
-
+    
         autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
             startY: 20,
+            styles: { fontSize: 7 }, // Para que quepan todas las columnas
         });
-
+    
         doc.save("Medidas_Corporales.pdf");
     };
-
+    
     const exportToExcel = () => {
         // Encabezados de la tabla
-        const tableColumn = ["#", "Fecha", "Peso (kg)", "Altura (cm)", "Músculo (%)", "Grasa Corporal (%)", "Grasa Visceral (%)"];
+        const tableColumn = [
+            "#", 
+            "Fecha", 
+            "Peso (kg)", 
+            "Altura (cm)", 
+            "Músculo (%)", 
+            "Grasa Corporal (%)", 
+            "Grasa Visceral (%)",
+            "Cuello (cm)",
+            "Hombros (cm)",
+            "Pecho (cm)",
+            "Cintura (cm)",
+            "Muslo (cm)",
+            "Pantorrilla (cm)",
+            "Antebrazo (cm)",
+            "Brazo (cm)"
+        ];
     
-        // Mapeo de los datos
         const tableRows = measurements.map((measurement, index) => [
             index + 1,
             formatDate(new Date(measurement.measurementDate)),
@@ -150,8 +190,15 @@ export const useMeasurement = () => {
             measurement.muscleMass,
             measurement.bodyFatPercentage,
             measurement.visceralFatPercentage,
+            measurement.neckSize,
+            measurement.shoulderSize,
+            measurement.chestSize,
+            measurement.waistSize,
+            measurement.thighSize,
+            measurement.calfSize,
+            measurement.forearmSize,
+            measurement.armSize
         ]);
-    
         // Crear worksheet y workbook
         const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
         const wb = XLSX.utils.book_new();
