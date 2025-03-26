@@ -74,6 +74,33 @@ function Form() {
         }
 
     }
+    
+    const validatePassword = (password: string): true | string => {
+        const num = /\d/;
+        const lowercase = /[a-z]/;
+        const uppercase = /[A-Z]/;
+        const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+        const charLength = /^.{8,20}$/;
+    
+        if (!charLength.test(password)) {
+            return "La contraseña debe tener al menos 8 y 20 caracteres.";
+        }
+        if (!lowercase.test(password)) {
+            return "La contraseña debe contener al menos una letra minúscula.";
+        }
+        if (!uppercase.test(password)) {
+            return "La contraseña debe contener al menos una letra mayúscula.";
+        }
+        if (!num.test(password)) {
+            return "La contraseña debe contener al menos un número.";
+        }
+        if (!specialChar.test(password)) {
+            return "La contraseña debe contener al menos un carácter especial.";
+        }
+    
+        return true;
+    };
+    
 
     useEffect(() => { 
         if(activeEditingId){
@@ -380,7 +407,8 @@ function Form() {
                     type="password" 
                     placeholder="Ingrese la contraseña" 
                     {...register('password', {
-                        required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false
+                        required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false,
+                        validate: validatePassword
                     })}
                 />
 
