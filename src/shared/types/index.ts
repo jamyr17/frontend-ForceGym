@@ -144,7 +144,7 @@ export type Client = {
 // --------------------------------------------------------
 export type Measurement = {
     idMeasurement: number
-    idClient: number
+    client: Client
     measurementDate: Date
     weight: number
     height: number

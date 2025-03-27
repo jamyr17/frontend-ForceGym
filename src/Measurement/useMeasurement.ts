@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 import Swal from 'sweetalert2';
-import { Measurement, MeasurementDataForm } from "../shared/types";
+import { Client, Measurement, MeasurementDataForm } from "../shared/types";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import useMeasurementStore from "./Store";
 import { useNavigate } from "react-router";
@@ -114,8 +114,7 @@ export const useMeasurement = () => {
     const exportToPDF = () => {
         const doc = new jsPDF(); 
         doc.setFont("helvetica");
-        doc.text("Reporte de Medidas Corporales", 14, 10);
-    
+        doc.text(`Reporte de Medidas Corporales de ${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}`, 14, 10);
         const tableColumn = [
             "#", 
             "Fecha", 
@@ -156,10 +155,10 @@ export const useMeasurement = () => {
             head: [tableColumn],
             body: tableRows,
             startY: 20,
-            styles: { fontSize: 7 }, // Para que quepan todas las columnas
+            styles: { fontSize: 8 }, // Para que quepan todas las columnas
         });
     
-        doc.save("Medidas_Corporales.pdf");
+        doc.save(`Medidas_Corporales_${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}.pdf`);
     };
     
     const exportToExcel = () => {
@@ -200,12 +199,12 @@ export const useMeasurement = () => {
             measurement.armSize
         ]);
         // Crear worksheet y workbook
+        const fileName = `Medidas_Corporales_${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}.xlsx`;
         const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Medidas Corporales");
-    
+        XLSX.utils.book_append_sheet(wb, ws, fileName);
         // Descargar
-        XLSX.writeFile(wb, "Medidas_Corporales.xlsx");
+        XLSX.writeFile(wb, fileName);
     };
 
     return {
