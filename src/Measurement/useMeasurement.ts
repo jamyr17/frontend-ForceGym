@@ -200,9 +200,10 @@ export const useMeasurement = () => {
         ]);
         // Crear worksheet y workbook
         const fileName = `Medidas_Corporales_${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}.xlsx`;
+        const wsname = `Medidas_${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}.xlsx`;
         const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, fileName);
+        XLSX.utils.book_append_sheet(wb, ws, wsname);
         // Descargar
         XLSX.writeFile(wb, fileName);
     };
