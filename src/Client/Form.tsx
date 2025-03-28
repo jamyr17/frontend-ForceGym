@@ -311,10 +311,9 @@ function Form() {
                 <input  
                     id="phoneNumber"
                     className="w-full p-3 border border-gray-100"  
-                    type="text" 
+                    type="number" 
                     placeholder="Ingrese el número de teléfono" 
                     {...register("phoneNumber", {
-                        required: 'El número de teléfono es obligatorio',
                         maxLength: {
                             value: MAXLENGTH_PHONENUMBER,
                             message: `Debe ingresar número de teléfono de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
@@ -331,32 +330,6 @@ function Form() {
             </div>
 
             <div className="mb-5">
-                <label htmlFor="phoneNumberContactEmergency" className="text-sm uppercase font-bold">
-                    Número del contacto de emergencia
-                </label>
-                <input  
-                    id="phoneNumberContactEmergency"
-                    className="w-full p-3 border border-gray-100"  
-                    type="text" 
-                    placeholder="Ingrese el número del contacto de emergencia" 
-                    {...register("phoneNumberContactEmergency", {
-                        required: 'El número del contacto de emergencia es obligatorio',
-                        maxLength: {
-                            value: MAXLENGTH_PHONENUMBER,
-                            message: `Debe ingresar un número de contacto de emergencia de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del contacto de emergencia */}
-                {errors.phoneNumberContactEmergency && 
-                    <ErrorForm>
-                        {errors.phoneNumberContactEmergency.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
                 <label htmlFor="nameEmergencyContact" className="text-sm uppercase font-bold">
                     Nombre del contacto de emergencia
                 </label>
@@ -366,7 +339,6 @@ function Form() {
                     type="text" 
                     placeholder="Ingrese el nombre del contacto de emergencia" 
                     {...register("nameEmergencyContact", {
-                        required: 'El nombre del contacto de emergencia es obligatorio',
                         maxLength: {
                             value: MAXLENGTH_NAME,
                             message: `Debe ingresar un nombre de contacto de emergencia de máximo ${MAXLENGTH_NAME} carácteres`
@@ -383,6 +355,33 @@ function Form() {
             </div>
 
             <div className="mb-5">
+                <label htmlFor="phoneNumberContactEmergency" className="text-sm uppercase font-bold">
+                    Número del contacto de emergencia
+                </label>
+                <input  
+                    id="phoneNumberContactEmergency"
+                    className="w-full p-3 border border-gray-100"  
+                    type="text" 
+                    placeholder="Ingrese el número del contacto de emergencia" 
+                    {...register("phoneNumberContactEmergency", {
+                        maxLength: {
+                            value: MAXLENGTH_PHONENUMBER,
+                            message: `Debe ingresar un número de contacto de emergencia de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del contacto de emergencia */}
+                {errors.phoneNumberContactEmergency && 
+                    <ErrorForm>
+                        {errors.phoneNumberContactEmergency.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            
+
+            <div className="mb-5">
                 <label htmlFor="email" className="text-sm uppercase font-bold">
                     Email 
                 </label>
@@ -392,7 +391,6 @@ function Form() {
                     type="email" 
                     placeholder="Ingrese el email" 
                     {...register("email", {
-                        required: "El email es obligatorio",
                         pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message: 'Email no válido'
