@@ -17,6 +17,7 @@ import { useEconomicExpense } from "./useExpense";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
 import FileTypeDecision from "../shared/components/ModalFileType";
+import ExpenseDashboard from './ExpenseDashboard';
 
 function EconomicExpenseManagement() {
     const {
@@ -102,7 +103,7 @@ function EconomicExpenseManagement() {
                             closeModal={closeModalForm}
                             Content={Form}
                         />
-
+                        
                     {economicExpenses?.length > 0 && (
                     <div className="flex gap-2">
                         <Modal
@@ -126,7 +127,6 @@ function EconomicExpenseManagement() {
                     </div>
                     )} 
                 </div> 
-                    
                     {economicExpenses?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
                         <thead>
@@ -165,7 +165,6 @@ function EconomicExpenseManagement() {
                             </tr>
                         </thead>
                         <tbody>
-                        
                             {economicExpenses?.map((economicExpense, index) => (
                             <tr key={economicExpense.idEconomicExpense} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
@@ -224,7 +223,6 @@ function EconomicExpenseManagement() {
                                 </td>
                             </tr>
                             ))}
-
                         </tbody>
                     </table>
                     ) : 
@@ -232,6 +230,9 @@ function EconomicExpenseManagement() {
                         <NoData module="gastos económicos" />
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
+                    {economicExpenses?.length > 0 && (
+                     <ExpenseDashboard economicExpenses={economicExpenses} />
+                    )}
                 </div>
             </main>
         </div>
