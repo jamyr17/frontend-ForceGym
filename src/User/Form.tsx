@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react";
 import { formatDate } from "../shared/utils/format";
 import { useNavigate } from "react-router";
 import { useCommonDataStore } from "../shared/CommonDataStore";
+import PasswordInput from "../shared/components/PasswordInput";
 
 // variables usadas en este componente para validaciones del formulario
 const MAXLENGTH_IDENTIFICATIONUMBER = 20
@@ -401,7 +402,7 @@ function Form() {
                 <label htmlFor="password" className="text-sm uppercase font-bold">
                     Contraseña
                 </label>
-                <input  
+                <PasswordInput    
                     id="password"
                     className="w-full p-3 border border-gray-100"  
                     type="password" 
@@ -424,7 +425,7 @@ function Form() {
                 <label htmlFor="confirmPassword" className="text-sm uppercase font-bold">
                     Confirmar Contraseña
                 </label>
-                <input  
+                <PasswordInput    
                     id="confirmPassword"
                     className="w-full p-3 border border-gray-100"  
                     type="password" 

@@ -1,4 +1,5 @@
 import type { CredencialUser } from "../shared/types/index"
+import PasswordInput from "../shared/components/PasswordInput";
 
 type LoginProps = {
     credencialUser: CredencialUser
@@ -29,17 +30,16 @@ function Login ({credencialUser, setCredencialUser, handleLoginSubmit} : LoginPr
                             className="p-2 outline-1"
                         />
 
-                        <label htmlFor='password' className="text-1xl font-bold">Contraseña</label>
-                        <input 
-                            type="password" 
-                            name="password" 
-                            id="password" 
-                            value={credencialUser.password} 
-                            onChange={e => setCredencialUser({...credencialUser, password: e.target.value})} 
-                            placeholder="Ingresar contraseña" 
-                            required 
-                            className="p-2 outline-1"
+                        <label htmlFor="password" className="text-1xl font-bold">Contraseña</label>
+                        <PasswordInput
+                        id="password"
+                        name="password"
+                        value={credencialUser.password}
+                        onChange={e => setCredencialUser({ ...credencialUser, password: e.target.value })}
+                        placeholder="Ingresar contraseña"
+                        required
                         />
+
 
                         <button type="submit" className="text-1xl mt-8 py-2 bg-black text-white rounded-4xl transition-all hover:bg-yellow hover:text-black hover:cursor-pointer">Iniciar Sesión</button>
                         <a href="#" className="text-1xls text-center hover:underline hover:decoration-yellow">¿Olvidó su contraseña?</a>
