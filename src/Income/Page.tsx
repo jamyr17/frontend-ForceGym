@@ -17,6 +17,9 @@ import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
 import FileTypeDecision from "../shared/components/ModalFileType";
+import IncomeDashboard from './IncomeDashboard';
+
+
 
 function EconomicIncomeManagement() {
     const {
@@ -52,8 +55,9 @@ function EconomicIncomeManagement() {
         showModalFileType,
         closeModalFileType
     } = useEconomicIncomeStore()
-
+    
     const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useEconomicIncome()
+   
     const navigate = useNavigate()
 
     useEffect(() => {}, [economicIncomes])
@@ -74,7 +78,9 @@ function EconomicIncomeManagement() {
     }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByClientType])
 
     return ( 
+        
         <div className="bg-black h-full w-full">
+
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">INGRESOS</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
@@ -235,6 +241,10 @@ function EconomicIncomeManagement() {
                         <NoData module="ingresos económicos" />
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
+                    {economicIncomes?.length > 0 && (
+                    <IncomeDashboard economicIncomes={economicIncomes} />
+                    )}
+               
                 </div>
             </main>
         </div>
