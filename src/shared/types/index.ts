@@ -1,6 +1,7 @@
 export type CredencialUser = {
     username: string
     password: string
+    recaptchaToken: string
 }
 
 export type Role = {
