@@ -1,28 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({ error, onChange, ...props }) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [inputValue, setInputValue] = useState(""); // Estado interno para manejar el valor
+// Usamos forwardRef para que react-hook-form pueda registrar el input correctamente
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ error, onChange, ...props }, ref) => {
+    const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    if (onChange) onChange(e); // Llamamos a onChange si existe
-  };
-
-  return (
-    <div className="relative">
-      <input
-        {...props}
-        type={showPassword ? "text" : "password"}
-        onChange={handleChange}
-        className="w-full p-3 border border-gray-300 rounded pr-10"
-      />
-      {inputValue && ( // Solo muestra el botón si hay texto en el input
+    return (
+      <div className="relative">
+        <input
+          {...props}
+          ref={ref} // Importante para react-hook-form
+          type={showPassword ? "text" : "password"}
+          onChange={onChange} // Permite que react-hook-form maneje el cambio
+          className="w-full p-3 border border-gray-300 rounded pr-10"
+        />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
@@ -30,10 +26,10 @@ const PasswordInput: React.FC<PasswordInputProps> = ({ error, onChange, ...props
         >
           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </button>
-      )}
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-    </div>
-  );
-};
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      </div>
+    );
+  }
+);
 
 export default PasswordInput;
