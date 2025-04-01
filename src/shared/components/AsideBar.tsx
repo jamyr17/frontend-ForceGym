@@ -3,6 +3,7 @@ import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp , MdTrendingDown   } from 'react-icons/md';
+import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
 import { Link } from 'react-router';
 import { getAuthUser } from '../utils/authentication';
@@ -43,6 +44,14 @@ function AsideBar() {
       </div>
 
       <div className="flex flex-col gap-6 text-lg">
+      <Link
+        to={'/gestion/dashboard'}
+        className="flex items-center gap-2 p-2 bg-yellow-500 text-black rounded-b-sm cursor-pointer"
+        title="Dashboard">
+        <PiHouseSimpleFill />
+        {isOpen && <p>Dashboard</p>}
+      </Link>
+
         <Link to={'/gestion/usuarios'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
         title="Usuarios">
           <FaRegUser />

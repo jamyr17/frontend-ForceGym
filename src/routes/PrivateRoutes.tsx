@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate } from "react-router";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import DashboardManagement from "../Dashboard/Page";
 import UserManagement from "../User/Page";
 import EconomicIncomeManagement from "../Income/Page";
 import EconomicExpenseManagement from "../Expense/Page";
@@ -40,6 +41,13 @@ function PrivateRoutes () {
         <>
         <AsideBar />
         <Routes>
+            <Route 
+                path="dashboard" 
+                element={
+                    <DashboardManagement/>
+                }
+            />
+
             <Route 
                 path="usuarios" 
                 element={
