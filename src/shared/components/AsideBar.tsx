@@ -5,9 +5,9 @@ import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp , MdTrendingDown   } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
-import { Link, useNavigate } from 'react-router-dom';
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
+import { Link, useNavigate } from 'react-router';
 
 function AsideBar() {
   const loggedUser = getAuthUser();
