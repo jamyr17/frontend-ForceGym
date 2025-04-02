@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
 import { GiWeightLiftingUp } from "react-icons/gi";
-import { MdOutlineInventory, MdOutlineTrendingUp , MdTrendingDown   } from 'react-icons/md';
+import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
+import { FaBalanceScale } from "react-icons/fa"; 
+import { Link, useNavigate } from 'react-router-dom';
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
 import { Link, useNavigate } from 'react-router';
 
 function AsideBar() {
   const loggedUser = getAuthUser();
+  const userRole = loggedUser?.role?.name;
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
@@ -29,6 +32,37 @@ function AsideBar() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
+
+  const NavItem = ({ 
+    to, 
+    icon, 
+    title, 
+    text,
+    allowedRoles 
+  }: {
+    to: string;
+    icon: React.ReactNode;
+    title: string;
+    text: string;
+    allowedRoles?: string[];
+  }) => {
+    if (allowedRoles && !allowedRoles.includes(userRole || '')) {
+      return null;
+    }
+    
+    return (
+      <Link
+        to={to}
+        className={`flex items-center gap-2 p-2 ${to === '/gestion/dashboard' ? 
+          'bg-yellow-500 text-black rounded-b-sm cursor-pointer' : 
+          'hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer'}`}
+        title={title}
+      >
+        {icon}
+        {isOpen && <p>{text}</p>}
+      </Link>
+    );
+  };
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -56,50 +90,64 @@ function AsideBar() {
           {isOpen && <p>Menú</p>}
         </div>
 
-      <div className="flex flex-col gap-6 text-lg">
-      <Link
-        to={'/gestion/dashboard'}
-        className="flex items-center gap-2 p-2 bg-yellow-500 text-black rounded-b-sm cursor-pointer"
-        title="Dashboard">
-        <PiHouseSimpleFill />
-        {isOpen && <p>Dashboard</p>}
-      </Link>
+        <div className="flex flex-col gap-6 text-lg">
+          <NavItem
+            to="/gestion/dashboard"
+            icon={<PiHouseSimpleFill />}
+            title="Dashboard"
+            text="Dashboard"
+          />
 
-        <Link to={'/gestion/usuarios'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
-        title="Usuarios">
-          <FaRegUser />
-          {isOpen && <p>Usuarios</p>}
-        </Link>
+          <NavItem
+            to="/gestion/usuarios"
+            icon={<FaRegUser />}
+            title="Usuarios"
+            text="Usuarios"
+          />
 
-          <Link to={'/gestion/clientes'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
-            title="Clientes">
-            <GiWeightLiftingUp />
-            {isOpen && <p>Clientes</p>}
-          </Link>
+          <NavItem
+            to="/gestion/clientes"
+            icon={<GiWeightLiftingUp />}
+            title="Clientes"
+            text="Clientes"
+          />
 
-          <Link to={'/gestion/ingresos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
-            title="Ingresos">
-            <MdOutlineTrendingUp />
-            {isOpen && <p>Ingresos</p>}
-          </Link>
+          <NavItem
+            to="/gestion/ingresos"
+            icon={<MdOutlineTrendingUp />}
+            title="Ingresos"
+            text="Ingresos"
+          />
 
-          <Link to={'/gestion/gastos'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
-            title="Gastos">
-            <MdTrendingDown />
-            {isOpen && <p>Gastos</p>}
-          </Link>
+          <NavItem
+            to="/gestion/gastos"
+            icon={<MdTrendingDown />}
+            title="Gastos"
+            text="Gastos"
+          />
 
-          <Link to={'/gestion/inventario'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
-            title="Inventario">
-            <MdOutlineInventory />
-            {isOpen && <p>Inventario</p>}
-          </Link>
+          <NavItem
+            to="/gestion/balance"
+            icon={<FaBalanceScale />}
+            title="Balance Económico"
+            text="Balance"
+          />
 
-          <Link to={'/gestion/plantillas-notificacion'} className="flex items-center gap-2 p-2 hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer"
-            title="Plantillas de Notificaciones">
-            <TbBellCog />
-            {isOpen && <p>Plantillas</p>}
-          </Link>
+          {/* Ítem de inventario solo para Administrador */}
+          <NavItem
+            to="/gestion/inventario"
+            icon={<MdOutlineInventory />}
+            title="Inventario"
+            text="Inventario"
+            allowedRoles={['Administrador']}
+          />
+
+          <NavItem
+            to="/gestion/plantillas-notificacion"
+            icon={<TbBellCog />}
+            title="Plantillas de Notificaciones"
+            text="Plantillas"
+          />
         </div>
 
         <div>
