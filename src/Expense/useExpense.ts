@@ -11,7 +11,7 @@ import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
 export const useEconomicExpense = () => {
     const navigate = useNavigate()
-    const { economicExpenses, fetchEconomicExpenses, deleteEconomicExpense, updateEconomicExpense, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicExpenseStore()
+    const { economicExpenses, fetchEconomicExpenses,deleteEconomicExpense, updateEconomicExpense, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicExpenseStore()
 
     const handleDelete = async ({ idEconomicExpense, voucherNumber } : EconomicExpense) => {
         await Swal.fire({

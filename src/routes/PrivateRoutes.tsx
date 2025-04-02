@@ -5,12 +5,15 @@ import DashboardManagement from "../Dashboard/Page";
 import UserManagement from "../User/Page";
 import EconomicIncomeManagement from "../Income/Page";
 import EconomicExpenseManagement from "../Expense/Page";
+import EconomicChartsPage from "../Balance/Page"; // Nuevo import
 import ProductInventoryManagement from "../Product/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
 import NotificationTemplateManagement from "../TemplateNotification/Page";
 import MeasurementManagement from "../Measurement/Page";
+import { ProtectedRoute } from "./ProtectedRoutes";
+
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -66,10 +69,19 @@ function PrivateRoutes () {
                     <EconomicExpenseManagement/>
                 }
             />
+             <Route 
+                path="balance" 
+                element={
+                    <EconomicChartsPage/>
+                }
+            />
+
             <Route 
                 path="inventario" 
                 element={
-                    <ProductInventoryManagement/>
+                <ProtectedRoute allowedRoles={['Administrador']}>
+                <ProductInventoryManagement/>
+                </ProtectedRoute>
                 }
             />
             <Route 
