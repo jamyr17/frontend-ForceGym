@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import MiniIncomeChart from "../Income/MiniIncomeChart";
 import MiniExpenseChart from "../Expense/MiniExpenseChart";
 import { IoIosNotificationsOutline } from "react-icons/io";
-
+import { NotificationsModal } from "../shared/components/NotificationsModal";
+import { ClientSelectionModal } from "../shared/components/ClientSelectionModal";
 
 function DashboardManagement() {
   const [economicIncomes, setEconomicIncomes] = useState([]);
   const [economicExpenses, setEconomicExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false); // Nuevo estado para el modal de notificaciones
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,14 +38,16 @@ function DashboardManagement() {
     <div className="bg-black min-h-screen p-8 text-white">
       <header className="relative flex justify-center items-center py-4">
         <img src="/LogoBlack.jpg" alt="Logo de Force GYM" className="w-52 h-auto" />
-        <IoIosNotificationsOutline className="text-white text-4xl cursor-pointer absolute right-4 top-1/2 transform -translate-y-1/2" />
+        <IoIosNotificationsOutline 
+          className="text-white text-4xl cursor-pointer absolute right-4 top-1/2 transform -translate-y-1/2" 
+          onClick={() => setIsNotificationsOpen(true)} // Ahora abre el modal de notificaciones
+        />
       </header>
-
-
 
       {/* Contenedor principal */}
       <div className="grid grid-cols-1 gap-6">
-      <div className="mt-6"></div>  {/* Margen superior de 4 unidades */}
+        <div className="mt-6"></div>  {/* Margen superior */}
+
         {/* Balance Mensual */}
         <div className="bg-white p-6 rounded-lg shadow-md text-black mx-auto w-full max-w-4xl">
           <h2 className="text-lg font-bold text-center">Balance Mensual</h2>
@@ -69,6 +74,12 @@ function DashboardManagement() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Notificaciones */}
+      <NotificationsModal 
+        isOpen={isNotificationsOpen} 
+        onClose={() => setIsNotificationsOpen(false)}
+      />
     </div>
   );
 }

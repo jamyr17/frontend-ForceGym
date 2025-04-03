@@ -10,6 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
 import { Link, useNavigate } from 'react-router';
+import { NotificationsModal } from "../shared/components/NotificationsModal";
 
 function AsideBar() {
   const loggedUser = getAuthUser();
