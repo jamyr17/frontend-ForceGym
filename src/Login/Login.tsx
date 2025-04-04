@@ -2,6 +2,7 @@ import { useRef } from "react"
 import type { CredencialUser } from "../shared/types/index"
 import PasswordInput from "../shared/components/PasswordInput";
 import ReCAPTCHA from 'react-google-recaptcha'
+import { Link } from "react-router";
 
 type LoginProps = {
     credencialUser: CredencialUser
@@ -46,8 +47,12 @@ function Login ({credencialUser, setCredencialUser, handleLoginSubmit} : LoginPr
                         <ReCAPTCHA ref={recaptcha} sitekey={`${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`} />
 
                         <button type="submit" className="text-1xl mt-4 py-2 bg-black text-white rounded-4xl transition-all hover:bg-yellow hover:text-black hover:cursor-pointer">Iniciar Sesión</button>
-                        <a href="#" className="text-1xls text-center hover:underline hover:decoration-yellow">¿Olvidó su contraseña?</a>
-                
+                        <Link
+                            to={"/forgot-password"}
+                            className="text-1xls text-center hover:underline hover:decoration-yellow"
+                        >
+                            ¿Olvidó su contraseña?
+                        </Link>
                     </form>
                 </section>
                 <aside className="bg-yellow self-center h-[470px] w-[375px] rounded-2xl">
