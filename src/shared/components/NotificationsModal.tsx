@@ -1,12 +1,13 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { NotificationTemplateModal } from "./NotificationTemplateModal"; // Asegúrate de tener este componente
+import { NotificationTemplateModal } from "./NotificationTemplateModal";
 
 type Client = {
   id: string;
   name: string;
-  additionalInfo?: string;
+  email: string;
+  phoneNumber: string;
 };
 
 type NotificationsData = {
@@ -26,6 +27,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     cumpleanos: [],
     aniversarios: [],
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
@@ -38,12 +40,63 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   }, [isOpen]);
 
+  const getNotifiedClients = () => {
+    return JSON.parse(localStorage.getItem("notifiedClients") || "[]");
+  };
+
+  const addNotifiedClients = (clientIds: string[]) => {
+    const notifiedClients = new Set([...getNotifiedClients(), ...clientIds]);
+    localStorage.setItem("notifiedClients", JSON.stringify([...notifiedClients]));
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      const allClients = [
+        ...notifications.mensualidades,
+        ...notifications.cumpleanos,
+        ...notifications.aniversarios,
+      ];
+      const notifiedClients = getNotifiedClients();
+      const clientsToNotify = allClients.filter(client => !notifiedClients.includes(client.id));
+
+      if (clientsToNotify.length > 0) {
+        sendEmail(clientsToNotify, "Notificación de ForceGym", "Mensaje automático de recordatorio.");
+        addNotifiedClients(clientsToNotify.map(client => client.id));
+      }
+    }
+  }, [isOpen, notifications]);
+
+  const sendEmail = async (clients: Client[], subject: string, message: string) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      const response = await fetch(`${import.meta.env.VITE_URL_API}mail/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          toUsers: clients.map(client => client.email),
+          subject,
+          message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al enviar el correo");
+      }
+      console.log("Correo enviado con éxito");
+    } catch (error) {
+      console.error("Error al enviar el correo:", error);
+    }
+  };
+
   const fetchNotifications = async () => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem("auth_token");
-      
+
       const [aniversariosRes, cumpleanosRes, vencimientosRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=1`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -62,10 +115,15 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
         vencimientosRes.json(),
       ]);
 
+      const alreadyEmailed = JSON.parse(localStorage.getItem("alreadyEmailed") || "[]");
+
+      const filterNewClients = (clients: Client[]) =>
+        clients.filter((c) => !alreadyEmailed.includes(c.id));
+
       setNotifications({
-        aniversarios: aniversariosData?.data?.clients || [],
-        cumpleanos: cumpleanosData?.data?.clients || [],
-        mensualidades: vencimientosData?.data?.clients || [],
+        aniversarios: filterNewClients(aniversariosData?.data?.clients || []),
+        cumpleanos: filterNewClients(cumpleanosData?.data?.clients || []),
+        mensualidades: filterNewClients(vencimientosData?.data?.clients || []),
       });
     } catch (err) {
       setError("Error al cargar las notificaciones");
@@ -75,63 +133,43 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   };
 
+  const handleSendWhatsApp = (client: Client, message: string) => {
+    if (client.phoneNumber) {
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${client.phoneNumber}?text=${encodedMessage}`;
+      window.open(whatsappUrl, "_blank");
+
+      setSelectedClients(prevClients => prevClients.filter(c => c.id !== client.id));
+    } else {
+      console.error(`El cliente ${client.name} no tiene un número de teléfono registrado.`);
+    }
+  };
+
   const handleActionClick = (type: string, clients: Client[]) => {
     setSelectedClients(clients);
     setNotificationType(type);
     setTemplateModalOpen(true);
   };
 
-  const handleSendNotification = (templateId: number, message: string) => {
-    console.log("Enviando notificación:", {
-      templateId,
-      message,
-      clients: selectedClients,
-      notificationType
-    });
-    // Aquí iría la lógica para enviar las notificaciones
-    setTemplateModalOpen(false);
-  };
-
-  const renderNotificationSection = (
-    title: string,
-    type: string,
-    clients: Client[],
-    actionText: string
-  ) => {
-    if (clients.length === 0) return null;
-  
-    const mainClient = clients[0];
-    const additionalCount = clients.length - 1;
-  
-    return (
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-1"> {title}</h2>
-        <p className="mb-1">
-          {additionalCount > 0
-            ? `${mainClient.name} y ${additionalCount} persona${additionalCount !== 1 ? 's' : ''} más`
-            : mainClient.name}
-          {title === "Mensualidades"
-            ? " se les ha caducado la mensualidad."
-            : title === "Cumpleaños"
-            ? " cumplen años el día de hoy."
-            : " cumplen su aniversario el día de hoy."}
-        </p>
-        <button
-          className="font-bold text-white hover:underline cursor-pointer"
-          onClick={() => handleActionClick(type, clients)}
-        >
-          {actionText}
-        </button>
-      </div>
-    );
-  };
-
-  const hasNotifications = () => {
-    return (
-      notifications.mensualidades.length > 0 ||
-      notifications.cumpleanos.length > 0 ||
-      notifications.aniversarios.length > 0
-    );
+  const handleSendNotification = async (templateId: number, message: string, clientId: number) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      await fetch(`${import.meta.env.VITE_URL_API}notification/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          idNotificationTemplate: templateId,
+          message,
+          idClient: clientId,
+        }),
+      });
+      console.log("Notificación enviada con éxito");
+    } catch (err) {
+      console.error("Error al enviar notificación:", err);
+    }
   };
 
   return (
@@ -169,28 +207,46 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
                     <p>Cargando notificaciones...</p>
                   ) : error ? (
                     <p className="text-red-500">{error}</p>
-                  ) : !hasNotifications() ? (
-                    <p className="text-center py-4">No hay notificaciones</p>
                   ) : (
                     <>
-                      {renderNotificationSection(
-                        "Mensualidades",
-                        "mensualidades",
-                        notifications.mensualidades,
-                        "Recuérdales"
-                      )}
-                      {renderNotificationSection(
-                        "Cumpleaños",
-                        "cumpleanos",
-                        notifications.cumpleanos,
-                        "Felicítales"
-                      )}
-                      {renderNotificationSection(
-                        "Aniversarios",
-                        "aniversarios",
-                        notifications.aniversarios,
-                        "Agradéceles"
-                      )}
+                      <h3 className="text-lg font-bold mb-2">Mensualidades</h3>
+                      {notifications.mensualidades.map(client => (
+                        <div key={client.id} className="mb-4 flex justify-between items-center">
+                          <p>{client.name}</p>
+                          <button
+                            className="bg-black text-white px-2 py-1 rounded"
+                            onClick={() => handleActionClick("mensualidades", [client])}
+                          >
+                            Usar plantilla
+                          </button>
+                        </div>
+                      ))}
+
+                      <h3 className="text-lg font-bold mt-6 mb-2">Cumpleaños</h3>
+                      {notifications.cumpleanos.map(client => (
+                        <div key={client.id} className="mb-4 flex justify-between items-center">
+                          <p>{client.name}</p>
+                          <button
+                            className="bg-black text-white px-2 py-1 rounded"
+                            onClick={() => handleActionClick("cumpleanos", [client])}
+                          >
+                            Usar plantilla
+                          </button>
+                        </div>
+                      ))}
+
+                      <h3 className="text-lg font-bold mt-6 mb-2">Aniversarios</h3>
+                      {notifications.aniversarios.map(client => (
+                        <div key={client.id} className="mb-4 flex justify-between items-center">
+                          <p>{client.name}</p>
+                          <button
+                            className="bg-black text-white px-2 py-1 rounded"
+                            onClick={() => handleActionClick("aniversarios", [client])}
+                          >
+                            Usar plantilla
+                          </button>
+                        </div>
+                      ))}
                     </>
                   )}
                 </div>
@@ -202,9 +258,9 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
 
       <NotificationTemplateModal
         clients={selectedClients}
-        onSend={handleSendNotification}
         isOpen={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}
+        onSend={handleSendNotification}
       />
     </>
   );
