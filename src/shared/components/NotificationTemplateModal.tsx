@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { IoIosClose } from "react-icons/io";
 import useNotificationTemplateStore from "../../TemplateNotification/Store";
-import { NotificationTemplate, Client } from "../../types"; // Asegúrate de importar los tipos correctos
+import { NotificationTemplate, Client } from "../types";
 
 const gymColors = {
   primary: "#cfad04",
