@@ -8,7 +8,6 @@ import { TbBellCog } from "react-icons/tb";
 import { FaBalanceScale } from "react-icons/fa"; 
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
-import { NotificationsModal } from "../shared/components/NotificationsModal";
 import { Link, useNavigate } from 'react-router';
 
 function AsideBar() {
@@ -54,7 +53,7 @@ function AsideBar() {
       <Link
         to={to}
         className={`flex items-center gap-2 p-2 ${to === '/gestion/dashboard' ? 
-          'bg-yellow-500 text-black rounded-b-sm cursor-pointer' : 
+          'bg-yellow text-black rounded-b-sm cursor-pointer' : 
           'hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer'}`}
         title={title}
       >
@@ -126,6 +125,7 @@ function AsideBar() {
             icon={<MdTrendingDown />}
             title="Gastos"
             text="Gastos"
+            allowedRoles={['Administrador']}
           />
 
           <NavItem
@@ -133,9 +133,8 @@ function AsideBar() {
             icon={<FaBalanceScale />}
             title="Balance Económico"
             text="Balance"
+            allowedRoles={['Administrador']}
           />
-
-          {/* Ítem de inventario solo para Administrador */}
           <NavItem
             to="/gestion/inventario"
             icon={<MdOutlineInventory />}
@@ -143,7 +142,6 @@ function AsideBar() {
             text="Inventario"
             allowedRoles={['Administrador']}
           />
-
           <NavItem
             to="/gestion/plantillas-notificacion"
             icon={<TbBellCog />}

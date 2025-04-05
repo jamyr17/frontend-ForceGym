@@ -1,131 +1,114 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { EconomicExpense, EconomicIncome } from "../shared/types";
+import { getData } from "../shared/services/gym";
+import { format } from 'date-fns';
+import { isCompleteDate } from "../shared/utils/validation";
 
-interface EconomicMovement {
-  id: number;
-  registrationDate: string;
-  detail: string;
-  amount: number;
-  isDeleted: boolean;
-  voucherNumber?: string;
-  meanOfPayment?: number;
-  clientId?: number;
-  activityTypeId?: number;
-  userId?: number;
-  categoryId?: number;
-}
+type EconomicBalanceStore = {
+    economicExpenses: EconomicExpense[];
+    economicIncomes: EconomicIncome[];
+    modalFilter: boolean;
+    filterByStatus: string;
+    filterByAmountRangeMax: number;
+    filterByAmountRangeMin: number;
+    filterByDateRangeMax: Date | null;
+    filterByDateRangeMin: Date | null;
+    filterByMeanOfPayment: number;
 
-interface EconomicFilters {
-  filterByStatus?: string;
-  filterByAmountRangeMin?: number;
-  filterByAmountRangeMax?: number;
-  filterByDateRangeStart?: string;
-  filterByDateRangeEnd?: string;
-  filterByMeanOfPayment?: number;
-  filterByCategory?: number;
-  filterByTypeClient?: number;
-}
+    fetchEconomicExpenses: () => Promise<any>;
+    fetchEconomicIncomes: () => Promise<any>;
 
-type EconomicStore = {
-  incomes: EconomicMovement[];
-  expenses: EconomicMovement[];
-  modalForm: boolean;
-  modalFilter: boolean;
-  activeEditingId: number | null;
-  filters: EconomicFilters;
-  fetchIncomes: () => Promise<void>;
-  fetchExpenses: () => Promise<void>;
-  getMovementById: (
-    id: number,
-    type: "income" | "expense"
-  ) => EconomicMovement | undefined;
-  showModalForm: () => void;
-  closeModalForm: () => void;
-  showModalFilter: () => void;
-  closeModalFilter: () => void;
-  setFilter: (filter: Partial<EconomicFilters>) => void;
-  resetFilters: () => void;
+    changeFilterByStatus: (newFilterByStatus: string) => void;
+    changeFilterByAmountRangeMax: (newFilter: number) => void;
+    changeFilterByAmountRangeMin: (newFilter: number) => void;
+    changeFilterByDateRangeMax: (newFilter: Date | null) => void;
+    changeFilterByDateRangeMin: (newFilter: Date | null) => void;
+    changeFilterByMeanOfPayment: (newFilter: number) => void;
+
+    showModalFilter: () => void;
+    closeModalFilter: () => void;
 };
 
-export const useEconomicStore = create<EconomicStore>()(
-  devtools((set, get) => ({
-    incomes: [],
-    expenses: [],
-    modalForm: false,
-    modalFilter: false,
-    activeEditingId: null,
-    filters: {},
+export const useEconomicBalanceStore = create<EconomicBalanceStore>()(
+    devtools((set, get) => ({
+        economicExpenses: [],
+        economicIncomes: [],
+        modalFilter: false,
+        filterByStatus: '',
+        filterByAmountRangeMax: 0,
+        filterByAmountRangeMin: 0,
+        filterByDateRangeMax: null,
+        filterByDateRangeMin: null,
+        filterByMeanOfPayment: 0,
 
-    fetchIncomes: async () => {
-      const { filters } = get();
-      const params = new URLSearchParams();
-      const token = localStorage.getItem("auth_token");
+        fetchEconomicExpenses: async () => {
+            const state = get();
+            let filters = ``;
 
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          params.append(key, value.toString());
-        }
-      });
+            if (state.filterByStatus !== '') {
+                filters += `&filterByStatus=${state.filterByStatus}`;
+            }
+            if (state.filterByAmountRangeMax !== 0 && state.filterByAmountRangeMin !== 0) {
+                filters += `&filterByAmountRangeMax=${state.filterByAmountRangeMax}&filterByAmountRangeMin=${state.filterByAmountRangeMin}`;
+            }
+            if (isCompleteDate(state.filterByDateRangeMax) && isCompleteDate(state.filterByDateRangeMin)) {
+                const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
+                const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
+            }
+            if (state.filterByMeanOfPayment != 0) {
+                filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`;
+            }
+        
+            const result = await getData(
+                `${import.meta.env.VITE_URL_API}economicExpense/listAll?${filters}`
+            );
 
-      const queryString = params.toString();
-      const response = await fetch(
-        `${import.meta.env.VITE_URL_API}economicIncome/listAll${
-          queryString ? `?${queryString}` : ""
-        }`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+            const expenses = result.data?.economicExpenses ?? [];
 
-      const result = await response.json();
-      set({ incomes: result.data });
-    },
+            set({ economicExpenses: expenses});
+            return result;
+        },
 
-    fetchExpenses: async () => {
-      const { filters } = get();
-      const params = new URLSearchParams();
-      const token = localStorage.getItem("auth_token");
+        fetchEconomicIncomes: async () => {
+            const state = get();
+            let filters = ``;
 
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          params.append(key, value.toString());
-        }
-      });
+            if (state.filterByStatus !== '') {
+                filters += `&filterByStatus=${state.filterByStatus}`;
+            }
+            if (state.filterByAmountRangeMax !== 0 && state.filterByAmountRangeMin !== 0) {
+                filters += `&filterByAmountRangeMax=${state.filterByAmountRangeMax}&filterByAmountRangeMin=${state.filterByAmountRangeMin}`;
+            }
+            if (isCompleteDate(state.filterByDateRangeMax) && isCompleteDate(state.filterByDateRangeMin)) {
+                const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
+                const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
+            }
+            if (state.filterByMeanOfPayment != 0) {
+                filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`;
+            }
 
-      const queryString = params.toString();
-      const response = await fetch(
-        `${import.meta.env.VITE_URL_API}economicExpense/listAll${
-          queryString ? `?${queryString}` : ""
-        }`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+            const result = await getData(
+                `${import.meta.env.VITE_URL_API}economicIncome/listAll?${filters}`
+            );
 
-      const result = await response.json();
-      set({ expenses: result.data });
-    },
+            const incomes = result.data?.economicIncomes ?? [];
 
-    getMovementById: (id, type) => {
-      return type === "income"
-        ? get().incomes.find((m) => m.id === id)
-        : get().expenses.find((m) => m.id === id);
-    },
+            set({ economicIncomes: incomes});
+            return result;
+        },
+        changeFilterByStatus: (newFilterByStatus) => set({ filterByStatus: newFilterByStatus }),
+        changeFilterByAmountRangeMax: (newFilter) => set({ filterByAmountRangeMax: newFilter }),
+        changeFilterByAmountRangeMin: (newFilter) => set({ filterByAmountRangeMin: newFilter }),
+        changeFilterByDateRangeMax: (newFilter) => set({ filterByDateRangeMax: newFilter }),
+        changeFilterByDateRangeMin: (newFilter) => set({ filterByDateRangeMin: newFilter }),
+        changeFilterByMeanOfPayment: (newFilter) => set({ filterByMeanOfPayment: newFilter }),
 
-    showModalForm: () => set({ modalForm: true }),
-    closeModalForm: () => set({ modalForm: false, activeEditingId: null }),
-    showModalFilter: () => set({ modalFilter: true }),
-    closeModalFilter: () => set({ modalFilter: false }),
-
-    setFilter: (filter) =>
-      set((state) => ({
-        filters: { ...state.filters, ...filter },
-      })),
-
-    resetFilters: () => set({ filters: {} }),
-  }))
+        showModalFilter: () => set({ modalFilter: true }),
+        closeModalFilter: () => set({ modalFilter: false })
+    }))
 );
+
+export default useEconomicBalanceStore;
