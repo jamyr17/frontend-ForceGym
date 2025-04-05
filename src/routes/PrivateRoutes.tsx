@@ -5,7 +5,6 @@ import DashboardManagement from "../Dashboard/Page";
 import UserManagement from "../User/Page";
 import EconomicIncomeManagement from "../Income/Page";
 import EconomicExpenseManagement from "../Expense/Page";
-import EconomicChartsPage from "../Balance/Page"; // Nuevo import
 import ProductInventoryManagement from "../Product/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
@@ -13,6 +12,7 @@ import ClientManagement from "../Client/Page";
 import NotificationTemplateManagement from "../TemplateNotification/Page";
 import MeasurementManagement from "../Measurement/Page";
 import { ProtectedRoute } from "./ProtectedRoutes";
+import EconomicBalanceDashboard from "../Balance/Page";
 
 
 function PrivateRoutes () {
@@ -54,29 +54,33 @@ function PrivateRoutes () {
             <Route 
                 path="usuarios" 
                 element={
-                    <ProtectedRoute allowedRoles={['Administrador']}>
-                    <UserManagement/>
-                    </ProtectedRoute>
-                    }
+                <ProtectedRoute allowedRoles={['Administrador']}>
+                <UserManagement/>
+                </ProtectedRoute>
+                }
             />
             <Route 
                 path="ingresos" 
                 element={
-                    <ProtectedRoute allowedRoles={['Administrador']}>
-                    <EconomicIncomeManagement/>
-                    </ProtectedRoute>
-                    }
+                <ProtectedRoute allowedRoles={['Administrador']}>
+                <EconomicIncomeManagement/>
+                </ProtectedRoute>
+                }
             />
             <Route 
                 path="gastos" 
                 element={
-                    <EconomicExpenseManagement/>
+                <ProtectedRoute allowedRoles={['Administrador']}>
+                <EconomicExpenseManagement/>
+                </ProtectedRoute>
                 }
             />
              <Route 
                 path="balance" 
                 element={
-                    <EconomicChartsPage/>
+                <ProtectedRoute allowedRoles={['Administrador']}>
+                <EconomicBalanceDashboard/>
+                </ProtectedRoute>
                 }
             />
 
