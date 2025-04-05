@@ -8,6 +8,7 @@ import { TbBellCog } from "react-icons/tb";
 import { FaBalanceScale } from "react-icons/fa"; 
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
+import { NotificationsModal } from "../shared/components/NotificationsModal";
 import { Link, useNavigate } from 'react-router';
 
 function AsideBar() {
@@ -102,6 +103,7 @@ function AsideBar() {
             icon={<FaRegUser />}
             title="Usuarios"
             text="Usuarios"
+            allowedRoles={['Administrador']}
           />
 
           <NavItem
@@ -116,6 +118,7 @@ function AsideBar() {
             icon={<MdOutlineTrendingUp />}
             title="Ingresos"
             text="Ingresos"
+            allowedRoles={['Administrador']}
           />
 
           <NavItem
