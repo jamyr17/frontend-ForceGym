@@ -54,18 +54,49 @@ export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: 
       setError("El mensaje no puede estar vacío");
       return;
     }
-
+  
+    const selectedClient = clients.find(c => c.idClient === selectedClientId);
+    
+    if (!selectedClient) {
+      setError("Cliente no válido");
+      return;
+    }
+  
+    if (!selectedClient.email && !selectedClient.phoneNumber) {
+      setError("El cliente no tiene email ni número de WhatsApp registrado");
+      return;
+    }
+  
     setIsSending(true);
     try {
-      await onSend(selectedTemplate.idNotificationTemplate, message, Number(selectedClientId));
+      // ENVIAR EMAIL
+      console.log(selectedClient);
+      await onSend(
+        selectedTemplate.idNotificationTemplate,
+        message,
+        selectedClient
+      );
+  
+      // ABRIR WHATSAPP
+      if (selectedClient.phoneNumber) {
+        const encodedMessage = encodeURIComponent(message);
+        const phone = selectedClient.phoneNumber.startsWith("506")
+          ? selectedClient.phoneNumber
+          : `506${selectedClient.phoneNumber}`;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        window.open(whatsappUrl, "_blank");
+      }
+  
       setError(null);
       onClose();
     } catch (err) {
       setError("Error al enviar la notificación");
+      console.error(err);
     } finally {
       setIsSending(false);
     }
   };
+  
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -101,7 +132,11 @@ export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: 
                   <select
                     className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                     style={{ borderColor: gymColors.primary }}
-                    onChange={(e) => setSelectedClientId(Number(e.target.value))}
+                    onChange={(e) => {
+                      const newId = parseInt(e.target.value, 10);
+                      console.log("Cliente seleccionado:", newId);
+                      setSelectedClientId(newId);
+                    }}
                     value={selectedClientId}
                   >
                     {clients.map(client => (
@@ -110,7 +145,7 @@ export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: 
                       </option>
                     ))}
                   </select>
-                </div>
+               </div>
 
                 <div className="space-y-2">
                   <label className="block text-sm font-bold uppercase tracking-wider" style={{ color: gymColors.secondary }}>PLANTILLA</label>
