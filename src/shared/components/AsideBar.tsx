@@ -6,11 +6,10 @@ import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-i
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
 import { FaBalanceScale } from "react-icons/fa"; 
-//import { Link, useNavigate } from 'react-router-dom';
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
-import { Link, useNavigate } from 'react-router';
 import { NotificationsModal } from "../shared/components/NotificationsModal";
+import { Link, useNavigate } from 'react-router';
 
 function AsideBar() {
   const loggedUser = getAuthUser();
@@ -104,6 +103,7 @@ function AsideBar() {
             icon={<FaRegUser />}
             title="Usuarios"
             text="Usuarios"
+            allowedRoles={['Administrador']}
           />
 
           <NavItem
@@ -118,6 +118,7 @@ function AsideBar() {
             icon={<MdOutlineTrendingUp />}
             title="Ingresos"
             text="Ingresos"
+            allowedRoles={['Administrador']}
           />
 
           <NavItem

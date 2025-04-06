@@ -54,14 +54,18 @@ function PrivateRoutes () {
             <Route 
                 path="usuarios" 
                 element={
+                    <ProtectedRoute allowedRoles={['Administrador']}>
                     <UserManagement/>
-                }
+                    </ProtectedRoute>
+                    }
             />
             <Route 
                 path="ingresos" 
                 element={
+                    <ProtectedRoute allowedRoles={['Administrador']}>
                     <EconomicIncomeManagement/>
-                }
+                    </ProtectedRoute>
+                    }
             />
             <Route 
                 path="gastos" 
