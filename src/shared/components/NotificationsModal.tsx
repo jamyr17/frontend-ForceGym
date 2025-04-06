@@ -1,11 +1,13 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { NotificationTemplateModal } from "./NotificationTemplateModal"; // Asegúrate de tener este componente
+import { NotificationTemplateModal } from "./NotificationTemplateModal";
 
 type Client = {
   id: string;
   name: string;
+  email: string;
+  phoneNumber: string;
   additionalInfo?: string;
 };
 
@@ -30,7 +32,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   const [error, setError] = useState<string | null>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [selectedClients, setSelectedClients] = useState<Client[]>([]);
-  const [notificationType, setNotificationType] = useState("");
+  const [notificationType, setNotificationType] = useState<"mensualidades" | "cumpleanos" | "aniversarios">("mensualidades");
 
   useEffect(() => {
     if (isOpen) {
@@ -38,12 +40,48 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   }, [isOpen]);
 
+  const sendEmail = async (clients: Client[], subject: string, message: string) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      
+      const response = await fetch(`${import.meta.env.VITE_URL_API}mail/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          toUsers: clients.map(client => client.email),
+          subject,
+          message,
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error completo en sendEmail:", error);
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
   const fetchNotifications = async () => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem("auth_token");
-      
+
       const [aniversariosRes, cumpleanosRes, vencimientosRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=1`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -55,6 +93,10 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+
+      if (!aniversariosRes.ok || !cumpleanosRes.ok || !vencimientosRes.ok) {
+        throw new Error("Error al cargar los datos");
+      }
 
       const [aniversariosData, cumpleanosData, vencimientosData] = await Promise.all([
         aniversariosRes.json(),
@@ -75,40 +117,58 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   };
 
-  const handleActionClick = (type: string, clients: Client[]) => {
+  const handleActionClick = (type: "mensualidades" | "cumpleanos" | "aniversarios", clients: Client[]) => {
     setSelectedClients(clients);
     setNotificationType(type);
     setTemplateModalOpen(true);
   };
 
-  const handleSendNotification = (templateId: number, message: string) => {
-    console.log("Enviando notificación:", {
-      templateId,
-      message,
-      clients: selectedClients,
-      notificationType
-    });
-    // Aquí iría la lógica para enviar las notificaciones
-    setTemplateModalOpen(false);
+  const handleSendNotification = async (
+    templateId: number,
+    message: string,
+    client: Client
+  ) => {
+    try {
+      console.log("Enviando notificación a:", client.email);
+      
+      if (client.email) {
+        await sendEmail([client], "Notificación de ForceGym", message);
+      } else {
+        console.warn(`Cliente ${client.name} no tiene email`);
+      }
+    
+      if (client.phoneNumber) {
+        const encodedMessage = encodeURIComponent(message);
+        const phone = client.phoneNumber.startsWith("506")
+          ? client.phoneNumber
+          : `506${client.phoneNumber}`;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        window.open(whatsappUrl, "_blank");
+      } else {
+        console.warn(`Cliente ${client.name} no tiene teléfono`);
+      }
+    } catch (error) {
+      console.error("Error en handleSendNotification:", error);
+    }
   };
 
   const renderNotificationSection = (
     title: string,
-    type: string,
+    type: "mensualidades" | "cumpleanos" | "aniversarios",
     clients: Client[],
     actionText: string
   ) => {
     if (clients.length === 0) return null;
-  
+
     const mainClient = clients[0];
     const additionalCount = clients.length - 1;
-  
+
     return (
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-1"> {title}</h2>
+        <h2 className="text-lg font-semibold mb-1">{title}</h2>
         <p className="mb-1">
           {additionalCount > 0
-            ? `${mainClient.name} y ${additionalCount} persona${additionalCount !== 1 ? 's' : ''} más`
+            ? `${mainClient.name} y ${additionalCount} persona${additionalCount !== 1 ? "s" : ""} más`
             : mainClient.name}
           {title === "Mensualidades"
             ? " se les ha caducado la mensualidad."
@@ -202,6 +262,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
 
       <NotificationTemplateModal
         clients={selectedClients}
+        notificationType={notificationType}
         onSend={handleSendNotification}
         isOpen={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}

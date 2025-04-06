@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { IoIosClose } from "react-icons/io";
 import useNotificationTemplateStore from "../../TemplateNotification/Store";
-import { NotificationTemplate, Client } from "../types";
+import { NotificationTemplate, Client } from "../../types";
 
 const gymColors = {
   primary: "#cfad04",
@@ -11,36 +11,67 @@ const gymColors = {
   error: "#E53E3E"
 };
 
+interface NotificationRecord {
+  clientId: number;
+  notificationType: 'mensualidad' | 'cumpleanos' | 'aniversario';
+  sentAt: string;
+  validUntil: string;
+}
+
 interface NotificationTemplateModalProps {
   clients: Client[];
-  onSend: (templateId: number, message: string, clientId: number) => Promise<void>;
+  notificationType: string; // Nuevo prop para identificar el tipo de notificación
+  onSend: (templateId: number, message: string, client: Client) => Promise<void>;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: NotificationTemplateModalProps) {
+export function NotificationTemplateModal({ 
+  clients, 
+  notificationType,
+  onSend, 
+  isOpen, 
+  onClose 
+}: NotificationTemplateModalProps) {
   const { notificationTemplates, fetchNotificationTemplates } = useNotificationTemplateStore();
   const [selectedTemplate, setSelectedTemplate] = useState<NotificationTemplate | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [selectedClientId, setSelectedClientId] = useState<number | "">("");
   const [isSending, setIsSending] = useState(false);
+  const [availableClients, setAvailableClients] = useState<Client[]>([]);
+  const [notificationHistory, setNotificationHistory] = useState<NotificationRecord[]>([]);
 
+  // Cargar historial al inicializar
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('notificationHistory');
+    if (savedHistory) {
+      setNotificationHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
+  // Filtrar clientes disponibles cuando se abre o cambian los clientes
   useEffect(() => {
     if (isOpen) {
       fetchNotificationTemplates();
-    }
-  }, [isOpen]);
+      
+      const now = new Date();
+      const filteredClients = clients.filter(client => {
+        const lastNotification = notificationHistory.find(
+          record => record.clientId === client.idClient && 
+                   record.notificationType === notificationType
+        );
 
-  useEffect(() => {
-    if (isOpen && clients.length > 0) {
-      setSelectedClientId(clients[0].idClient);
+        return !lastNotification || new Date(lastNotification.validUntil) < now;
+      });
+
+      setAvailableClients(filteredClients);
+      setSelectedClientId(filteredClients[0]?.idClient || "");
     }
-  }, [isOpen, clients]);
+  }, [isOpen, clients, notificationHistory, notificationType]);
 
   const handleTemplateChange = (templateId: string) => {
     const template = notificationTemplates.find(t => t.idNotificationTemplate === Number(templateId)) || null;
-    console.log("Plantilla seleccionada:", template);
     setSelectedTemplate(template);
     setMessage(template?.message || "");
   };
@@ -54,14 +85,81 @@ export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: 
       setError("El mensaje no puede estar vacío");
       return;
     }
-
+  
+    const selectedClient = availableClients.find(c => c.idClient === selectedClientId);
+    
+    if (!selectedClient) {
+      setError("Cliente no válido");
+      return;
+    }
+  
+    if (!selectedClient.email && !selectedClient.phoneNumber) {
+      setError("El cliente no tiene email ni número de WhatsApp registrado");
+      return;
+    }
+  
     setIsSending(true);
     try {
-      await onSend(selectedTemplate.idNotificationTemplate, message, Number(selectedClientId));
-      setError(null);
-      onClose();
+      await onSend(
+        selectedTemplate.idNotificationTemplate,
+        message,
+        selectedClient
+      );
+
+      // Registrar la notificación
+      const now = new Date();
+      const validUntil = new Date();
+      
+      // Establecer fecha de validez según tipo de notificación
+      if (notificationType === 'mensualidades') {
+        validUntil.setMonth(now.getMonth() + 1); // 1 mes para membresías
+      } else {
+        validUntil.setFullYear(now.getFullYear() + 1); // 1 año para cumpleaños/aniversarios
+      }
+
+      const newRecord: NotificationRecord = {
+        clientId: selectedClient.idClient,
+        notificationType: notificationType as 'mensualidad' | 'cumpleanos' | 'aniversario',
+        sentAt: now.toISOString(),
+        validUntil: validUntil.toISOString()
+      };
+
+      // Actualizar historial
+      const updatedHistory = [
+        ...notificationHistory.filter(
+          r => !(r.clientId === selectedClient.idClient && r.notificationType === notificationType)
+        ),
+        newRecord
+      ];
+
+      setNotificationHistory(updatedHistory);
+      localStorage.setItem('notificationHistory', JSON.stringify(updatedHistory));
+
+      // Actualizar lista de clientes disponibles
+      setAvailableClients(prev => prev.filter(c => c.idClient !== selectedClient.idClient));
+      
+      // Abrir WhatsApp si tiene teléfono
+      if (selectedClient.phoneNumber) {
+        const encodedMessage = encodeURIComponent(message);
+        const phone = selectedClient.phoneNumber.startsWith("506")
+          ? selectedClient.phoneNumber
+          : `506${selectedClient.phoneNumber}`;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        window.open(whatsappUrl, "_blank");
+      }
+
+      // Cerrar si no quedan más clientes
+      if (availableClients.length <= 1) {
+        onClose();
+      } else {
+        // Seleccionar el siguiente cliente
+        const currentIndex = availableClients.findIndex(c => c.idClient === selectedClient.idClient);
+        const nextClient = availableClients[(currentIndex + 1) % availableClients.length];
+        setSelectedClientId(nextClient.idClient);
+      }
     } catch (err) {
       setError("Error al enviar la notificación");
+      console.error(err);
     } finally {
       setIsSending(false);
     }
@@ -103,12 +201,17 @@ export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: 
                     style={{ borderColor: gymColors.primary }}
                     onChange={(e) => setSelectedClientId(Number(e.target.value))}
                     value={selectedClientId}
+                    disabled={availableClients.length === 0}
                   >
-                    {clients.map(client => (
-                      <option key={client.idClient} value={client.idClient}>
-                        {client.name} {client.firstLastName}
-                      </option>
-                    ))}
+                    {availableClients.length === 0 ? (
+                      <option value="">No hay clientes disponibles</option>
+                    ) : (
+                      availableClients.map(client => (
+                        <option key={client.idClient} value={client.idClient}>
+                          {client.name} {client.firstLastName}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
@@ -142,11 +245,15 @@ export function NotificationTemplateModal({ clients, onSend, isOpen, onClose }: 
 
                 <button
                   className={`w-full py-3 rounded-lg font-bold transition-colors mt-6 ${isSending ? 'opacity-80' : 'hover:bg-opacity-90'}`}
-                  style={{ backgroundColor: gymColors.primary, color: gymColors.secondary }}
+                  style={{ 
+                    backgroundColor: availableClients.length === 0 ? "#cccccc" : gymColors.primary, 
+                    color: gymColors.secondary 
+                  }}
                   onClick={handleSend}
-                  disabled={isSending}
+                  disabled={isSending || availableClients.length === 0}
                 >
-                  {isSending ? "ENVIANDO..." : "ENVIAR NOTIFICACIÓN"}
+                  {availableClients.length === 0 ? "NO HAY CLIENTES" : 
+                   isSending ? "ENVIANDO..." : "ENVIAR NOTIFICACIÓN"}
                 </button>
               </div>
             </Dialog.Panel>
