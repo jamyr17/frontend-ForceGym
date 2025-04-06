@@ -32,7 +32,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   const [error, setError] = useState<string | null>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [selectedClients, setSelectedClients] = useState<Client[]>([]);
-  const [notificationType, setNotificationType] = useState("");
+  const [notificationType, setNotificationType] = useState<"mensualidades" | "cumpleanos" | "aniversarios">("mensualidades");
 
   useEffect(() => {
     if (isOpen) {
@@ -41,42 +41,38 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   }, [isOpen]);
 
   const sendEmail = async (clients: Client[], subject: string, message: string) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const token = localStorage.getItem("auth_token");
-      console.log("Token usado:", token); // Depuración
       
-      const requestPayload = {
-        toUsers: clients.map(client => client.email),
-        subject,
-        message,
-      };
-      console.log("Payload enviado:", requestPayload); // Depuración
-  
       const response = await fetch(`${import.meta.env.VITE_URL_API}mail/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify({
+          toUsers: clients.map(client => client.email),
+          subject,
+          message,
+        }),
+        signal: controller.signal
       });
-  
-      console.log("Respuesta del servidor:", {
-        status: response.status,
-        statusText: response.statusText,
-      });
-  
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error detallado:", errorText);
-        throw new Error(`Error ${response.status}: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
-      const data = await response.json();
-      return data;
+
+      return await response.json();
     } catch (error) {
-      console.error("Error completo:", error);
+      console.error("Error completo en sendEmail:", error);
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
@@ -121,7 +117,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   };
 
-  const handleActionClick = (type: string, clients: Client[]) => {
+  const handleActionClick = (type: "mensualidades" | "cumpleanos" | "aniversarios", clients: Client[]) => {
     setSelectedClients(clients);
     setNotificationType(type);
     setTemplateModalOpen(true);
@@ -135,12 +131,12 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     try {
       console.log("Enviando notificación a:", client.email);
       
-      if (!client.email) {
-        console.warn(`Cliente ${client.name} no tiene email`);
-      } else {
+      if (client.email) {
         await sendEmail([client], "Notificación de ForceGym", message);
+      } else {
+        console.warn(`Cliente ${client.name} no tiene email`);
       }
-  
+    
       if (client.phoneNumber) {
         const encodedMessage = encodeURIComponent(message);
         const phone = client.phoneNumber.startsWith("506")
@@ -153,16 +149,12 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
       }
     } catch (error) {
       console.error("Error en handleSendNotification:", error);
-
-    } finally {
-      setTemplateModalOpen(false);
     }
   };
-  
 
   const renderNotificationSection = (
     title: string,
-    type: string,
+    type: "mensualidades" | "cumpleanos" | "aniversarios",
     clients: Client[],
     actionText: string
   ) => {
@@ -270,6 +262,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
 
       <NotificationTemplateModal
         clients={selectedClients}
+        notificationType={notificationType}
         onSend={handleSendNotification}
         isOpen={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}
