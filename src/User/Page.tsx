@@ -95,12 +95,6 @@ function UserManagement() {
                             closeModal={closeModalForm}
                             Content={Form}
                         />
-
-                        {users?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
-                        </button>
-                        }
                     </div>
                     
                     {users?.length>0 ? (
