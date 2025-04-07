@@ -79,7 +79,7 @@ function EconomicIncomeManagement() {
 
     return ( 
         
-        <div className="bg-black h-full w-full">
+        <div className="bg-black min-h-screen">
 
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">INGRESOS</h1>

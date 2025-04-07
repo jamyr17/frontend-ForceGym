@@ -67,7 +67,7 @@ function DashboardManagement() {
   const chartData = processChartData();
 
   return (
-    <div className="bg-black min-h-screen p-2">
+    <div className="bg-black min-h-screen">
       <header className="relative flex justify-center items-center py-2">
         <img src="/LogoBlack.jpg" alt="Logo de Force GYM" className="w-40 h-auto" />
         <IoIosNotificationsOutline 
