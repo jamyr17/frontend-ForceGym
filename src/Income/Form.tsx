@@ -10,9 +10,10 @@ import { formatDate } from "../shared/utils/format";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 
-const MAXLENGTH_VOUCHER = 100
-const MAXLENGTH_DETAIL = 100
-const MAXDATE = new Date().toUTCString()
+const MAXLENGTH_VOUCHER = 100;
+const MAXLENGTH_DETAIL = 100;
+const MAXDATE = new Date().toLocaleDateString('sv-SE');
+const CASH_PAYMENT_ID = 2; // Asumiendo que 2 es el ID para Efectivo
 
 function Form() {
     const navigate = useNavigate();
@@ -20,15 +21,53 @@ function Form() {
     const { onChange, ...rest } = register('idClient');
     const { meansOfPayment, activityTypes, allClients, fetchAllClients} = useCommonDataStore();
     const { economicIncomes, activeEditingId, fetchEconomicIncomes, addEconomicIncome, updateEconomicIncome, closeModalForm } = useEconomicIncomeStore();
+    
+    // Observamos los valores relevantes
     const idMeanOfPayment = watch("idMeanOfPayment") ? Number(watch("idMeanOfPayment")) : null;
+    const voucherNumber = watch("voucherNumber");
+    const amount = watch("amount");
+    const isCashPayment = idMeanOfPayment === CASH_PAYMENT_ID;
 
     const submitForm = async (data: EconomicIncomeDataForm) => {
+        // Validación adicional para cliente
+        if (!data.idClient) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Debe seleccionar un cliente',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Validación adicional para voucher con efectivo
+        if (isCashPayment && data.voucherNumber) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se puede ingresar número de comprobante cuando el medio de pago es Efectivo',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Validación adicional para monto negativo
+        if (data.amount <= 0) {
+            Swal.fire({
+                title: 'Error',
+                text: 'El monto debe ser mayor a cero',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
         let action = '', result;
-        const loggedUser = getAuthUser()
+        const loggedUser = getAuthUser();
         const reqUser = {
             ...data, 
             paramLoggedIdUser: loggedUser?.idUser
-        }
+        };
         
         if (activeEditingId === 0) {
             result = await addEconomicIncome(reqUser);
@@ -38,17 +77,17 @@ function Form() {
             action = 'editado';
         }
 
-        closeModalForm()
-        reset()
+        closeModalForm();
+        reset();
         
         if (result.ok) {
-            const result2 = await fetchEconomicIncomes()
+            const result2 = await fetchEconomicIncomes();
             
             if(result2.logout){
-                setAuthHeader(null)
-                setAuthUser(null)
-                navigate('/login', {replace: true})
-            }else{
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', {replace: true});
+            } else {
                 await Swal.fire({
                     title: `Ingreso económico ${action}`,
                     text: `Se ha ${action} el ingreso`,
@@ -58,36 +97,49 @@ function Form() {
                     timerProgressBar: true,
                     width: 500,
                     confirmButtonColor: '#CFAD04'
-                })
+                });
             }
-
-        }else if(result.logout){
-            setAuthHeader(null)
-            setAuthUser(null)
-            navigate('/login')
+        } else if(result.logout) {
+            setAuthHeader(null);
+            setAuthUser(null);
+            navigate('/login');
         }
     };
 
     useEffect(() => {
-        fetchAllClients()
-    }, [])
+        fetchAllClients();
+    }, []);
 
     useEffect(() => {
         if (activeEditingId) {
-            const activeIncome = economicIncomes.find(income => income.idEconomicIncome === activeEditingId)
+            const activeIncome = economicIncomes.find(income => income.idEconomicIncome === activeEditingId);
             if (activeIncome) {
-                setValue('idEconomicIncome', activeIncome.idEconomicIncome)
-                setValue('idClient', activeIncome.client.idClient)
-                setValue('isDeleted', activeIncome.isDeleted)
-                setValue('registrationDate', activeIncome.registrationDate)
-                setValue('amount', activeIncome.amount)
-                setValue('detail', activeIncome.detail)
-                setValue('voucherNumber', activeIncome.voucherNumber)
-                setValue('idMeanOfPayment', activeIncome.meanOfPayment.idMeanOfPayment)
-                setValue('idActivityType', activeIncome.activityType.idActivityType)
+                setValue('idEconomicIncome', activeIncome.idEconomicIncome);
+                setValue('idClient', activeIncome.client.idClient);
+                setValue('isDeleted', activeIncome.isDeleted);
+                setValue('registrationDate', activeIncome.registrationDate);
+                setValue('amount', activeIncome.amount);
+                setValue('detail', activeIncome.detail);
+                setValue('voucherNumber', activeIncome.voucherNumber);
+                setValue('idMeanOfPayment', activeIncome.meanOfPayment.idMeanOfPayment);
+                setValue('idActivityType', activeIncome.activityType.idActivityType);
             }
         }
     }, [activeEditingId]);
+
+    // Efecto para limpiar voucherNumber cuando se selecciona Efectivo
+    useEffect(() => {
+        if (isCashPayment && voucherNumber) {
+            setValue('voucherNumber', '');
+        }
+    }, [isCashPayment, voucherNumber]);
+
+    // Efecto para prevenir valores negativos en el monto
+    useEffect(() => {
+        if (amount !== undefined && amount < 0) {
+            setValue('amount', 0);
+        }
+    }, [amount]);
 
     return (
         <form 
@@ -119,12 +171,13 @@ function Form() {
                     id="idClient"
                     className="w-full"
                     onChange={(selectedOption) => {
-                        setValue("idClient", selectedOption?.value, { shouldValidate: true });
+                        if (selectedOption) {
+                            setValue("idClient", selectedOption.value, { shouldValidate: true });
+                        }
                     }}
                     options={allClients}
+                    required
                 />
-
-                {/* mostrar errores de cliente */}
                 {errors.idClient && 
                     <ErrorForm>
                         {errors.idClient.message}
@@ -140,6 +193,7 @@ function Form() {
                     id="registrationDate"
                     className="w-full p-3 border border-gray-100"  
                     type="date" 
+                    max={MAXDATE}
                     {...register('registrationDate', {
                         required: 'La fecha es obligatoria',
                         max: {
@@ -148,8 +202,6 @@ function Form() {
                         }
                     })}
                 />
-
-                {/* mostrar errores del input de la fecha */}
                 {errors.registrationDate && 
                     <ErrorForm>
                         {errors.registrationDate.message}
@@ -163,19 +215,24 @@ function Form() {
                 </label>
                 <input  
                     id="voucherNumber"
-                    className="w-full p-3 border border-gray-100"  
+                    className={`w-full p-3 border ${isCashPayment ? 'bg-gray-100' : 'border-gray-100'}`}  
                     type="text" 
-                    placeholder="Ingrese el voucher" 
+                    placeholder={isCashPayment ? 'No aplica para efectivo' : 'Ingrese el voucher'} 
+                    disabled={isCashPayment}
                     {...register('voucherNumber', {
                         required: idMeanOfPayment === 1 ? 'El voucher es obligatorio' : false,
                         maxLength: {
                             value: MAXLENGTH_VOUCHER,
                             message: `Debe ingresar un voucher de máximo ${MAXLENGTH_VOUCHER} carácteres`
+                        },
+                        validate: (value) => {
+                            if (isCashPayment && value) {
+                                return 'No se puede ingresar voucher con pago en efectivo';
+                            }
+                            return true;
                         }
                     })}
                 />
-
-                {/* mostrar errores del input deL voucher */}
                 {errors.voucherNumber && 
                     <ErrorForm>
                         {errors.voucherNumber.message}
@@ -200,8 +257,6 @@ function Form() {
                         }
                     })}
                 />
-
-                {/* mostrar errores del input del detalle */}
                 {errors.detail && 
                     <ErrorForm>
                         {errors.detail.message}
@@ -216,14 +271,22 @@ function Form() {
                 <select
                     id="idMeanOfPayment"
                     className="w-full p-3 border border-gray-100" 
-                    {...register("idMeanOfPayment")}  
+                    {...register("idMeanOfPayment", {
+                        required: 'El medio de pago es obligatorio'
+                    })}  
                 >
-                    {meansOfPayment.map((meanOfPayment)=> (
+                    <option value="">Seleccione un medio de pago</option>
+                    {meansOfPayment.map((meanOfPayment) => (
                         <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
                             {meanOfPayment.name}
                         </option>
                     ))}
                 </select>
+                {errors.idMeanOfPayment && 
+                    <ErrorForm>
+                        {errors.idMeanOfPayment.message}
+                    </ErrorForm>
+                }
             </div>
 
             <div className="mb-5">
@@ -234,17 +297,24 @@ function Form() {
                     id="amount"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
+                    min="0"
+                    step="1"
                     placeholder="Ingrese el monto" 
-                    {...register('amount', {
-                        required: 'El monto es obligatorio', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un monto válido`
+                    onKeyDown={(e) => {
+                        // Prevenir la entrada de caracteres no deseados
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                            e.preventDefault();
                         }
+                    }}
+                    {...register('amount', {
+                        required: 'El monto es obligatorio',
+                        min: {
+                            value: 0,
+                            message: 'El monto debe ser mayor a cero'
+                        },
+                        valueAsNumber: true
                     })}
                 />
-
-                {/* mostrar errores del input del monto */}
                 {errors.amount && 
                     <ErrorForm>
                         {errors.amount.message}
@@ -259,17 +329,29 @@ function Form() {
                 <select
                     id="idActivityType"
                     className="w-full p-3 border border-gray-100" 
-                    {...register("idActivityType")}  
+                    {...register("idActivityType", {
+                        required: 'La actividad es obligatoria'
+                    })}  
                 >
-                    {activityTypes.map((activity)=> (
+                    <option value="">Seleccione una actividad</option>
+                    {activityTypes.map((activity) => (
                         <option key={activity.idActivityType} value={activity.idActivityType}>
                             {activity.name}
                         </option>
                     ))}
                 </select>
+                {errors.idActivityType && 
+                    <ErrorForm>
+                        {errors.idActivityType.message}
+                    </ErrorForm>
+                }
             </div>
 
-            <input type="submit" className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors" value={activeEditingId ? 'Actualizar' : 'Registrar'} />
+            <input 
+                type="submit" 
+                className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors" 
+                value={activeEditingId ? 'Actualizar' : 'Registrar'} 
+            />
         </form> 
     );
 }
