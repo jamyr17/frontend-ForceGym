@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router';
 import Login from '../Login/Login';
 import { useLogin } from '../Login/useLogin';
 import ForgotPasswordForm from '../Login/ForgotPasswordForm';
+import ChangePasswordForm from '../Login/ChangePasswordForm';
 
 function PublicRoutes () {
     const { credencialUser, setCredencialUser, handleLoginSubmit } = useLogin()
@@ -22,6 +23,12 @@ function PublicRoutes () {
                 path="/forgot-password" 
                 element={
                     <ForgotPasswordForm/>
+                } 
+            />
+            <Route 
+                path="/reset-password" 
+                element={
+                    <ChangePasswordForm />
                 } 
             />
         </Routes>
