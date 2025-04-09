@@ -13,6 +13,7 @@ import NotificationTemplateManagement from "../TemplateNotification/Page";
 import MeasurementManagement from "../Measurement/Page";
 import { ProtectedRoute } from "./ProtectedRoutes";
 import EconomicBalanceDashboard from "../Balance/Page";
+import ClientTypeManagement from "../ClientType/Page";
 
 
 function PrivateRoutes () {
@@ -96,6 +97,12 @@ function PrivateRoutes () {
                 path="clientes" 
                 element={
                     <ClientManagement/>
+                }
+            />
+              <Route 
+                path="tiposCliente" 
+                element={
+                    <ClientTypeManagement/>
                 }
             />
             <Route 

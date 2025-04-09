@@ -1,4 +1,4 @@
-import { Client, ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm } from ".";
+import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm, ClientType } from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -57,6 +57,14 @@ export function mapProductInventoryToDataForm(product: ProductInventory): Produc
         cost: product.cost,
         quantity: product.quantity,
         isDeleted: product.isDeleted
+    };
+}
+
+export function mapClientTypeToDataForm(clientType: ClientType): ClientTypeDataForm {
+    return {
+        idClientType: clientType.idClientType,
+        name: clientType.name,
+        isDeleted: clientType.isDeleted
     };
 }
 

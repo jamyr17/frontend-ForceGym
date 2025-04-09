@@ -242,9 +242,11 @@ function EconomicIncomeManagement() {
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                     {economicIncomes?.length > 0 && (
+                    <>
+                    <hr className="my-6 border-black border-t-6" />
                     <IncomeDashboard economicIncomes={economicIncomes} />
-                    )}
-               
+                    </>
+                    )}              
                 </div>
             </main>
         </div>

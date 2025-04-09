@@ -231,8 +231,12 @@ function EconomicExpenseManagement() {
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                     {economicExpenses?.length > 0 && (
-                     <ExpenseDashboard economicExpenses={economicExpenses} />
+                    <>
+                        <hr className="my-6 border-black border-t-6" />
+                        <ExpenseDashboard economicExpenses={economicExpenses} />
+                    </>
                     )}
+
                 </div>
             </main>
         </div>
