@@ -153,15 +153,15 @@ function AsideBar() {
           <NavItem
             to="/gestion/categorias"
             icon={<MdOutlineCategory />}
-            title="Plantillas de Notificaciones"
-            text="Plantillas"
+            title="Categorías"
+            text="Categorías"
           />
         </div>
 
         <div>
           <div>
             {isOpen && (
-              <div className="flex items-center justify-center gap-2 mb-2 text-sm border-t border-2 border-gray-500">
+              <div className="flex items-center justify-center gap-2 mb-2 text-sm border-t-2 pt-2 border-gray-500">
                 <FaRegCircleUser className="text-base" />
                 <p className="font-medium">{loggedUser?.username}</p>
               </div>
