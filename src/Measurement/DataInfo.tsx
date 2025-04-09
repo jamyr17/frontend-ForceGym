@@ -48,18 +48,18 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>TALLA DE CUELLO (cm)</strong></p>
-                    <p>{measurement.neckSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>TALLA DE HOMBROS (cm)</strong></p>
-                    <p>{measurement.shoulderSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
                     <p><strong>TALLA DE PECHO (cm)</strong></p>
                     <p>{measurement.chestSize}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>MEDIDA DE ESPALDA (cm)</strong></p>
+                    <p>{measurement.backSize}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>MEDIDA DE CADERA (cm)</strong></p>
+                    <p>{measurement.hipSize}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
@@ -68,23 +68,43 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PIERNA (cm)</strong></p>
-                    <p>{measurement.thighSize}</p>
+                    <p><strong>PIERNA IZQUIERDA (cm)</strong></p>
+                    <p>{measurement.leftLegSize}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PANTORRILLA (cm)</strong></p>
-                    <p>{measurement.calfSize}</p>
+                    <p><strong>PIERNA DERECHA (cm)</strong></p>
+                    <p>{measurement.rightLegSize}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>ANTEBRAZO (cm)</strong></p>
-                    <p>{measurement.forearmSize}</p>
+                    <p><strong>PANTORRILLA IZQUIERDA (cm)</strong></p>
+                    <p>{measurement.leftCalfSize}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>BRAZO (cm)</strong></p>
-                    <p>{measurement.armSize}</p>
+                    <p><strong>PANTORRILLA DERECHA (cm)</strong></p>
+                    <p>{measurement.rightCalfSize}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>ANTEBRAZO IZQUIERDA(cm)</strong></p>
+                    <p>{measurement.leftForeArmSize}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>ANTEBRAZO DERECHA (cm)</strong></p>
+                    <p>{measurement.rightForeArmSize}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>BRAZO IZQUIERDA(cm)</strong></p>
+                    <p>{measurement.leftArmSize}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>BRAZO DERECHA(cm)</strong></p>
+                    <p>{measurement.rightArmSize}</p>
                 </div>
             </div>
         </div>
