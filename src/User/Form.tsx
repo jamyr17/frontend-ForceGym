@@ -430,9 +430,18 @@ function Form() {
                     className="w-full p-3 border border-gray-100"  
                     type="password" 
                     placeholder="Confirme la contraseña" 
-                    {...register('confirmPassword', {
-                        validate: value => value === passwordRef.current?.value || "Las contraseñas no coinciden"
+                    {...register('password', {
+                        validate: value => {
+                            if (activeEditingId === 0 && !value) {
+                                return 'La contraseña es obligatoria'
+                            }
+                            if (value) {
+                                return validatePassword(value)
+                            }
+                            return true
+                        }
                     })}
+                    
                 />
 
                 {/* mostrar errores del input de la confirmación de contraseña */}

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaRegCircleUser } from "react-icons/fa6";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
 import { FaBalanceScale } from "react-icons/fa"; 
+import { MdOutlineCategory } from "react-icons/md";
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
 import { Link, useNavigate } from 'react-router';
@@ -148,11 +150,22 @@ function AsideBar() {
             title="Plantillas de Notificaciones"
             text="Plantillas"
           />
+          <NavItem
+            to="/gestion/categorias"
+            icon={<MdOutlineCategory />}
+            title="Plantillas de Notificaciones"
+            text="Plantillas"
+          />
         </div>
 
         <div>
           <div>
-            {isOpen && <p className="text-center text-lg">{loggedUser?.username}</p>}
+            {isOpen && (
+              <div className="flex items-center justify-center gap-2 mb-2 text-sm border-t border-2 border-gray-500">
+                <FaRegCircleUser className="text-base" />
+                <p className="font-medium">{loggedUser?.username}</p>
+              </div>
+            )}
           </div>
 
           <div

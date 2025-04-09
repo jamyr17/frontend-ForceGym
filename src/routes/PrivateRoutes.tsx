@@ -13,6 +13,7 @@ import NotificationTemplateManagement from "../TemplateNotification/Page";
 import MeasurementManagement from "../Measurement/Page";
 import { ProtectedRoute } from "./ProtectedRoutes";
 import EconomicBalanceDashboard from "../Balance/Page";
+import CategoryManagement from "../Category/Page";
 
 
 function PrivateRoutes () {
@@ -108,6 +109,12 @@ function PrivateRoutes () {
                 path="plantillas-notificacion" 
                 element={
                     <NotificationTemplateManagement/>
+                }
+            />
+            <Route 
+                path="categorias" 
+                element={
+                    <CategoryManagement/>
                 }
             />
         </Routes>
