@@ -1,18 +1,26 @@
 import { FormEvent } from "react"
 import Swal from 'sweetalert2'
 import { ClientType, ClientTypeDataForm } from "../shared/types"
-import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useClientTypeStore from "./Store"
+import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import { useNavigate } from "react-router"
 
 export const useClientType = () => {
     const navigate = useNavigate()
-    const { fetchClientTypes, deleteClientType, updateClientType, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientTypeStore()
+    const { 
+        fetchClientTypes, 
+        directionOrderBy, 
+        deleteClientType, 
+        updateClientType, 
+        changeSearchTerm, 
+        changeOrderBy, 
+        changeDirectionOrderBy 
+    } = useClientTypeStore()
 
     const handleDelete = async ({ idClientType, name } : ClientType) => {
         await Swal.fire({
-            title: '¿Desea eliminar este tipo de cliente?',
-            text: `Está eliminando el tipo de cliente ${name}`,
+            title: '¿Desea eliminar el tipo de cliente?',
+            text: `Estaría eliminando "${name}"`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -24,12 +32,12 @@ export const useClientType = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteClientType(idClientType, loggedUser?.idUser)
+                const response = await deleteClientType(idClientType, loggedUser?.idUser || 0)
 
                 if(response.ok){
                     Swal.fire({
                         title: 'Tipo de cliente eliminado',
-                        text: `Se ha eliminado el tipo de cliente ${name}`,
+                        text: `Ha eliminado "${name}"`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -50,14 +58,14 @@ export const useClientType = () => {
         })
     }
 
-    const handleSearch = (e : FormEvent<HTMLFormElement>) => {
+    const handleSearch = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const form = e.target as HTMLFormElement
         const { searchTerm } = Object.fromEntries(new FormData(form))
         changeSearchTerm(searchTerm.toString())
     }
 
-    const handleOrderByChange = (orderByTerm : string) => {
+    const handleOrderByChange = (orderByTerm: string) => {
         changeOrderBy(orderByTerm)
         changeDirectionOrderBy(directionOrderBy === 'DESC' ? 'ASC' : 'DESC')
     }
@@ -66,13 +74,13 @@ export const useClientType = () => {
         const loggedUser = getAuthUser()
         const reqClientType = {
             ...clientType, 
-            isDeleted: 0,
-            paramLoggedIdUser: loggedUser?.idUser
+            isDeleted: false,
+            loggedIdUser: loggedUser?.idUser
         }
-        
+            
         await Swal.fire({
-            title: '¿Desea restaurar este tipo de cliente?',
-            text: `Está restaurando el tipo de cliente ${clientType.name}`,
+            title: '¿Desea restaurar el tipo de cliente?',
+            text: `Estaría restaurando "${clientType.name}"`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -88,7 +96,7 @@ export const useClientType = () => {
                 if(response.ok){
                     Swal.fire({
                         title: 'Tipo de cliente restaurado',
-                        text: `Se ha restaurado el tipo de cliente ${clientType.name}`,
+                        text: `Ha restaurado "${clientType.name}"`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -96,7 +104,7 @@ export const useClientType = () => {
                         width: 500,
                         confirmButtonColor: '#CFAD04'
                     })
-                    
+
                     fetchClientTypes()
                 }
 
