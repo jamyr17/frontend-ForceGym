@@ -28,7 +28,11 @@ export type Category = {
     idCategory: number
     name: string
 }
-
+export type ClientType = {  
+    idClientType: number
+    name: string
+    isDeleted: number
+}
 export type TypeClient = {
     idTypeClient: number
     name: string
@@ -185,3 +189,10 @@ export type NotificationTemplate = {
 }
 
 export type NotificationTemplateDataForm = Omit<NotificationTemplate, 'user' | 'notificationType'> & Pick<NotificationType, 'idNotificationType'> & Pick<User, 'idUser'>
+
+export type ClientTypeDataForm = Omit<ClientType, 'user' | 'notificationType'> & {
+    idClientType: number;
+    name: string;
+    isDeleted: number; 
+}
+
