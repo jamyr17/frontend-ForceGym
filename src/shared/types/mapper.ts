@@ -1,4 +1,4 @@
-import { Client, ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm } from ".";
+import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm, ClientType } from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -60,6 +60,14 @@ export function mapProductInventoryToDataForm(product: ProductInventory): Produc
     };
 }
 
+export function mapClientTypeToDataForm(clientType: ClientType): ClientTypeDataForm {
+    return {
+        idClientType: clientType.idClientType,
+        name: clientType.name,
+        isDeleted: clientType.isDeleted
+    };
+}
+
 export function mapMeasurementToDataForm(measurement: Measurement): MeasurementDataForm {
     return {
         idMeasurement: measurement.idMeasurement,
@@ -70,14 +78,18 @@ export function mapMeasurementToDataForm(measurement: Measurement): MeasurementD
         bodyFatPercentage: measurement.bodyFatPercentage,
         muscleMass: measurement.muscleMass,
         visceralFatPercentage: measurement.visceralFatPercentage,
-        neckSize: measurement.neckSize,
-        shoulderSize: measurement.shoulderSize,
         chestSize: measurement.chestSize,
+        backSize: measurement.backSize,
+        hipSize: measurement.hipSize,
         waistSize: measurement.waistSize,
-        thighSize: measurement.thighSize,
-        calfSize: measurement.calfSize,
-        forearmSize: measurement.forearmSize,
-        armSize: measurement.armSize,
+        leftLegSize: measurement.leftLegSize,
+        rightLegSize: measurement.rightLegSize,
+        leftCalfSize: measurement.leftCalfSize,
+        rightCalfSize: measurement.rightCalfSize,
+        leftForeArmSize: measurement.leftForeArmSize,
+        rightForeArmSize: measurement.rightForeArmSize,
+        leftArmSize: measurement.leftArmSize,
+        rightArmSize: measurement.rightArmSize,
         isDeleted: measurement.isDeleted
     };
 }

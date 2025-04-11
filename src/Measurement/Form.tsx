@@ -101,14 +101,16 @@ function Form() {
             setValue('muscleMass', selectedMeasurement.muscleMass);
             setValue('bodyFatPercentage', selectedMeasurement.bodyFatPercentage);
             setValue('visceralFatPercentage', selectedMeasurement.visceralFatPercentage);
-            setValue('neckSize', selectedMeasurement.neckSize);
-            setValue('shoulderSize', selectedMeasurement.shoulderSize);
             setValue('chestSize', selectedMeasurement.chestSize);
             setValue('waistSize', selectedMeasurement.waistSize);
-            setValue('thighSize', selectedMeasurement.thighSize);
-            setValue('calfSize', selectedMeasurement.calfSize);
-            setValue('forearmSize', selectedMeasurement.forearmSize);
-            setValue('armSize', selectedMeasurement.armSize);
+            setValue('leftLegSize', selectedMeasurement.leftLegSize);
+            setValue('rightLegSize', selectedMeasurement.rightLegSize);
+            setValue('leftCalfSize', selectedMeasurement.leftCalfSize);
+            setValue('rightCalfSize', selectedMeasurement.rightCalfSize);
+            setValue('leftForeArmSize', selectedMeasurement.leftForeArmSize);
+            setValue('rightForeArmSize', selectedMeasurement.rightForeArmSize);
+            setValue('leftArmSize', selectedMeasurement.leftArmSize);
+            setValue('rightArmSize', selectedMeasurement.rightArmSize);
         }
     }, [selectedMeasurement]);
 
@@ -297,58 +299,6 @@ function Form() {
             </div>
 
             <div className="mb-5">
-                <label htmlFor="neckSize" className="text-sm uppercase font-bold">
-                    Medida del cuello
-                </label>
-                <input  
-                    id="neckSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida del cuello" 
-                    {...register('neckSize', {
-                        required: 'La medida del cuello es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.neckSize && 
-                    <ErrorForm>
-                        {errors.neckSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="shoulderSize" className="text-sm uppercase font-bold">
-                    Medida de los hombros
-                </label>
-                <input  
-                    id="shoulderSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de los hombros" 
-                    {...register('shoulderSize', {
-                        required: 'La medida de los hombros es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.shoulderSize && 
-                    <ErrorForm>
-                        {errors.shoulderSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
                 <label htmlFor="chestSize" className="text-sm uppercase font-bold">
                     Medida del pecho
                 </label>
@@ -370,6 +320,58 @@ function Form() {
                 {errors.chestSize && 
                     <ErrorForm>
                         {errors.chestSize.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="backSize" className="text-sm uppercase font-bold">
+                    Medida de la espalda
+                </label>
+                <input  
+                    id="backSize"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    placeholder="Ingrese la medida de la espalda" 
+                    {...register('backSize', {
+                        required: 'La medida de la espalda es obligatoria', 
+                        min: {
+                            value: 1,
+                            message: `Debe ingresar un valor válido`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del monto */}
+                {errors.backSize && 
+                    <ErrorForm>
+                        {errors.backSize.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="hipSize" className="text-sm uppercase font-bold">
+                    Medida de la cadera
+                </label>
+                <input  
+                    id="hipSize"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    placeholder="Ingrese la medida de la cadera" 
+                    {...register('hipSize', {
+                        required: 'La medida de la cadera es obligatoria', 
+                        min: {
+                            value: 1,
+                            message: `Debe ingresar un valor válido`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del monto */}
+                {errors.hipSize && 
+                    <ErrorForm>
+                        {errors.hipSize.message}
                     </ErrorForm>
                 }
             </div>
@@ -401,16 +403,16 @@ function Form() {
             </div>
 
             <div className="mb-5">
-                <label htmlFor="thighSize" className="text-sm uppercase font-bold">
-                    Medida del muslo
+                <label htmlFor="leftLegSize" className="text-sm uppercase font-bold">
+                    Medida de la pierna izquierda
                 </label>
                 <input  
-                    id="thighSize"
+                    id="leftLegSize"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
-                    placeholder="Ingrese la medida del muslo" 
-                    {...register('thighSize', {
-                        required: 'La medida del muslo es obligatoria', 
+                    placeholder="Ingrese la medida de la pierna izquierda" 
+                    {...register('leftLegSize', {
+                        required: 'La medida de la pierna izquierda es obligatoria', 
                         min: {
                             value: 1,
                             message: `Debe ingresar un valor válido`
@@ -419,24 +421,24 @@ function Form() {
                 />
 
                 {/* mostrar errores del input del monto */}
-                {errors.thighSize && 
+                {errors.leftLegSize && 
                     <ErrorForm>
-                        {errors.thighSize.message}
+                        {errors.leftLegSize.message}
                     </ErrorForm>
                 }
             </div>
 
             <div className="mb-5">
-                <label htmlFor="calfSize" className="text-sm uppercase font-bold">
-                    Medida de la pantorrilla
+                <label htmlFor="rightLegSize" className="text-sm uppercase font-bold">
+                    Medida de la pierna derecha
                 </label>
                 <input  
-                    id="calfSize"
+                    id="rightLegSize"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
-                    placeholder="Ingrese la medida de la pantorrilla" 
-                    {...register('calfSize', {
-                        required: 'La medida de la pantorrilla es obligatoria', 
+                    placeholder="Ingrese la medida de la pierna derecha" 
+                    {...register('rightLegSize', {
+                        required: 'La medida de la pierna derecha es obligatoria', 
                         min: {
                             value: 1,
                             message: `Debe ingresar un valor válido`
@@ -445,24 +447,24 @@ function Form() {
                 />
 
                 {/* mostrar errores del input del monto */}
-                {errors.calfSize && 
+                {errors.rightLegSize && 
                     <ErrorForm>
-                        {errors.calfSize.message}
+                        {errors.rightLegSize.message}
                     </ErrorForm>
                 }
             </div>
 
             <div className="mb-5">
-                <label htmlFor="forearmSize" className="text-sm uppercase font-bold">
-                    Medida del antebrazo
+                <label htmlFor="leftCalfSize" className="text-sm uppercase font-bold">
+                    Medida de la pantorrilla izquierda
                 </label>
                 <input  
-                    id="forearmSize"
+                    id="leftCalfSize"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
-                    placeholder="Ingrese la medida del antebrazo" 
-                    {...register('forearmSize', {
-                        required: 'La medida del antebrazo es obligatoria', 
+                    placeholder="Ingrese la medida de la pantorrilla izquierda" 
+                    {...register('leftCalfSize', {
+                        required: 'La medida de la pantorrilla izquierda es obligatoria', 
                         min: {
                             value: 1,
                             message: `Debe ingresar un valor válido`
@@ -471,24 +473,24 @@ function Form() {
                 />
 
                 {/* mostrar errores del input del monto */}
-                {errors.calfSize && 
+                {errors.leftCalfSize && 
                     <ErrorForm>
-                        {errors.calfSize.message}
+                        {errors.leftCalfSize.message}
                     </ErrorForm>
                 }
             </div>
 
             <div className="mb-5">
-                <label htmlFor="armSize" className="text-sm uppercase font-bold">
-                    Medida del brazo
+                <label htmlFor="rightCalfSize" className="text-sm uppercase font-bold">
+                    Medida de la pantorrilla derecha
                 </label>
                 <input  
-                    id="armSize"
+                    id="rightCalfSize"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
-                    placeholder="Ingrese la medida del brazo" 
-                    {...register('armSize', {
-                        required: 'La medida del brazo es obligatoria', 
+                    placeholder="Ingrese la medida de la pantorrilla derecha" 
+                    {...register('rightCalfSize', {
+                        required: 'La medida de la pantorrilla derecha es obligatoria', 
                         min: {
                             value: 1,
                             message: `Debe ingresar un valor válido`
@@ -497,9 +499,113 @@ function Form() {
                 />
 
                 {/* mostrar errores del input del monto */}
-                {errors.armSize && 
+                {errors.rightCalfSize && 
                     <ErrorForm>
-                        {errors.armSize.message}
+                        {errors.rightCalfSize.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="leftForeArmSize" className="text-sm uppercase font-bold">
+                    Medida del antebrazo izquierdo
+                </label>
+                <input  
+                    id="leftForeArmSize"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    placeholder="Ingrese la medida del antebrazo izquierdo" 
+                    {...register('leftForeArmSize', {
+                        required: 'La medida del antebrazo izquierdo es obligatoria', 
+                        min: {
+                            value: 1,
+                            message: `Debe ingresar un valor válido`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del monto */}
+                {errors.leftForeArmSize && 
+                    <ErrorForm>
+                        {errors.leftForeArmSize.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="rightForeArmSize" className="text-sm uppercase font-bold">
+                    Medida del antebrazo derecho
+                </label>
+                <input  
+                    id="rightForeArmSize"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    placeholder="Ingrese la medida del antebrazo derecho " 
+                    {...register('rightForeArmSize', {
+                        required: 'La medida del antebrazo derecho es obligatoria', 
+                        min: {
+                            value: 1,
+                            message: `Debe ingresar un valor válido`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del monto */}
+                {errors.rightForeArmSize && 
+                    <ErrorForm>
+                        {errors.rightForeArmSize.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="leftArmSize" className="text-sm uppercase font-bold">
+                    Medida del brazo izquierdo
+                </label>
+                <input  
+                    id="leftArmSize"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    placeholder="Ingrese la medida del brazo izquierdo"
+                    {...register('leftArmSize', {
+                        required: 'La medida del brazo izquierdo es obligatoria', 
+                        min: {
+                            value: 1,
+                            message: `Debe ingresar un valor válido`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del monto */}
+                {errors.leftArmSize && 
+                    <ErrorForm>
+                        {errors.leftArmSize.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="rightArmSize" className="text-sm uppercase font-bold">
+                    Medida del brazo derecho
+                </label>
+                <input  
+                    id="rightArmSize"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    placeholder="Ingrese la medida del brazo derecho"
+                    {...register('rightArmSize', {
+                        required: 'La medida del brazo derecho es obligatoria', 
+                        min: {
+                            value: 1,
+                            message: `Debe ingresar un valor válido`
+                        }
+                    })}
+                />
+
+                {/* mostrar errores del input del monto */}
+                {errors.rightArmSize && 
+                    <ErrorForm>
+                        {errors.rightArmSize.message}
                     </ErrorForm>
                 }
             </div>

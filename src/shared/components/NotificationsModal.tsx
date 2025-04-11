@@ -42,8 +42,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
 
   const sendEmail = async (clients: Client[], subject: string, message: string) => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+  
     try {
       const token = localStorage.getItem("auth_token");
       
@@ -61,8 +60,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
         signal: controller.signal
       });
 
-      clearTimeout(timeoutId);
-
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -72,7 +70,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
       console.error("Error completo en sendEmail:", error);
       throw error;
     } finally {
-      clearTimeout(timeoutId);
+      
     }
   };
 
@@ -83,13 +81,13 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
       const token = localStorage.getItem("auth_token");
 
       const [aniversariosRes, cumpleanosRes, vencimientosRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=1`, {
+        fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=3`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=2`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=3`, {
+        fetch(`${import.meta.env.VITE_URL_API}client/filter?filterType=1`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -120,6 +118,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   const handleActionClick = (type: "mensualidades" | "cumpleanos" | "aniversarios", clients: Client[]) => {
     setSelectedClients(clients);
     setNotificationType(type);
+    onClose()
     setTemplateModalOpen(true);
   };
 

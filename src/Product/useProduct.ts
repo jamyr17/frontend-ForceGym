@@ -145,7 +145,7 @@ export const useProductInventory = () => {
             product.code,
             product.name,
             product.quantity,
-            product.cost 
+            formatAmountToCRC(product.cost)
         ]);
     
         // Crear worksheet y workbook

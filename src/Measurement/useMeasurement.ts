@@ -123,14 +123,18 @@ export const useMeasurement = () => {
             "Músculo (%)", 
             "Grasa Corporal (%)", 
             "Grasa Visceral (%)",
-            "Cuello (cm)",
-            "Hombros (cm)",
             "Pecho (cm)",
+            "Espalda (cm)",
+            "Cadera (cm)",
             "Cintura (cm)",
-            "Muslo (cm)",
-            "Pantorrilla (cm)",
-            "Antebrazo (cm)",
-            "Brazo (cm)"
+            "Pierna Izquierda (cm)",
+            "Pierna Derecha (cm)",
+            "Pantorrilla Izquierda(cm)",
+            "Pantorrilla Derecha(cm)",
+            "Antebrazo Izquierda(cm)",
+            "Antebrazo Derecha(cm)",
+            "Brazo Izquierda(cm)",
+            "Brazo Derecha(cm)"
         ];
     
         const tableRows = measurements.map((measurement, index) => [
@@ -141,14 +145,18 @@ export const useMeasurement = () => {
             measurement.muscleMass,
             measurement.bodyFatPercentage,
             measurement.visceralFatPercentage,
-            measurement.neckSize,
-            measurement.shoulderSize,
             measurement.chestSize,
+            measurement.backSize,
+            measurement.hipSize,
             measurement.waistSize,
-            measurement.thighSize,
-            measurement.calfSize,
-            measurement.forearmSize,
-            measurement.armSize
+            measurement.leftLegSize,
+            measurement.rightLegSize,
+            measurement.leftCalfSize,
+            measurement.rightCalfSize,
+            measurement.leftForeArmSize,
+            measurement.rightForeArmSize,
+            measurement.leftArmSize,
+            measurement.rightArmSize
         ]);
     
         autoTable(doc, {
@@ -171,14 +179,18 @@ export const useMeasurement = () => {
             "Músculo (%)", 
             "Grasa Corporal (%)", 
             "Grasa Visceral (%)",
-            "Cuello (cm)",
-            "Hombros (cm)",
             "Pecho (cm)",
+            "Espalda (cm)",
+            "Cadera (cm)",
             "Cintura (cm)",
-            "Muslo (cm)",
-            "Pantorrilla (cm)",
-            "Antebrazo (cm)",
-            "Brazo (cm)"
+            "Pierna Izquierda (cm)",
+            "Pierna Derecha (cm)",
+            "Pantorrilla Izquierda(cm)",
+            "Pantorrilla Derecha(cm)",
+            "Antebrazo Izquierda(cm)",
+            "Antebrazo Derecha(cm)",
+            "Brazo Izquierda(cm)",
+            "Brazo Derecha(cm)"
         ];
     
         const tableRows = measurements.map((measurement, index) => [
@@ -189,14 +201,18 @@ export const useMeasurement = () => {
             measurement.muscleMass,
             measurement.bodyFatPercentage,
             measurement.visceralFatPercentage,
-            measurement.neckSize,
-            measurement.shoulderSize,
             measurement.chestSize,
+            measurement.backSize,
+            measurement.hipSize,
             measurement.waistSize,
-            measurement.thighSize,
-            measurement.calfSize,
-            measurement.forearmSize,
-            measurement.armSize
+            measurement.leftLegSize,
+            measurement.rightLegSize,
+            measurement.leftCalfSize,
+            measurement.rightCalfSize,
+            measurement.leftForeArmSize,
+            measurement.rightForeArmSize,
+            measurement.leftArmSize,
+            measurement.rightArmSize
         ]);
         // Crear worksheet y workbook
         const fileName = `Medidas_Corporales_${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}.xlsx`;

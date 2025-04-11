@@ -150,7 +150,7 @@ export const useEconomicIncome = () => {
             income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
             `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
             formatDate(new Date(income.registrationDate)),
-            income.amount, 
+            formatAmountToCRC(income.amount), 
             income.meanOfPayment.name,
             income.activityType.name, 
             income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
