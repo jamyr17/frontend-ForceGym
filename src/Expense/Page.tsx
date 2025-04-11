@@ -190,7 +190,7 @@ function EconomicExpenseManagement() {
                                                 getEconomicExpenseById(economicExpense.idEconomicExpense);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
