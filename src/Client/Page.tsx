@@ -229,7 +229,7 @@ function ClientManagement() {
                                 </Link>
 
                                 {client.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapClientToDataForm(client))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapClientToDataForm(client))} className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (

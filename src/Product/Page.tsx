@@ -217,7 +217,7 @@ function ProductInventoryManagement() {
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {product.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapProductInventoryToDataForm(product))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapProductInventoryToDataForm(product))} className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (

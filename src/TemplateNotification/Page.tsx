@@ -175,7 +175,7 @@ function NotificationTemplateManagement() {
                                 ) : ( 
                                     <button 
                                         onClick={() => handleDelete(notificationTemplate)} 
-                                        className={`p-2 rounded-sm hover:cursor-pointer bg-black hover:bg-gray-700'}`}
+                                        className={`p-2 rounded-sm hover:cursor-pointer bg-black hover:bg-gray-700`}
                                         title="Eliminar"
                                     >
                                     <MdOutlineDelete className={`text-white`} />
