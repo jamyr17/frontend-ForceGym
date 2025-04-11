@@ -18,7 +18,7 @@ function Login ({credencialUser, setCredencialUser, handleLoginSubmit} : LoginPr
             <main className="flex justify-center h-[550px] gap-16 p-12 w-auto bg-white rounded-lg">
                 <section className="flex flex-col h-full gap-4">
                     <header className="flex justify-center">
-                        <img src="Logo.jpg" alt="Logo de Force GYM" className="w-52 h-auto"></img>
+                        <img src="Logo.webp" alt="Logo de Force GYM" className="w-52 h-auto"></img>
                     </header>
 
                     <form className="flex flex-col gap-4" onSubmit={(e) => handleLoginSubmit(e, recaptcha)}>
