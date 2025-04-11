@@ -3,6 +3,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { IoIosClose } from "react-icons/io";
 import useNotificationTemplateStore from "../../TemplateNotification/Store";
 import { NotificationTemplate, Client } from "../../types";
+import { postData } from "../services/gym";
+import Swal from 'sweetalert2';
 
 const gymColors = {
   primary: "#cfad04",
@@ -10,13 +12,6 @@ const gymColors = {
   accent: "#FFFFFF",
   error: "#E53E3E"
 };
-
-interface NotificationRecord {
-  clientId: number;
-  notificationType: 'mensualidad' | 'cumpleanos' | 'aniversario';
-  sentAt: string;
-  validUntil: string;
-}
 
 interface NotificationTemplateModalProps {
   clients: Client[];
@@ -40,35 +35,18 @@ export function NotificationTemplateModal({
   const [selectedClientId, setSelectedClientId] = useState<number | "">("");
   const [isSending, setIsSending] = useState(false);
   const [availableClients, setAvailableClients] = useState<Client[]>([]);
-  const [notificationHistory, setNotificationHistory] = useState<NotificationRecord[]>([]);
 
-  // Cargar historial al inicializar
-  useEffect(() => {
-    const savedHistory = localStorage.getItem('notificationHistory');
-    if (savedHistory) {
-      setNotificationHistory(JSON.parse(savedHistory));
-    }
-  }, []);
-
-  // Filtrar clientes disponibles cuando se abre o cambian los clientes
+  // Filtrar clientes disponibles cuando se abre
   useEffect(() => {
     if (isOpen) {
       fetchNotificationTemplates();
-      
-      const now = new Date();
-      const filteredClients = clients.filter(client => {
-        const lastNotification = notificationHistory.find(
-          record => record.clientId === client.idClient && 
-                   record.notificationType === notificationType
-        );
-
-        return !lastNotification || new Date(lastNotification.validUntil) < now;
-      });
+    
+      const filteredClients = clients;
 
       setAvailableClients(filteredClients);
       setSelectedClientId(filteredClients[0]?.idClient || "");
     }
-  }, [isOpen, clients, notificationHistory, notificationType]);
+  }, [isOpen, clients, notificationType]);
 
   const handleTemplateChange = (templateId: string) => {
     const template = notificationTemplates.find(t => t.idNotificationTemplate === Number(templateId)) || null;
@@ -117,35 +95,32 @@ export function NotificationTemplateModal({
         validUntil.setFullYear(now.getFullYear() + 1); // 1 año para cumpleaños/aniversarios
       }
 
-      const newRecord: NotificationRecord = {
-        clientId: selectedClient.idClient,
-        notificationType: notificationType as 'mensualidad' | 'cumpleanos' | 'aniversario',
-        sentAt: now.toISOString(),
-        validUntil: validUntil.toISOString()
-      };
-
-      // Actualizar historial
-      const updatedHistory = [
-        ...notificationHistory.filter(
-          r => !(r.clientId === selectedClient.idClient && r.notificationType === notificationType)
-        ),
-        newRecord
-      ];
-
-      setNotificationHistory(updatedHistory);
-      localStorage.setItem('notificationHistory', JSON.stringify(updatedHistory));
-
       // Actualizar lista de clientes disponibles
       setAvailableClients(prev => prev.filter(c => c.idClient !== selectedClient.idClient));
-      
-      // Abrir WhatsApp si tiene teléfono
-      if (selectedClient.phoneNumber) {
-        const encodedMessage = encodeURIComponent(message);
-        const phone = selectedClient.phoneNumber.startsWith("506")
-          ? selectedClient.phoneNumber
-          : `506${selectedClient.phoneNumber}`;
-        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-        window.open(whatsappUrl, "_blank");
+
+      // Guardar notificacion en BD
+      const result = await postData(
+        `${import.meta.env.VITE_URL_API}notification/add`, 
+        { 
+          idClient: selectedClient.idClient, 
+          idNotificationType: selectedTemplate.notificationType.idNotificationType
+        }
+      );
+
+      if(!result.ok){
+        console.log('fue por esto')
+        await Swal.fire({
+            title: `Error`,
+            text: `Ocurrió un error procesando la notificación automatizada`,
+            icon: 'error',
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+            width: 500,
+            confirmButtonColor: '#CFAD04'
+        });
+
+        return;
       }
 
       // Cerrar si no quedan más clientes
