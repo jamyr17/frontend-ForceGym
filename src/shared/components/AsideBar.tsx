@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaRegCircleUser } from "react-icons/fa6";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
 import { FaBalanceScale } from "react-icons/fa"; 
+import { MdOutlineCategory } from "react-icons/md";
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
 import { Link, useNavigate, useLocation } from 'react-router';
@@ -92,6 +94,7 @@ function AsideBar() {
         </div>
 
         <div className="flex flex-col gap-6 text-lg">
+
           <NavItem to="/gestion/dashboard" icon={<PiHouseSimpleFill />} title="Dashboard" text="Dashboard" />
           <NavItem to="/gestion/usuarios" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/clientes" icon={<GiWeightLiftingUp />} title="Clientes" text="Clientes" />
@@ -99,12 +102,18 @@ function AsideBar() {
           <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas" />
+          <NavItem to="/gestion/categorias" icon={<TbBellCog />} title="Categorías" text="Categorías" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas" allowedRoles={['Administrador']} />
         </div>
 
         <div>
           <div>
-            {isOpen && <p className="text-center text-lg">{loggedUser?.username}</p>}
+            {isOpen && (
+              <div className="flex items-center justify-center gap-2 mb-2 text-sm border-t-2 pt-2 border-gray-500">
+                <FaRegCircleUser className="text-base" />
+                <p className="font-medium">{loggedUser?.username}</p>
+              </div>
+            )}
           </div>
 
           <div
