@@ -194,7 +194,7 @@ export type NotificationTemplate = {
 
 export type NotificationTemplateDataForm = Omit<NotificationTemplate, 'user' | 'notificationType'> & Pick<NotificationType, 'idNotificationType'> & Pick<User, 'idUser'>
 
-export type ClientTypeDataForm = Omit<ClientType, 'user' | 'notificationType'> & {
+export type ClientTypeDataForm = {
     idClientType: number;
     name: string;
     isDeleted: number; 

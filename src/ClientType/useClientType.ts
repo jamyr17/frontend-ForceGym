@@ -32,8 +32,7 @@ export const useClientType = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteClientType(idClientType, loggedUser?.idUser || 0)
-
+                const response = await deleteClientType(idClientType, loggedUser?.idUser)
                 if(response.ok){
                     Swal.fire({
                         title: 'Tipo de cliente eliminado',
@@ -74,8 +73,8 @@ export const useClientType = () => {
         const loggedUser = getAuthUser()
         const reqClientType = {
             ...clientType, 
-            isDeleted: false,
-            loggedIdUser: loggedUser?.idUser
+            isDeleted: 0,
+            paramloggedIdUser: loggedUser?.idUser
         }
             
         await Swal.fire({
