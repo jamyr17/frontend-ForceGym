@@ -190,7 +190,7 @@ function EconomicExpenseManagement() {
                                                 getEconomicExpenseById(economicExpense.idEconomicExpense);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -231,8 +231,12 @@ function EconomicExpenseManagement() {
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                     {economicExpenses?.length > 0 && (
-                     <ExpenseDashboard economicExpenses={economicExpenses} />
+                    <>
+                        <hr className="my-6 border-black border-t-6" />
+                        <ExpenseDashboard economicExpenses={economicExpenses} />
+                    </>
                     )}
+
                 </div>
             </main>
         </div>

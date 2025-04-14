@@ -1,24 +1,23 @@
 import { useEffect } from "react"
-import useNotificationTemplateStore from "./Store"
+import useClientTypeStore from "./Store"
 import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore } from "react-icons/md"
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
 import Pagination from "../shared/components/Pagination"
-import { useNotificationTemplate } from "./useNotificationTemplate"
+import { useClientType } from "./useClientType"
 import SearchInput from "../shared/components/SearchInput"
 import ModalFilter from "../shared/components/ModalFilter"
 import { FilterButton, FilterSelect } from "./Filter"
 import Modal from "../shared/components/Modal"
 import Form from "./Form"
 import DataInfo from "./DataInfo";
-import { mapNotificationTemplateToDataForm } from "../shared/types/mapper";
-import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { mapClientTypeToDataForm } from "../shared/types/mapper";
 import { useNavigate } from "react-router";
 import NoData from "../shared/components/NoData";
 
-function NotificationTemplateManagement() {
+function ClientTypeManagement() {
     const {
-        notificationTemplates,
+        clientTypes,
         modalForm,
         modalFilter,
         modalInfo,
@@ -30,9 +29,8 @@ function NotificationTemplateManagement() {
         searchType,
         searchTerm,
         filterByStatus,
-        filterByNotificationType,
-        fetchNotificationTemplates,
-        getNotificationTemplateById,
+        fetchClientTypes,
+        getClientTypeById,
         changePage,
         changeSize,
         changeSearchType,
@@ -41,35 +39,28 @@ function NotificationTemplateManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
-    } = useNotificationTemplateStore();
+    } = useClientTypeStore();
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useNotificationTemplate()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useClientType()
     const navigate = useNavigate()
 
-    useEffect(() => {}, [notificationTemplates])
+    useEffect(() => {}, [clientTypes])
 
     useEffect(() => {
         const fetchData = async () => {
-            const { logout } = await fetchNotificationTemplates()
-
-            if(logout){
-                setAuthHeader(null)
-                setAuthUser(null)
-                navigate('/login', {replace: true})
-            }    
-
+            await fetchClientTypes()
         }
         
         fetchData()
-    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByNotificationType])
+    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus])
 
     return (
         <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
-                <h1 className="text-4xl uppercase">Plantillas</h1>
+                <h1 className="text-4xl uppercase">Tipos de Cliente</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Mensaje</option>
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Usuario</option>
+                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>ID</option>
+                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Nombre</option>
                 </SearchInput>
                 <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
@@ -88,51 +79,40 @@ function NotificationTemplateManagement() {
                                 </button>
                             )}
                             modal={modalForm}
-                            getDataById={getNotificationTemplateById}
+                            getDataById={getClientTypeById}
                             closeModal={closeModalForm}
                             Content={Form}
                         />
-
                     </div>
                     
-                    {notificationTemplates?.length>0 ? (
+                    {clientTypes?.length > 0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th><button
                                     className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
-                                    onClick={() => {handleOrderByChange('message')}}
+                                    onClick={() => {handleOrderByChange('name')}}
                                 >
-                                    MENSAJE  
-                                    {(orderBy==='message' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
-                                    {(orderBy==='message' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
-                                </button></th>
-
-                                <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
-                                    onClick={() => {handleOrderByChange('notificationType')}}
-                                >
-                                    TIPO DE NOTIFICACIÓN  
-                                    {(orderBy==='notificationType' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
-                                    {(orderBy==='notificationType' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
+                                    NOMBRE  
+                                    {(orderBy==='name' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
+                                    {(orderBy==='name' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
 
                                 {filterByStatus && <th>ESTADO</th>}
+
                                 <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                         
-                            {notificationTemplates?.map((notificationTemplate, index) => (
-                            <tr key={notificationTemplate.idNotificationTemplate} className="text-center py-8">
+                            {clientTypes?.map((clientType, index) => (
+                            <tr key={clientType.idClientType} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
-                                <td className="py-2">{notificationTemplate.message}</td>
-                                <td className="py-2">{notificationTemplate.notificationType.name}</td>
-
+                                <td className="py-2">{clientType.name}</td> 
                                 {filterByStatus && (
                                 <td>
-                                    {notificationTemplate.isDeleted ? (
+                                    {clientType.isDeleted ? (
                                     <button className="py-0.5 px-2 rounded-lg bg-red-500 text-white">Inactivo</button>
                                     ) : (
                                     <button className="py-0.5 px-2 rounded-lg bg-green-500 text-white">Activo</button>
@@ -144,7 +124,7 @@ function NotificationTemplateManagement() {
                                     Button={() => (
                                         <button
                                             onClick={() => {
-                                                getNotificationTemplateById(notificationTemplate.idNotificationTemplate);
+                                                getClientTypeById(clientType.idClientType);
                                                 showModalInfo();
                                             }}
                                             className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
@@ -154,13 +134,13 @@ function NotificationTemplateManagement() {
                                         </button>
                                     )}
                                     modal={modalInfo}
-                                    getDataById={getNotificationTemplateById}
+                                    getDataById={getClientTypeById}
                                     closeModal={closeModalInfo}
                                     Content={DataInfo}
                                 />
                                 <button
                                     onClick={() => {
-                                        getNotificationTemplateById(notificationTemplate.idNotificationTemplate);
+                                        getClientTypeById(clientType.idClientType);
                                         showModalForm();
                                     }}
                                     className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
@@ -168,17 +148,17 @@ function NotificationTemplateManagement() {
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
-                                {notificationTemplate.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapNotificationTemplateToDataForm(notificationTemplate))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
+                                {clientType.isDeleted ? (
+                                    <button onClick={() => handleRestore(mapClientTypeToDataForm(clientType))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : ( 
                                     <button 
-                                        onClick={() => handleDelete(notificationTemplate)} 
-                                        className={`p-2 rounded-sm hover:cursor-pointer bg-black hover:bg-gray-700`}
+                                        onClick={() => handleDelete(clientType)} 
+                                        className="p-2 rounded-sm hover:cursor-pointer bg-black hover:bg-gray-700"
                                         title="Eliminar"
                                     >
-                                    <MdOutlineDelete className={`text-white`} />
+                                    <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}
                                 </td>
@@ -189,7 +169,7 @@ function NotificationTemplateManagement() {
                     </table>
                     ) : 
                     (
-                        <NoData module="plantillas de notificación" />
+                        <NoData module="tipos de cliente" />
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                 </div>
@@ -198,4 +178,4 @@ function NotificationTemplateManagement() {
     );
 }
 
-export default NotificationTemplateManagement;
+export default ClientTypeManagement;

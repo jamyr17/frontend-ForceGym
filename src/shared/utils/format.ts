@@ -16,5 +16,5 @@ export const formatDateForParam = (date: Date): string => {
 }
 
 export const formatAmountToCRC = (amount: number) => {
-    return '₡' + amount.toLocaleString('es-CR');
-};
+    return `CRC ${amount.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+  };  

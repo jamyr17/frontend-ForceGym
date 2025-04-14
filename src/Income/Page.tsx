@@ -221,7 +221,7 @@ function EconomicIncomeManagement() {
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {economicIncome.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapEconomicIncomeToDataForm(economicIncome))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapEconomicIncomeToDataForm(economicIncome))} className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
@@ -242,9 +242,11 @@ function EconomicIncomeManagement() {
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                     {economicIncomes?.length > 0 && (
+                    <>
+                    <hr className="my-6 border-black border-t-6" />
                     <IncomeDashboard economicIncomes={economicIncomes} />
-                    )}
-               
+                    </>
+                    )}              
                 </div>
             </main>
         </div>

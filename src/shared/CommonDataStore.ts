@@ -8,6 +8,7 @@ type CommonDataStore = {
     activityTypes: ActivityType[]
     meansOfPayment: MeanOfPayment[]
     typesClient: TypeClient[]
+    clientTypes: ClientTypes[]
     genders: Gender[]
     allClients: ClientOptions[]
     categories: Category[]
@@ -56,6 +57,11 @@ export const useCommonDataStore = create<CommonDataStore>()(
             set(() => ({ typesClient: result.data.typesClient }))
             return result
         },
+        fetchClientTypes: async () => {
+            const result = await getData(`${import.meta.env.VITE_URL_API}ClientType/list`)
+            set(() => ({ clientTypes: result.data.typesClient }))
+            return result
+        },
 
         fetchGenders: async () => {
             const result = await getData(`${import.meta.env.VITE_URL_API}gender/list`)
@@ -70,7 +76,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
         },
 
         fetchCategories: async () => {
-            const result = await getData(`${import.meta.env.VITE_URL_API}category/list`)
+            const result = await getData(`${import.meta.env.VITE_URL_API}category/listAll`)
             set(() => ({ categories: result.data }))
             return result
         },

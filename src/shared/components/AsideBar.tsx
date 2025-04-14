@@ -10,7 +10,7 @@ import { FaBalanceScale } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 
 function AsideBar() {
   const loggedUser = getAuthUser();
@@ -18,6 +18,7 @@ function AsideBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -28,7 +29,6 @@ function AsideBar() {
     };
 
     document.addEventListener('click', handleClickOutside);
-
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
@@ -47,16 +47,18 @@ function AsideBar() {
     text: string;
     allowedRoles?: string[];
   }) => {
-    if (allowedRoles && !allowedRoles.includes(userRole || '')) {
-      return null;
-    }
-    
+    if (allowedRoles && !allowedRoles.includes(userRole || '')) return null;
+
+    const isActive = location.pathname === to;
+
     return (
       <Link
         to={to}
-        className={`flex items-center gap-2 p-2 ${to === '/gestion/dashboard' ? 
-          'bg-yellow text-black rounded-b-sm cursor-pointer' : 
-          'hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer'}`}
+        className={`flex items-center gap-2 p-2 ${
+          isActive 
+            ? 'bg-yellow text-black rounded-b-sm font-semibold' 
+            : 'hover:bg-yellow hover:rounded-b-sm hover:text-black hover:cursor-pointer'
+        }`}
         title={title}
       >
         {icon}
@@ -78,8 +80,8 @@ function AsideBar() {
     <>
       <aside
         id="sidebar"
-        className={`md:flex flex-col fixed group items-center justify-between pt-6 bg-black text-white h-full transition-all ${
-          isOpen ? 'w-/12' : 'w-12'
+        className={`md:flex flex-col fixed group items-center justify-between pt-6 bg-black text-white h-full transition-all duration-300 z-50 ${
+          isOpen ? 'w-48' : 'w-12'
         }`}
       >
         <div
@@ -92,70 +94,16 @@ function AsideBar() {
         </div>
 
         <div className="flex flex-col gap-6 text-lg">
-          <NavItem
-            to="/gestion/dashboard"
-            icon={<PiHouseSimpleFill />}
-            title="Dashboard"
-            text="Dashboard"
-          />
 
-          <NavItem
-            to="/gestion/usuarios"
-            icon={<FaRegUser />}
-            title="Usuarios"
-            text="Usuarios"
-            allowedRoles={['Administrador']}
-          />
-
-          <NavItem
-            to="/gestion/clientes"
-            icon={<GiWeightLiftingUp />}
-            title="Clientes"
-            text="Clientes"
-          />
-
-          <NavItem
-            to="/gestion/ingresos"
-            icon={<MdOutlineTrendingUp />}
-            title="Ingresos"
-            text="Ingresos"
-            allowedRoles={['Administrador']}
-          />
-
-          <NavItem
-            to="/gestion/gastos"
-            icon={<MdTrendingDown />}
-            title="Gastos"
-            text="Gastos"
-            allowedRoles={['Administrador']}
-          />
-
-          <NavItem
-            to="/gestion/balance"
-            icon={<FaBalanceScale />}
-            title="Balance Económico"
-            text="Balance"
-            allowedRoles={['Administrador']}
-          />
-          <NavItem
-            to="/gestion/inventario"
-            icon={<MdOutlineInventory />}
-            title="Inventario"
-            text="Inventario"
-            allowedRoles={['Administrador']}
-          />
-          <NavItem
-            to="/gestion/plantillas-notificacion"
-            icon={<TbBellCog />}
-            title="Plantillas de Notificaciones"
-            text="Plantillas"
-          />
-          <NavItem
-            to="/gestion/categorias"
-            icon={<MdOutlineCategory />}
-            title="Categorías"
-            text="Categorías"
-          />
+          <NavItem to="/gestion/dashboard" icon={<PiHouseSimpleFill />} title="Dashboard" text="Dashboard" />
+          <NavItem to="/gestion/usuarios" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/clientes" icon={<GiWeightLiftingUp />} title="Clientes" text="Clientes" />
+          <NavItem to="/gestion/ingresos" icon={<MdOutlineTrendingUp />} title="Ingresos" text="Ingresos" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/categorias" icon={<TbBellCog />} title="Categorías" text="Categorías" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas" allowedRoles={['Administrador']} />
         </div>
 
         <div>

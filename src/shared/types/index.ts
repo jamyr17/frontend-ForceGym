@@ -28,7 +28,11 @@ export type Category = {
     idCategory: number
     name: string
 }
-
+export type ClientType = {  
+    idClientType: number
+    name: string
+    isDeleted: number
+}
 export type TypeClient = {
     idTypeClient: number
     name: string
@@ -152,14 +156,18 @@ export type Measurement = {
     muscleMass: number
     bodyFatPercentage: number 
     visceralFatPercentage: number
-    neckSize: number
-    shoulderSize: number
     chestSize: number
+    backSize: number
+    hipSize: number
     waistSize: number
-    thighSize: number
-    calfSize: number
-    forearmSize: number
-    armSize: number
+    leftLegSize: number
+    rightLegSize: number
+    leftCalfSize: number
+    rightCalfSize: number
+    leftForeArmSize: number
+    rightForeArmSize: number
+    leftArmSize: number
+    rightArmSize: number
     isDeleted: number
 }
 
@@ -185,3 +193,10 @@ export type NotificationTemplate = {
 }
 
 export type NotificationTemplateDataForm = Omit<NotificationTemplate, 'user' | 'notificationType'> & Pick<NotificationType, 'idNotificationType'> & Pick<User, 'idUser'>
+
+export type ClientTypeDataForm = Omit<ClientType, 'user' | 'notificationType'> & {
+    idClientType: number;
+    name: string;
+    isDeleted: number; 
+}
+

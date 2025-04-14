@@ -28,6 +28,7 @@ type EconomicBalanceStore = {
 
     showModalFilter: () => void;
     closeModalFilter: () => void;
+    clearAllFilters: () => void;
 };
 
 export const useEconomicBalanceStore = create<EconomicBalanceStore>()(
@@ -42,6 +43,14 @@ export const useEconomicBalanceStore = create<EconomicBalanceStore>()(
         filterByDateRangeMin: null,
         filterByMeanOfPayment: 0,
 
+        clearAllFilters: () => set(() => ({
+            filterByStatus: '',
+            filterByAmountRangeMax: 0,
+            filterByAmountRangeMin: 0,
+            filterByDateRangeMax: null,
+            filterByDateRangeMin: null,
+            filterByMeanOfPayment: 0,
+        })),
         fetchEconomicExpenses: async () => {
             const state = get();
             let filters = ``;

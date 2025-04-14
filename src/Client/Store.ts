@@ -64,6 +64,8 @@ type ClientStore = {
     closeModalInfo: () => void;
     showModalFileType: () => void;
     closeModalFileType: () => void;
+    
+    clearAllFilters: () => void;
 };
 
 export const useClientStore = create<ClientStore>()(
@@ -92,6 +94,23 @@ export const useClientStore = create<ClientStore>()(
         filterByBirthDateRangeMax: null,
         filterByBirthDateRangeMin: null,
         filterByClientType: -1,
+
+        
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByDiabetes: null,
+            filterByHypertension: null,
+            filterByMuscleInjuries: null,       
+            filterByBoneJointIssues: null,
+            filterByBalanceLoss: null,
+            filterByCardiovascularDisease: null,
+            filterByBreathingIssues: null,
+            filterByBirthDateRangeMax: null,
+            filterByBirthDateRangeMin: null,
+            filterByClientType: -1,
+        })),
+
 
         fetchClients: async () => {
             const state = useClientStore.getState();
