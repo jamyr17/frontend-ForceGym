@@ -6,6 +6,7 @@ import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
+import { MdOutlineGroups } from "react-icons/md";
 import { FaBalanceScale } from "react-icons/fa"; 
 import { CgGym } from "react-icons/cg";
 import { MdOutlineCategory } from "react-icons/md";
@@ -105,6 +106,7 @@ function AsideBar() {
           <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías"/>
           <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas"/>
           <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios"/>
+          <NavItem to="/gestion/tiposCliente" icon={<MdOutlineGroups />} title="Tipos De Clientes" text="Tipos de Clientes" allowedRoles={['Administrador']} />
         </div>
 
         <div>

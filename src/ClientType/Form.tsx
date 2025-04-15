@@ -19,7 +19,7 @@ function Form() {
     } = useForm<ClientTypeDataForm>();
 
     const { 
-        selectedClientType, 
+        clientTypes,
         activeEditingId, 
         fetchClientTypes, 
         addClientType, 
@@ -71,14 +71,22 @@ function Form() {
             navigate('/login');
         }
     };
-
     useEffect(() => {
-        if (selectedClientType) {
-            setValue('idClientType', selectedClientType.idClientType);
-            setValue('name', selectedClientType.name);
-            setValue('isDeleted', selectedClientType.isDeleted ? 0 : 1);
+        if (activeEditingId) {
+            const activeClientType = clientTypes.find(ct => ct.idClientType === activeEditingId);
+            if (activeClientType) {
+                setValue('idClientType', activeClientType.idClientType);
+                setValue('name', activeClientType.name);
+                setValue('isDeleted', activeClientType.isDeleted);
+            }
+        } else {
+            reset({
+                idClientType: 0,
+                name: '',
+                isDeleted: 0 // Nuevo registro como activo (0)
+            });
         }
-    }, [selectedClientType, setValue]);
+    }, [activeEditingId, clientTypes, setValue, reset]);
 
     return (
         <form 
