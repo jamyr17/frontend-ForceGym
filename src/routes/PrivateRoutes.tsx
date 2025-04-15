@@ -23,24 +23,32 @@ function PrivateRoutes () {
     const navigate = useNavigate()
 
     useEffect(() => {
-        const fetchData = async() => {
-            const resultRoles = await fetchRoles()
-            const resultMeansOfPayment = await fetchMeansOfPayment()
-            const resultActivityTypes = await fetchActivityTypes()
-            const resultGenders = await fetchGenders()
-            const resultTypesClient = await fetchTypesClient()
-            const resultCategories = await fetchCategories()
-            const resultNotificationTypes = await fetchNotificationTypes()
-
-            if(resultRoles.logout || resultMeansOfPayment.logout || resultActivityTypes.logout || resultGenders.logout || resultTypesClient.logout || resultCategories.logout || resultNotificationTypes.logout){
-                setAuthHeader(null)
-                setAuthUser(null)
-                navigate('/login', {replace: true})
+        const fetchData = async () => {
+            // Lista de funciones a ejecutar en orden
+            const fetchFunctions = [
+                fetchRoles,
+                fetchMeansOfPayment,
+                fetchActivityTypes,
+                fetchGenders,
+                fetchTypesClient,
+                fetchCategories,
+                fetchNotificationTypes
+            ];
+    
+            // Ejecutar cada función secuencialmente y validar
+            for (const fetchFn of fetchFunctions) {
+                const result = await fetchFn();
+                if (result.logout) {
+                    setAuthHeader(null);
+                    setAuthUser(null);
+                    navigate('/login', { replace: true });
+                    return; // Salir del bucle y la función si hay logout
+                }
             }
-        }
-
-        fetchData()
-    }, [])
+        };
+    
+        fetchData();
+    }, []);
 
     return (
         <>
