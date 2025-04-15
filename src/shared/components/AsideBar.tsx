@@ -7,6 +7,7 @@ import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-i
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
 import { FaBalanceScale } from "react-icons/fa"; 
+import { CgGym } from "react-icons/cg";
 import { MdOutlineCategory } from "react-icons/md";
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
@@ -94,7 +95,6 @@ function AsideBar() {
         </div>
 
         <div className="flex flex-col gap-6 text-lg">
-
           <NavItem to="/gestion/dashboard" icon={<PiHouseSimpleFill />} title="Dashboard" text="Dashboard" />
           <NavItem to="/gestion/usuarios" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/clientes" icon={<GiWeightLiftingUp />} title="Clientes" text="Clientes" />
@@ -102,8 +102,9 @@ function AsideBar() {
           <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías"/>
+          <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas"/>
+          <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios"/>
         </div>
 
         <div>
