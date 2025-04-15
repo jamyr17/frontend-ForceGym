@@ -49,6 +49,9 @@ type ProductInventoryStore = {
     closeModalInfo: () => void;
     showModalFileType: () => void;
     closeModalFileType: () => void;
+    
+    clearAllFilters: () => void;
+
 };
 
 export const useProductInventoryStore = create<ProductInventoryStore>()(
@@ -71,6 +74,16 @@ export const useProductInventoryStore = create<ProductInventoryStore>()(
         filterByCostRangeMin: 0,
         filterByQuantityRangeMax: 0,
         filterByQuantityRangeMin: 0,
+
+        clearAllFilters: () => set(() => ({
+            filterByStatus: '',
+            filterByCostRangeMin: 0,
+            filterByCostRangeMax: 0,
+            filterByQuantityRangeMin: 0,
+            filterByQuantityRangeMax: 0,
+            searchTerm: ''
+        })),
+        
 
         fetchProductsInventory: async () => {
             const state = useProductInventoryStore.getState();

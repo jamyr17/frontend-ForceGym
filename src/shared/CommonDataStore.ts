@@ -76,8 +76,11 @@ export const useCommonDataStore = create<CommonDataStore>()(
         },
 
         fetchCategories: async () => {
-            const result = await getData(`${import.meta.env.VITE_URL_API}category/list`)
+            
+            const result = await getData(`${import.meta.env.VITE_URL_API}category/listAll`)
+            console.log(result);
             set(() => ({ categories: result.data }))
+            console.log(result.data);
             return result
         },
 

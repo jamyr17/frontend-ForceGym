@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import useNotificationTemplateStore from "./Store"
-import { MdOutlineDelete, MdModeEdit, MdOutlineFileDownload, MdOutlineSettingsBackupRestore } from "react-icons/md"
+import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore } from "react-icons/md"
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
 import Pagination from "../shared/components/Pagination"

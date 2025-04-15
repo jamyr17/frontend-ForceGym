@@ -26,7 +26,8 @@ export function FilterSelect() {
         filterByDateRangeMax, 
         changeFilterByStatus, 
         changeFilterByDateRangeMin, 
-        changeFilterByDateRangeMax
+        changeFilterByDateRangeMax,
+        clearAllFilters
     } = useMeasurementStore();
     
     const filteredStatusSelectStyles = filterByStatus !== '' && ' px-0.5 border-yellow text-yellow';
@@ -34,6 +35,17 @@ export function FilterSelect() {
 
     return (
         <div className="flex flex-col gap-4">
+            
+            {/* Botón de limpiar todos */}
+            <div className="flex justify-end pr-4">
+                <button
+                    className="text-yellow border border-yellow px-3 py-1 rounded-md hover:bg-yellow hover:text-black transition-all"
+                    onClick={clearAllFilters}
+                >
+                    Limpiar todos los filtros
+                </button>
+            </div>
+            
             {/* Filtro por Estado */}
             <div className="flex items-center gap-4">
                 <label htmlFor="status" className="w-20">Estado</label>

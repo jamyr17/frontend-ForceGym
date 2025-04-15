@@ -27,7 +27,11 @@ export type Gender = {
 export type Category = {
     idCategory: number
     name: string
+    user: User
+    isDeleted: number
 }
+export type CategoryDataForm = Omit<Category, 'user'> & Pick<User, 'idUser'>
+
 export type ClientType = {  
     idClientType: number
     name: string
@@ -148,6 +152,7 @@ export type Client = {
 }
 // --------------------------------------------------------
 export type Measurement = {
+    idClient: number
     idMeasurement: number
     client: Client
     measurementDate: Date
@@ -199,4 +204,3 @@ export type ClientTypeDataForm = {
     name: string;
     isDeleted: number; 
 }
-

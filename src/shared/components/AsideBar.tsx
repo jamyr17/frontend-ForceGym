@@ -103,9 +103,9 @@ function AsideBar() {
           <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/tiposCliente" icon={<MdOutlineGroups />} title="Tipos De Clientes" text="Tipos de Clientes" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías" allowedRoles={['Administrador']}
           <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/tiposCliente" icon={<MdOutlineGroups />} title="Tipos De Clientes" text="Tipos de Clientes" allowedRoles={['Administrador']} />
         </div>
 
         <div>
