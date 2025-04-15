@@ -16,7 +16,7 @@ import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate, Link } from "react-router";
 import { useClient } from "./useClient";
-import Form from "./Form";
+import Form from "./Form/MultiStepForm";
 import DataInfo from "./DataInfo";
 
 function ClientManagement() {
