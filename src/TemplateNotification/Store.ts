@@ -40,6 +40,8 @@ type NotificationTemplateStore = {
     closeModalFilter: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    
+    clearAllFilters: () => void;
 };
 
 export const useNotificationTemplateStore = create<NotificationTemplateStore>()(
@@ -63,6 +65,18 @@ export const useNotificationTemplateStore = create<NotificationTemplateStore>()(
         filterByDateRangeMin: null ,
         filterByMeanOfPayment: 0,
         filterByNotificationType: 0,
+
+        
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByAmountRangeMax: 0,
+            filterByAmountRangeMin: 0,
+            filterByDateRangeMax: null,
+            filterByDateRangeMin: null ,
+            filterByMeanOfPayment: 0,
+            filterByNotificationType: 0,
+        })),
 
         fetchNotificationTemplates: async () => {
             const state = useNotificationTemplateStore.getState();
@@ -89,7 +103,6 @@ export const useNotificationTemplateStore = create<NotificationTemplateStore>()(
             if (state.page > (Math.trunc(result.data.totalRecords / state.size) + 1)) {
                 newPage = 1;
             }
-
             const templates = result.data?.notificationTemplates ?? []
             const totalRecords = result.data?.totalRecords ?? 0
 

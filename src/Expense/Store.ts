@@ -55,6 +55,8 @@ type EconomicExpenseStore = {
     closeModalInfo: () => void;
     showModalFileType: () => void;
     closeModalFileType: () => void;
+    
+    clearAllFilters: () => void;
 };
 
 export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
@@ -79,6 +81,18 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
         filterByDateRangeMin: null ,
         filterByMeanOfPayment: 0,
         filterByCategory: -1,
+
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByAmountRangeMax: 0,
+            filterByAmountRangeMin: 0,
+            filterByDateRangeMax: null,
+            filterByDateRangeMin: null ,
+            filterByMeanOfPayment: 0,
+            filterByCategory: -1,
+        })),
+
 
         fetchEconomicExpenses: async () => {
             const state = useEconomicExpenseStore.getState();

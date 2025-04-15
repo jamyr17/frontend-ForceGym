@@ -49,6 +49,7 @@ type MeasurementStore = {
     closeModalInfo: () => void;
     showModalFileType: () => void;
     closeModalFileType: () => void;
+    clearAllFilters: () => void;
 };
 
 export const useMeasurementStore = create<MeasurementStore>()(
@@ -72,6 +73,14 @@ export const useMeasurementStore = create<MeasurementStore>()(
         filterByStatus: '',
         filterByDateRangeMax: null,
         filterByDateRangeMin: null ,
+
+        
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByDateRangeMax: null,
+            filterByDateRangeMin: null ,
+        })),
 
         fetchMeasurements: async () => {
             const state = useMeasurementStore.getState();

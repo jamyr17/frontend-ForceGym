@@ -55,6 +55,7 @@ type EconomicIncomeStore = {
     closeModalInfo: () => void;
     showModalFileType: () => void;
     closeModalFileType: () => void;
+    clearAllFilters: () => void;
 };
 
 export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
@@ -79,6 +80,17 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
         filterByDateRangeMin: null,
         filterByMeanOfPayment: 0,
         filterByClientType: -1,
+
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByAmountRangeMax: 0,
+            filterByAmountRangeMin: 0,
+            filterByDateRangeMax: null,
+            filterByDateRangeMin: null ,
+            filterByMeanOfPayment: 0,
+            filterByCategory: -1,
+        })),
 
         fetchEconomicIncomes: async () => {
             const state = useEconomicIncomeStore.getState();
