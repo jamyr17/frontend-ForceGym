@@ -22,7 +22,7 @@ type ClientTypeStore = {
     getClientTypeById: (id: number) => void
     addClientType: (data: ClientTypeDataForm) => Promise<any>
     updateClientType: (data: ClientTypeDataForm) => Promise<any>
-    deleteClientType: (id: ClientType['idClientType'], loggedIdUser: number) => Promise<any>
+    deleteClientType: (id: number, loggedIdUser: number) => Promise<any>;
 
     changeSize: (newSize: number) => void
     changePage: (newPage: number) => void
@@ -70,7 +70,6 @@ const useClientTypeStore = create<ClientTypeStore>()(
             if (state.filterByStatus !== '') {
                 filters += `&filterByStatus=${state.filterByStatus}`
             }
-        
             const result = await getData(
                 `${import.meta.env.VITE_URL_API}clientType/list?size=${state.size}&page=${state.page}${filters}`
             )
