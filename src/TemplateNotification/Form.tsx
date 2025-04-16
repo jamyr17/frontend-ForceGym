@@ -15,7 +15,7 @@ function Form() {
     const messageInputRef = useRef<HTMLInputElement>(null);
     const [messageValue, setMessageValue] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [cursorPosition, setCursorPosition] = useState<number>(0);
+    const [cursorPosition, setCursorPosition] = useState<number | null>(null);
 
     const navigate = useNavigate();
     const { notificationTypes } = useCommonDataStore();
@@ -84,6 +84,31 @@ function Form() {
         }
     }, [activeEditingId]);
 
+    const handleEmojiClick = (emojiData: any) => {
+        const emoji = emojiData.emoji;
+
+        const input = messageInputRef.current;
+        if (input) {
+            const start = input.selectionStart ?? 0;
+            const end = input.selectionEnd ?? 0;
+
+            // Inserta el emoji en la posición del cursor y actualiza el estado
+            const newText = messageValue.slice(0, start) + emoji + messageValue.slice(end);
+            setMessageValue(newText);
+            setValue('message', newText);
+
+            // Actualiza la posición del cursor
+            const newCursorPosition = start + emoji.length;
+            setCursorPosition(newCursorPosition);
+
+            // Restablece el foco y la posición del cursor
+            setTimeout(() => {
+                input.focus();
+                input.setSelectionRange(newCursorPosition, newCursorPosition);
+            }, 0);
+        }
+    };
+
     return (
         <form
             className="bg-white rounded-lg px-5 mb-10 overflow-scroll"
@@ -148,16 +173,7 @@ function Form() {
                         type="button"
                         className="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-100 p-1 rounded hover:bg-gray-200 transition"
                         title={showEmojiPicker ? 'Ocultar emojis' : 'Mostrar emojis'}
-                        onClick={() => {
-                            setShowEmojiPicker(!showEmojiPicker);
-                            const input = messageInputRef.current;
-                            if (input) {
-                                setTimeout(() => {
-                                    input.focus();
-                                    setCursorPosition(input.selectionStart ?? 0);
-                                }, 0);
-                            }
-                        }}
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
                         😊
                     </button>
@@ -165,32 +181,7 @@ function Form() {
 
                 {showEmojiPicker && (
                     <div className="mt-2">
-                        <EmojiPicker
-                            onEmojiClick={(emojiData) => {
-                                const emoji = emojiData.emoji;
-                                const start = cursorPosition;
-                                const end = cursorPosition;
-
-                                const newText =
-                                    messageValue.slice(0, start) +
-                                    emoji +
-                                    messageValue.slice(end);
-
-                                const newCursorPosition = start + emoji.length;
-
-                                setMessageValue(newText);
-                                setValue('message', newText);
-                                setCursorPosition(newCursorPosition);
-
-                                setTimeout(() => {
-                                    const input = messageInputRef.current;
-                                    if (input) {
-                                        input.focus();
-                                        input.setSelectionRange(newCursorPosition, newCursorPosition);
-                                    }
-                                }, 0);
-                            }}
-                        />
+                        <EmojiPicker onEmojiClick={handleEmojiClick} />
                     </div>
                 )}
 
