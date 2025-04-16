@@ -91,21 +91,24 @@ export type EconomicIncome = {
     meanOfPayment: MeanOfPayment
     amount: number
     activityType: ActivityType
+    hasDelay: boolean
+    delayDays: number | null
     isDeleted: number
 }
 
 export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType' | "client"> & Pick<Client, 'idClient'> & {
     idMeanOfPayment: MeanOfPayment['idMeanOfPayment']
     idActivityType: ActivityType['idActivityType']
+    hasDelay: boolean
 }
 
-export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client"> & {
+export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client" | "delayDays"> & {
     user: User
     idEconomicExpense: number
     category: Category
 }
 
-export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome" | "idClient"> & Omit<EconomicExpense, "meanOfPayment" | "category" | "user">
+export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome" | "idClient" | "delayDays" | "hasDelay"> & Omit<EconomicExpense, "meanOfPayment" | "category" | "user">
     & Pick<EconomicExpense, 'idEconomicExpense'> & {
         idUser: number
         idCategory: number

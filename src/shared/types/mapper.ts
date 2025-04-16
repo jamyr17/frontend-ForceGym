@@ -30,6 +30,8 @@ export function mapEconomicIncomeToDataForm(economicIncome: EconomicIncome): Eco
         idMeanOfPayment: economicIncome.meanOfPayment.idMeanOfPayment,
         amount: economicIncome.amount,
         idActivityType: economicIncome.activityType.idActivityType,
+        hasDelay: economicIncome.delayDays!==null,
+        delayDays: economicIncome.delayDays,
         isDeleted: economicIncome.isDeleted
     };
 }
