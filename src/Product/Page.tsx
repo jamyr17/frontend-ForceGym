@@ -132,7 +132,7 @@ function ProductInventoryManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('code')}}
                                 >
                                     CÓDIGO  
@@ -140,7 +140,7 @@ function ProductInventoryManagement() {
                                     {(orderBy==='code' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('name')}}
                                 >
                                     NOMBRE  
@@ -148,7 +148,7 @@ function ProductInventoryManagement() {
                                     {(orderBy==='name' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('quantity')}}
                                 >
                                     CANTIDAD  

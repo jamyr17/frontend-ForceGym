@@ -201,6 +201,10 @@ function Form() {
                     min="0"
                     step="1"
                     placeholder="Ingrese la cantidad" 
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                    }}
                     {...register('quantity', {
                         required: 'La cantidad es obligatoria', 
                         min: {
@@ -234,6 +238,10 @@ function Form() {
                     min="0"
                     step="0"
                     placeholder="Ingrese el costo" 
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                    }}
                     {...register('cost', {
                         required: 'El costo es obligatorio', 
                         min: {
