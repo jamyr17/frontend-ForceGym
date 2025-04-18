@@ -18,7 +18,7 @@ const CASH_PAYMENT_ID = 2; // Asumiendo que 2 es el ID para Efectivo
 function Form() {
     const navigate = useNavigate();
     const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<EconomicIncomeDataForm>();
-    const { onChange, ...rest } = register('idClient');
+    const { onChange } = register('idClient');
     const { meansOfPayment, activityTypes, allClients, fetchAllClients} = useCommonDataStore();
     const { economicIncomes, activeEditingId, fetchEconomicIncomes, addEconomicIncome, updateEconomicIncome, closeModalForm } = useEconomicIncomeStore();
     
@@ -27,6 +27,7 @@ function Form() {
     const voucherNumber = watch("voucherNumber");
     const amount = watch("amount");
     const isCashPayment = idMeanOfPayment === CASH_PAYMENT_ID;
+    const hasDelay = watch('hasDelay');
 
     const submitForm = async (data: EconomicIncomeDataForm) => {
         // Validación adicional para cliente
@@ -66,7 +67,8 @@ function Form() {
         const loggedUser = getAuthUser();
         const reqUser = {
             ...data, 
-            paramLoggedIdUser: loggedUser?.idUser
+            paramLoggedIdUser: loggedUser?.idUser,
+            delayDays: data.hasDelay ? data.delayDays : null
         };
         
         if (activeEditingId === 0) {
@@ -123,7 +125,12 @@ function Form() {
                 setValue('voucherNumber', activeIncome.voucherNumber);
                 setValue('idMeanOfPayment', activeIncome.meanOfPayment.idMeanOfPayment);
                 setValue('idActivityType', activeIncome.activityType.idActivityType);
+                setValue('hasDelay', activeIncome.delayDays!=null || false);
+                setValue('delayDays', activeIncome.delayDays || null);
             }
+        }else{
+            setValue('hasDelay', false);
+            setValue('delayDays', null);
         }
     }, [activeEditingId]);
 
@@ -208,8 +215,51 @@ function Form() {
                     </ErrorForm>
                 }
             </div>
+            
+            <div className="mt-4">
+                <label htmlFor="delayDays" className="text-sm uppercase font-bold">
+                    Días de atraso
+                </label>
+                <br/>
+                <label className="flex items-center mt-2">
+                    ¿Hubo días de atraso?
+                    <input
+                        type="checkbox"
+                        id="hasDelay"
+                        className="ml-2"
+                        {...register('hasDelay')}
+                    />
+                </label>
+            </div>
 
-            <div className="mb-5">
+            {hasDelay && (
+                <div className="mt-4">
+                    <label htmlFor="delayDays" className="text-sm uppercase font-bold">
+                        Cantidad de días de atraso
+                    </label>
+                    <input
+                        id="delayDays"
+                        type="number"
+                        min="1"
+                        className="w-full p-3 border border-gray-100 mt-2"
+                        {...register('delayDays', {
+                            required: 'Debe especificar el número de días de atraso',
+                            min: {
+                            value: 1,
+                            message: 'El número de días debe ser positivo'
+                            },
+                            valueAsNumber: true
+                        })}
+                    />
+                    {errors.delayDays && 
+                    <ErrorForm>
+                        {errors.delayDays.message}
+                    </ErrorForm>
+                    }
+                </div>
+            )}
+
+            <div className="mt-2 mb-5">
                 <label htmlFor="voucherNumber" className="text-sm uppercase font-bold">
                     Voucher
                 </label>
