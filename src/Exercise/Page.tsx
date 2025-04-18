@@ -3,16 +3,25 @@ import { useNavigate } from "react-router";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
 import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore } from "react-icons/md";
+
+import useExerciseStore from "./Store";
+import { useExercise } from "./useExercise";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { mapExerciseToDataForm } from "../shared/types/mapper";
+
 import SearchInput from "../shared/components/SearchInput";
 import ModalFilter from "../shared/components/ModalFilter";
+import { FilterButton, FilterSelect } from "./Filter";
+import Modal from "../shared/components/Modal";
+import Form from "./Form";
+import DataInfo from "./DataInfo";
 import Pagination from "../shared/components/Pagination";
 import NoData from "../shared/components/NoData";
 
 function ExerciseManagement() {
     const navigate = useNavigate();
-    /*const {
-        categories,
+    const {
+        exercises,
         modalForm,
         modalFilter,
         modalInfo,
@@ -40,10 +49,10 @@ function ExerciseManagement() {
         handleDelete,
         handleSearch,
         handleOrderByChange,
-        handleRestore
-    } = useExercise();*/
+        handleRestore,
+    } = useExercise();
 
-    /*useEffect(() => {
+    useEffect(() => {
         const fetchData = async () => {
             const { logout } = await fetchExercises();
             if (logout) {
@@ -60,19 +69,33 @@ function ExerciseManagement() {
         searchTerm,
         orderBy,
         directionOrderBy,
-        filterByStatus
-    ]);*/
+        filterByStatus,
+    ]);
 
     return (
         <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">Ejercicios</h1>
+                <SearchInput
+                    searchTerm={searchTerm}
+                    handleSearch={handleSearch}
+                    changeSearchType={changeSearchType}
+                >
+                    <option value={1} defaultChecked={searchType === 1}>Nombre</option>
+                    <option value={2} defaultChecked={searchType === 2}>Descripción</option>
+                </SearchInput>
+                <ModalFilter
+                    modalFilter={modalFilter}
+                    closeModalFilter={closeModalFilter}
+                    FilterButton={FilterButton}
+                    FilterSelect={FilterSelect}
+                />
             </header>
 
             <main className="justify-items-center ml-12 p-4">
                 <div className="flex flex-col mx-12 mt-4 bg-white text-lg w-full max-h-full overflow-scroll">
                     <div className="flex justify-between">
-                        { /* <Modal
+                        <Modal
                             Button={() => (
                                 <button
                                     className="mt-4 ml-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer"
@@ -86,10 +109,10 @@ function ExerciseManagement() {
                             getDataById={getExerciseById}
                             closeModal={closeModalForm}
                             Content={Form}
-                        /> */ }
+                        />
                     </div>
 
-                    {/* {categories?.length > 0 ? ( */ }
+                    {exercises?.length > 0 ? (
                         <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
                             <thead>
                                 <tr>
@@ -97,28 +120,30 @@ function ExerciseManagement() {
                                     <th>
                                         <button
                                             className="inline-flex items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300"
-                                            
+                                            onClick={() => handleOrderByChange("name")}
                                         >
                                             NOMBRE
-                                            {/*{orderBy === "name" && (
+                                            {orderBy === "name" && (
                                                 directionOrderBy === "DESC"
                                                     ? <FaArrowUp className="text-yellow" />
                                                     : <FaArrowDown className="text-yellow" />
-                                            )} */}
+                                            )}
                                         </button>
                                     </th>
-                                    {/*filterByStatus && <th>ESTADO</th>*/}
+                                    <th>DESCRIPCIÓN</th>
+                                    {filterByStatus && <th>ESTADO</th>}
                                     <th>ACCIONES</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {/*categories.map((category, index) => (
-                                    <tr key={category.idExercise} className="text-center py-8">
+                                {exercises.map((exercise, index) => (
+                                    <tr key={exercise.idExercise} className="text-center py-8">
                                         <td className="py-2">{index + 1}</td>
-                                        <td className="py-2">{category.name}</td>
+                                        <td className="py-2">{exercise.name}</td>
+                                        <td className="py-2">{exercise.description}</td>
                                         {filterByStatus && (
                                             <td>
-                                                {category.isDeleted ? (
+                                                {exercise.isDeleted ? (
                                                     <button className="py-0.5 px-2 rounded-lg bg-red-500 text-white">Inactivo</button>
                                                 ) : (
                                                     <button className="py-0.5 px-2 rounded-lg bg-green-500 text-white">Activo</button>
@@ -130,7 +155,7 @@ function ExerciseManagement() {
                                                 Button={() => (
                                                     <button
                                                         onClick={() => {
-                                                            getExerciseById(category.idExercise);
+                                                            getExerciseById(exercise.idExercise);
                                                             showModalInfo();
                                                         }}
                                                         className="p-2 bg-black rounded-sm hover:bg-gray-700"
@@ -146,7 +171,7 @@ function ExerciseManagement() {
                                             />
                                             <button
                                                 onClick={() => {
-                                                    getExerciseById(category.idExercise);
+                                                    getExerciseById(exercise.idExercise);
                                                     showModalForm();
                                                 }}
                                                 className="p-2 bg-black rounded-sm hover:bg-gray-700"
@@ -154,9 +179,9 @@ function ExerciseManagement() {
                                             >
                                                 <MdModeEdit className="text-white" />
                                             </button>
-                                            {category.isDeleted ? (
+                                            {exercise.isDeleted ? (
                                                 <button
-                                                    onClick={() => handleRestore(mapExerciseToDataForm(category))}
+                                                    onClick={() => handleRestore(mapExerciseToDataForm(exercise))}
                                                     className="p-2 bg-black rounded-sm hover:bg-gray-700"
                                                     title="Restaurar"
                                                 >
@@ -164,7 +189,7 @@ function ExerciseManagement() {
                                                 </button>
                                             ) : (
                                                 <button
-                                                    onClick={() => handleDelete(category)}
+                                                    onClick={() => handleDelete(exercise)}
                                                     className="p-2 bg-black rounded-sm hover:bg-gray-700"
                                                     title="Eliminar"
                                                 >
@@ -173,20 +198,20 @@ function ExerciseManagement() {
                                             )}
                                         </td>
                                     </tr>
-                                ))} */}
+                                ))}
                             </tbody>
                         </table>
-                    {/* ) : (
-                        <NoData module="categorías" />
-                    )} */}
+                    ) : (
+                        <NoData module="ejercicios" />
+                    )}
 
-                    {/*<Pagination
+                    <Pagination
                         page={page}
                         size={size}
                         totalRecords={totalRecords}
                         onSizeChange={changeSize}
                         onPageChange={changePage}
-                    /> */}
+                    />
                 </div>
             </main>
         </div>

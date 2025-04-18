@@ -189,6 +189,18 @@ export type ClientOptions = {
     label: string
 }
 // --------------------------------------------------------
+export type Exercise = {
+    idExercise: number
+    name: string
+    description: string
+    sets: number
+    repetitions: number
+    user: User
+    isDeleted: number
+}
+
+export type ExerciseDataForm = Omit<Exercise, 'user'> & Pick<User, 'idUser'>
+// --------------------------------------------------------
 export type NotificationTemplate = {
     idNotificationTemplate: number
     user: User
