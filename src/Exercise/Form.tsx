@@ -158,6 +158,11 @@ function FormExercise() {
           type="number"
           min="1"
           placeholder="Ingrese el número de series"
+          onWheel={(e) => {
+            // Prevenir el cambio de valor con la rueda del mouse
+            e.preventDefault();
+            e.currentTarget.blur();
+        }}
           {...register("sets", {
             required: "Las series son obligatorias",
             min: {
@@ -180,6 +185,11 @@ function FormExercise() {
           type="number"
           min="1"
           placeholder="Ingrese el número de repeticiones"
+          onWheel={(e) => {
+            // Prevenir el cambio de valor con la rueda del mouse
+            e.preventDefault();
+            e.currentTarget.blur();
+        }}
           {...register("repetitions", {
             required: "Las repeticiones son obligatorias",
             min: {

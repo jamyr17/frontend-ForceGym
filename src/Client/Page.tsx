@@ -140,7 +140,7 @@ function ClientManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('identificationNumber')}}
                                 >
                                     CÉDULA  
@@ -192,15 +192,17 @@ function ClientManagement() {
                                 <Modal
                                     Button={() => (
                                         <button
-                                            onClick={() => {
-                                                getClientById(client.idClient);
-                                                showModalInfo();
-                                            }}
-                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                            title="Ver detalles"
-                                        >
-                                            <IoIosMore className="text-white" />
-                                        </button>
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          getClientById(client.idClient);
+                                          setTimeout(() => showModalInfo(), 0);
+                                        }}
+                                        className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                        title="Ver detalles"
+                                      >
+                                        <IoIosMore className="text-white" />
+                                      </button>
                                     )}
                                     modal={modalInfo}
                                     getDataById={getClientById}

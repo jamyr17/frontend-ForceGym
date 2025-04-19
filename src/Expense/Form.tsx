@@ -312,6 +312,10 @@ function Form() {
                     min="0"
                     step="1"
                     placeholder="Ingrese el monto" 
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                    }}
                     onKeyDown={(e) => {
                         // Prevenir la entrada de caracteres no deseados
                         if (e.key === '-' || e.key === 'e' || e.key === 'E') {
