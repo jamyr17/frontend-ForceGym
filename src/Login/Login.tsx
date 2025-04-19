@@ -55,8 +55,13 @@ function Login ({credencialUser, setCredencialUser, handleLoginSubmit} : LoginPr
                         </Link>
                     </form>
                 </section>
-                <aside className="bg-yellow self-center h-[470px] w-[375px] rounded-2xl">
-
+            
+                <aside className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
+                    <img 
+                        src="Gym.webp" 
+                        alt="Imagen del equipo de Force GYM" 
+                        className="w-full h-auto max-h-[600px] object-contain rounded-lg"
+                    />
                 </aside>
             </main>
         </div>
