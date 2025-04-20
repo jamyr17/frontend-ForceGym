@@ -14,9 +14,16 @@ export type MeanOfPayment = {
     name: string
 }
 
+export type Fee = {
+    idClientType: ClientType['idClientType'][]
+    amount: number
+}
+
 export type ActivityType = {
     idActivityType: number
     name: string
+    fees: Fee[]
+    isDeleted: number
 }
 
 export type Gender = {
@@ -190,6 +197,7 @@ export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'he
 export type ClientOptions = {
     value: number
     label: string
+    idClientType: number
 }
 // --------------------------------------------------------
 export type Exercise = {
