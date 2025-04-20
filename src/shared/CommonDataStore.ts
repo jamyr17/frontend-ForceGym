@@ -47,7 +47,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
         },
 
         fetchActivityTypes: async () => {
-            const result = await getData(`${import.meta.env.VITE_URL_API}activityType/list`)
+            const result = await getData(`${import.meta.env.VITE_URL_API}activityType/listFees`)
             set(() => ({ activityTypes: result.data }))
             return result
         },

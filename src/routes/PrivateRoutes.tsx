@@ -16,6 +16,7 @@ import EconomicBalanceDashboard from "../Balance/Page";
 import CategoryManagement from "../Category/Page";
 import ClientTypeManagement from "../ClientType/Page";
 import ExerciseManagement from "../Exercise/Page";
+import ActivityTypeManagement from "../ActivityType/Page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -109,7 +110,7 @@ function PrivateRoutes () {
                 }
             />
               <Route 
-                path="tiposCliente" 
+                path="tipos-cliente" 
                 element={
                     <ClientTypeManagement/>
                 }
@@ -136,6 +137,12 @@ function PrivateRoutes () {
                 path="ejercicios" 
                 element={
                     <ExerciseManagement/>
+                }
+            />
+            <Route 
+                path="tipos-actividad" 
+                element={
+                    <ActivityTypeManagement/>
                 }
             />
         </Routes>
