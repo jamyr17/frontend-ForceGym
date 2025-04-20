@@ -28,6 +28,8 @@ function Form() {
     const amount = watch("amount");
     const isCashPayment = idMeanOfPayment === CASH_PAYMENT_ID;
     const hasDelay = watch('hasDelay');
+    const idClient = watch("idClient");
+    const idActivityType = watch("idActivityType");
 
     const submitForm = async (data: EconomicIncomeDataForm) => {
         // Validación adicional para cliente
@@ -134,6 +136,32 @@ function Form() {
         }
     }, [activeEditingId]);
 
+    useEffect(() => {
+        if (idClient && idActivityType) {
+            // 1. Obtener el tipo de cliente seleccionado
+            const selectedClient = allClients.find(client => client.value === idClient);
+            const clientTypeId = selectedClient?.idClientType;
+    
+            // 2. Obtener la actividad seleccionada
+            const selectedActivity = activityTypes.find(activity => activity.idActivityType === Number(idActivityType));
+    
+            if (clientTypeId && selectedActivity) {
+                // 3. Buscar la tarifa correspondiente
+                const matchingFee = selectedActivity.fees.find(fee => 
+                    fee.idClientType.includes(clientTypeId)
+                );
+    
+                // 4. Actualizar el monto si se encontró una tarifa
+                if (matchingFee) {
+                    setValue('amount', matchingFee.amount);
+                } else {
+                    //Resetear el monto si no hay tarifa definida
+                    setValue('amount', 0);
+                }
+            }
+        }
+    }, [idClient, idActivityType, allClients, activityTypes, setValue]);
+
     // Efecto para limpiar voucherNumber cuando se selecciona Efectivo
     useEffect(() => {
         if (isCashPayment && voucherNumber) {
@@ -192,6 +220,31 @@ function Form() {
                 }
             </div>
 
+            <div className="my-5">
+                <label htmlFor="idActivityType" className="text-sm uppercase font-bold">
+                    Actividad 
+                </label>
+                <select
+                    id="idActivityType"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idActivityType", {
+                        required: 'La actividad es obligatoria'
+                    })}  
+                >
+                    <option value="">Seleccione una actividad</option>
+                    {activityTypes.map((activity) => (
+                        <option key={activity.idActivityType} value={activity.idActivityType}>
+                            {activity.name}
+                        </option>
+                    ))}
+                </select>
+                {errors.idActivityType && 
+                    <ErrorForm>
+                        {errors.idActivityType.message}
+                    </ErrorForm>
+                }
+            </div>
+
             <div className="mb-5">
                 <label htmlFor="registrationDate" className="text-sm uppercase font-bold">
                     Fecha
@@ -216,7 +269,7 @@ function Form() {
                 }
             </div>
             
-            <div className="mt-4">
+            <div className="my-4">
                 <label htmlFor="delayDays" className="text-sm uppercase font-bold">
                     Días de atraso
                 </label>
@@ -258,6 +311,31 @@ function Form() {
                     }
                 </div>
             )}
+
+            <div className="my-5">
+                <label htmlFor="idMeanOfPayment" className="text-sm uppercase font-bold">
+                    Medio de Pago 
+                </label>
+                <select
+                    id="idMeanOfPayment"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idMeanOfPayment", {
+                        required: 'El medio de pago es obligatorio'
+                    })}  
+                >
+                    <option value="">Seleccione un medio de pago</option>
+                    {meansOfPayment.map((meanOfPayment) => (
+                        <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
+                            {meanOfPayment.name}
+                        </option>
+                    ))}
+                </select>
+                {errors.idMeanOfPayment && 
+                    <ErrorForm>
+                        {errors.idMeanOfPayment.message}
+                    </ErrorForm>
+                }
+            </div>
 
             <div className="mt-2 mb-5">
                 <label htmlFor="voucherNumber" className="text-sm uppercase font-bold">
@@ -314,31 +392,6 @@ function Form() {
                 }
             </div>
 
-            <div className="my-5">
-                <label htmlFor="idMeanOfPayment" className="text-sm uppercase font-bold">
-                    Medio de Pago 
-                </label>
-                <select
-                    id="idMeanOfPayment"
-                    className="w-full p-3 border border-gray-100" 
-                    {...register("idMeanOfPayment", {
-                        required: 'El medio de pago es obligatorio'
-                    })}  
-                >
-                    <option value="">Seleccione un medio de pago</option>
-                    {meansOfPayment.map((meanOfPayment) => (
-                        <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
-                            {meanOfPayment.name}
-                        </option>
-                    ))}
-                </select>
-                {errors.idMeanOfPayment && 
-                    <ErrorForm>
-                        {errors.idMeanOfPayment.message}
-                    </ErrorForm>
-                }
-            </div>
-
             <div className="mb-5">
                 <label htmlFor="amount" className="text-sm uppercase font-bold">
                     Monto
@@ -373,31 +426,6 @@ function Form() {
                 {errors.amount && 
                     <ErrorForm>
                         {errors.amount.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="my-5">
-                <label htmlFor="idActivityType" className="text-sm uppercase font-bold">
-                    Actividad 
-                </label>
-                <select
-                    id="idActivityType"
-                    className="w-full p-3 border border-gray-100" 
-                    {...register("idActivityType", {
-                        required: 'La actividad es obligatoria'
-                    })}  
-                >
-                    <option value="">Seleccione una actividad</option>
-                    {activityTypes.map((activity) => (
-                        <option key={activity.idActivityType} value={activity.idActivityType}>
-                            {activity.name}
-                        </option>
-                    ))}
-                </select>
-                {errors.idActivityType && 
-                    <ErrorForm>
-                        {errors.idActivityType.message}
                     </ErrorForm>
                 }
             </div>
