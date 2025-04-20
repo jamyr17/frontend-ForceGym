@@ -24,15 +24,21 @@ function AsideBar() {
   const location = useLocation();
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: any) => {
+      const aside = document.getElementById('sidebar');
       if (
         submenuRef.current &&
         !submenuRef.current.contains(event.target as Node) &&
         !buttonRef.current?.contains(event.target as Node)
       ) {
         setShowFloatingMenu(false);
+      } 
+    
+      if (aside && !aside.contains(event.target)) {
+        setIsOpen(false);
       }
     };
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
@@ -56,16 +62,16 @@ function AsideBar() {
     return (
       <Link
         to={to}
-        className={`flex items-center gap-3 px-4 py-2 w-full transition-colors duration-200 ${
+        className={`flex text-center items-center gap-3 px-4 py-2 w-full transition-colors duration-200 rounded-md ${
           isActive
             ? 'bg-yellow text-black font-semibold shadow-sm rounded-md'
-            : 'hover:bg-yellow hover:text-black hover:rounded-md'
+            : 'hover:bg-yellow hover:text-black'
         }`}
         title={title}
         onClick={() => setShowFloatingMenu(false)}
       >
-        <span className="text-xl">{icon}</span>
-        <span className="text-sm truncate">{text}</span>
+        <span className={`text-md ${isOpen && "pl-6"}`}>{icon}</span>
+        <span className="truncate">{text}</span>
       </Link>
     );
   };
@@ -80,7 +86,7 @@ function AsideBar() {
     <>
       <aside
         id="sidebar"
-        className={`md:flex flex-col fixed items-start justify-between pt-6 pb-6 bg-black text-white h-full transition-all duration-300 z-50 overflow-y-auto ${
+        className={`md:flex text-md flex-col fixed items-center justify-between pt-6 pb-6 bg-black text-white h-full transition-all duration-300 z-50 ${
           isOpen ? 'w-56 px-2' : 'w-14'
         }`}
       >
@@ -91,10 +97,10 @@ function AsideBar() {
           onClick={() => setIsOpen(!isOpen)}
         >
           <IoMdMenu className="text-xl" />
-          {isOpen && <span className="text-base font-semibold">Menú</span>}
+          {isOpen && <span className="">Menú</span>}
         </div>
 
-        <div className="flex flex-col gap-4 text-base w-full mt-4">
+        <div className={`flex flex-col items-center gap-1 w-full mt-4 ${isOpen && "border-y-2 py-4 border-gray-500"}`}>
           <NavItem to="/gestion/dashboard" icon={<PiHouseSimpleFill />} title="Dashboard" text="Dashboard" />
           <NavItem to="/gestion/usuarios" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/clientes" icon={<GiWeightLiftingUp />} title="Clientes" text="Clientes" />
@@ -102,27 +108,26 @@ function AsideBar() {
           <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas" text="Plantillas" />
           <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios" />
 
           {/* Botón más opciones */}
           <div
             ref={buttonRef}
-            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-yellow hover:text-black hover:rounded-md"
+            className="flex text-center items-center gap-3 px-4 py-2 w-full transition-colors duration-200 rounded-md cursor-pointer hover:bg-yellow hover:text-black"
             title="Más opciones"
             onClick={(e) => {
               e.stopPropagation();
               setShowFloatingMenu(!showFloatingMenu);
             }}
           >
-            <FaSlidersH className="text-xl" />
-            {isOpen && <span className="text-base">Más opciones</span>}
+            <span className={`${isOpen && "pl-6"}`}><FaSlidersH/></span>
+            {isOpen && <span>Más opciones</span>}
           </div>
         </div>
 
         <div className="w-full">
           {isOpen && (
-            <div className="flex items-center justify-center gap-2 mb-2 text-sm border-t-2 pt-2 border-gray-500">
+            <div className="flex items-center justify-center gap-2">
               <FaRegCircleUser className="text-base" />
               <p className="font-medium truncate">{loggedUser?.username}</p>
             </div>
@@ -130,11 +135,11 @@ function AsideBar() {
 
           <div
             onClick={handleLogout}
-            className="flex items-center text-lg gap-2 my-4 px-4 py-2 hover:bg-yellow hover:rounded-md hover:text-black hover:cursor-pointer"
+            className="flex items-center justify-center text-lg gap-2 mt-6 px-4 py-2 hover:bg-yellow hover:rounded-md hover:text-black hover:cursor-pointer"
             title="Cerrar sesión"
           >
             <FaSignOutAlt className="text-xl" />
-            {isOpen && <span className="text-base">Cerrar sesión</span>}
+            {isOpen && <span className="text-xl">Cerrar sesión</span>}
           </div>
         </div>
       </aside>
@@ -149,9 +154,10 @@ function AsideBar() {
           left: `${(buttonRef.current?.getBoundingClientRect().right ?? 0) + 12}px`,
         }}
       >
-        <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías" />
-        <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos Cliente" text="Tipos Cliente" allowedRoles={['Administrador']} />
-        <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos Actividad" text="Tipos Actividad" allowedRoles={['Administrador']} />
+        <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías de Gastos" text="Categorías de Gastos" />
+        <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos de Cliente" text="Tipos de Cliente" allowedRoles={['Administrador']} />
+        <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos de Actividad" text="Tipos de Actividad" allowedRoles={['Administrador']} />
+        <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificación" text="Plantillas de Notificación" />
       </div>
     )}
 
