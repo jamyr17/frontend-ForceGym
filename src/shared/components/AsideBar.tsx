@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { IoMdMenu } from 'react-icons/io';
-import { FaRegUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaRegUser, FaSignOutAlt, FaBalanceScale, FaRegCalendarAlt } from 'react-icons/fa';
 import { FaRegCircleUser } from "react-icons/fa6";
 import { GiWeightLiftingUp } from "react-icons/gi";
-import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown } from 'react-icons/md';
+import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown, MdOutlineGroups, MdOutlineCategory } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
-import { MdOutlineGroups } from "react-icons/md";
-import { FaBalanceScale } from "react-icons/fa"; 
 import { CgGym } from "react-icons/cg";
-import { MdOutlineCategory } from "react-icons/md";
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
 import { Link, useNavigate, useLocation } from 'react-router';
@@ -106,7 +103,8 @@ function AsideBar() {
           <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías" text="Categorías"/>
           <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificaciones" text="Plantillas"/>
           <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios"/>
-          <NavItem to="/gestion/tiposCliente" icon={<MdOutlineGroups />} title="Tipos De Clientes" text="Tipos de Clientes" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos De Clientes" text="Tipos de Clientes" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos De Actividad" text="Tipos de Actividad" allowedRoles={['Administrador']} />
         </div>
 
         <div>
