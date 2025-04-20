@@ -229,6 +229,19 @@ function EconomicExpenseManagement() {
                     (
                         <NoData module="gastos económicos" />
                     )}
+
+
+                    {economicExpenses?.length > 0 && (
+                        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-lg font-bold">Total de Gastos: 
+                                {economicExpenses.reduce((total, item) => total + item.amount, 0).toLocaleString('es-CR', {
+                                })} CRC
+                                </h3>
+                            </div>
+                        </div>
+                    )}
+
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                     {economicExpenses?.length > 0 && (
                     <>

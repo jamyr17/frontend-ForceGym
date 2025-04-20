@@ -56,12 +56,14 @@ function Login ({credencialUser, setCredencialUser, handleLoginSubmit} : LoginPr
                     </form>
                 </section>
             
-                <aside className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-                    <img 
-                        src="Gym.webp" 
-                        alt="Imagen del equipo de Force GYM" 
-                        className="w-full h-auto max-h-[600px] object-contain rounded-lg"
-                    />
+                <aside className="w-full max-w-[500px] flex items-center justify-center bg-white rounded-r-lg overflow-hidden">
+                    <div className="w-full h-full rounded-xl overflow-hidden shadow-md">
+                        <img 
+                            src="Gym.webp" 
+                            alt="Imagen del equipo de Force GYM" 
+                            className="w-full h-full max-h-[550px] object-cover object-center"
+                        />
+                    </div>
                 </aside>
             </main>
         </div>

@@ -43,6 +43,16 @@ export const useMultiStepForm = () => {
     phoneNumber: ''
   });
 
+  const formatToYYYYMMDD = (date: Date | string): string => {
+    if (!date) return '';
+  
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const year = d.getFullYear();
+    const month = (`0${d.getMonth() + 1}`).slice(-2);
+    const day = (`0${d.getDate()}`).slice(-2);
+    return `${year}-${month}-${day}`;
+  };
+  
   const getEditingValues = (): ClientDataForm => {
     if (!activeEditingId) return getDefaultValues();
     
@@ -53,7 +63,7 @@ export const useMultiStepForm = () => {
       idClient: activeClient.idClient,
       idUser: activeClient.user.idUser,
       idTypeClient: activeClient.typeClient.idTypeClient,
-      registrationDate: activeClient.registrationDate,
+      registrationDate: formatToYYYYMMDD(activeClient.registrationDate),
       expirationMembershipDate: activeClient.expirationMembershipDate,
       phoneNumberContactEmergency: activeClient.phoneNumberContactEmergency,
       nameEmergencyContact: activeClient.nameEmergencyContact,
@@ -80,7 +90,8 @@ export const useMultiStepForm = () => {
   };
 
   const defaultValues = useMemo(getEditingValues, [activeEditingId, clients]);
-  const methods = useForm<ClientDataForm>({ 
+
+  const methods = useForm<ClientDataForm>({
     defaultValues,
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -91,10 +102,10 @@ export const useMultiStepForm = () => {
   const submitForm = async (data: ClientDataForm) => {
     let action = '', result;
     const loggedUser = getAuthUser();
-    
+
     const reqClient: ClientDataForm & { paramLoggedIdUser?: number } = {
       ...data,
-      idUser: loggedUser?.idUser || 1, 
+      idUser: loggedUser?.idUser || 1,
       paramLoggedIdUser: loggedUser?.idUser
     };
 
@@ -107,7 +118,7 @@ export const useMultiStepForm = () => {
     }
 
     handleClose();
-    
+
     if (result.ok) {
       const result2 = await fetchClients();
       if (result2.logout) {
@@ -139,12 +150,12 @@ export const useMultiStepForm = () => {
     closeModalForm();
   };
 
-  type FormField = 
-    | "idClient" | "idUser" | "idTypeClient" | "registrationDate" 
+  type FormField =
+    | "idClient" | "idUser" | "idTypeClient" | "registrationDate"
     | "phoneNumberContactEmergency" | "nameEmergencyContact" | "signatureImage" | "isDeleted"
-    | "idHealthQuestionnaire" | "diabetes" | "hypertension" | "muscleInjuries" 
+    | "idHealthQuestionnaire" | "diabetes" | "hypertension" | "muscleInjuries"
     | "boneJointIssues" | "balanceLoss" | "cardiovascularDisease" | "breathingIssues"
-    | "idPerson" | "identificationNumber" | "name" | "firstLastName" | "secondLastName" 
+    | "idPerson" | "identificationNumber" | "name" | "firstLastName" | "secondLastName"
     | "birthday" | "idGender" | "email" | "phoneNumber";
 
   interface StepFields {
@@ -153,25 +164,16 @@ export const useMultiStepForm = () => {
   }
 
   const inputsByStep: StepFields[] = [
-    {step: 1, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender']},
-    {step: 2, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency']},
-    {step: 3, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues']}
+    { step: 1, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
+    { step: 2, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency'] },
+    { step: 3, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues'] }
   ];
 
   const validateStepChange = async () => {
-    try {
-      const matchingItem = inputsByStep.find(item => item.step === step);
-      if (!matchingItem) {
-        return false; 
-      }
-      
-      if (methods.formState.isValid) return true;
-      
-      return await methods.trigger(matchingItem.fields);
-    } catch (error) {
-      console.error('Validation failed:', error);
-      return false;
-    }
+    const current = inputsByStep.find(item => item.step === step);
+    if (!current) return false;
+    if (methods.formState.isValid) return true;
+    return await methods.trigger(current.fields);
   };
 
   const handleStepChangeByMenu = async (toStep: number) => {
