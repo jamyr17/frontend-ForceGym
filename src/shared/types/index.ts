@@ -154,7 +154,7 @@ export type Client = {
     typeClient: TypeClient
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
-    expirationMembershipDate: Date
+    expirationMembershipDate: string | Date
     phoneNumberContactEmergency: string
     nameEmergencyContact: string
     signatureImage: string
@@ -190,8 +190,9 @@ export type MeasurementDataForm = Omit<Measurement, 'client'> & {
     idClient: number
 }
 
-export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
+export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'| 'registrationDate'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
     idGender: number
+    registrationDate: string | Date
 }
 
 export type ClientOptions = {

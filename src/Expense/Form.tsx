@@ -7,11 +7,13 @@ import useEconomicExpenseStore from "./Store";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { formatDate } from "../shared/utils/format";
 
 const MAXLENGTH_VOUCHER = 100;
 const MAXLENGTH_DETAIL = 100;
-const MAXDATE = new Date().toLocaleDateString('sv-SE');
+//const MAXDATE = new Date().toLocaleDateString('sv-SE');
 const CASH_PAYMENT_ID = 2; 
+const MAXDATE = new Date().toUTCString();
 
 function Form() {
     const navigate = useNavigate();
@@ -199,26 +201,15 @@ function Form() {
                     id="registrationDate"
                     className="w-full p-3 border border-gray-100"  
                     type="date" 
-                    max={MAXDATE} // Establecemos la fecha máxima como hoy
                     {...register('registrationDate', {
-                        required: 'La fecha es obligatoria',
-                        validate: (value) => {
-                            const selectedDate = new Date(value);
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            
-                            if (selectedDate > today) {
-                                return 'No se pueden registrar gastos con fecha futura';
-                            }
-                            return true;
+                        required: 'La fecha de registro es obligatoria',
+                        max: {
+                        value: MAXDATE,
+                        message: `Debe ingresar una fecha de registro de máximo ${formatDate(new Date())}`
                         }
                     })}
-                />
-                {errors.registrationDate && 
-                    <ErrorForm>
-                        {errors.registrationDate.message}
-                    </ErrorForm>
-                }
+                    />
+                {errors.registrationDate && <ErrorForm>{errors.registrationDate.message?.toString()}</ErrorForm>}
             </div>
 
             <div className="mb-5">

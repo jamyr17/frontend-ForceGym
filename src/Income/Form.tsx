@@ -12,8 +12,9 @@ import { useCommonDataStore } from "../shared/CommonDataStore";
 
 const MAXLENGTH_VOUCHER = 100;
 const MAXLENGTH_DETAIL = 100;
-const MAXDATE = new Date().toLocaleDateString('sv-SE');
+//const MAXDATE = new Date().toLocaleDateString('sv-SE');
 const CASH_PAYMENT_ID = 2; // Asumiendo que 2 es el ID para Efectivo
+const MAXDATE = new Date().toUTCString();
 
 function Form() {
     const navigate = useNavigate();
@@ -253,21 +254,17 @@ function Form() {
                     id="registrationDate"
                     className="w-full p-3 border border-gray-100"  
                     type="date" 
-                    max={MAXDATE}
                     {...register('registrationDate', {
-                        required: 'La fecha es obligatoria',
+                        required: 'La fecha de registro es obligatoria',
                         max: {
-                            value: MAXDATE,
-                            message: `Debe ingresar una fecha de máximo ${formatDate(new Date())}`
+                        value: MAXDATE,
+                        message: `Debe ingresar una fecha de registro de máximo ${formatDate(new Date())}`
                         }
                     })}
-                />
-                {errors.registrationDate && 
-                    <ErrorForm>
-                        {errors.registrationDate.message}
-                    </ErrorForm>
-                }
+                    />
+                {errors.registrationDate && <ErrorForm>{errors.registrationDate.message?.toString()}</ErrorForm>}
             </div>
+
             
             <div className="my-4">
                 <label htmlFor="delayDays" className="text-sm uppercase font-bold">

@@ -18,3 +18,7 @@ export const formatDateForParam = (date: Date): string => {
 export const formatAmountToCRC = (amount: number) => {
     return `CRC ${amount.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
   };  
+
+export const formatNullable = (value: any, fallback = "No disponible") => {
+    return value === null || value === undefined || value === "" ? fallback : value;
+};

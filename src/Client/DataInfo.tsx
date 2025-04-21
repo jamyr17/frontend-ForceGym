@@ -1,4 +1,4 @@
-import { formatAmountToCRC, formatDate } from "../shared/utils/format";
+import { formatAmountToCRC, formatDate, formatNullable } from "../shared/utils/format";
 import useClientStore from "./Store";
 import { CiCircleCheck } from "react-icons/ci";
 import { MdOutlineCancel } from "react-icons/md";
@@ -51,13 +51,13 @@ function DataInfo() {
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NÚMERO DEL CONTACTO DE EMERGENCIA</strong></p>
-                    <p>{client.phoneNumberContactEmergency}</p>
+                    <p>{formatNullable(client.phoneNumberContactEmergency)}</p>
                 </div>
 
                 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE DEL CONTACTO EMERGENCIA</strong></p>
-                    <p>{client.nameEmergencyContact}</p>
+                    <p>{formatNullable(client.nameEmergencyContact)}</p>
                 </div>
                 
             </div>

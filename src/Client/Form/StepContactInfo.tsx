@@ -4,7 +4,7 @@ import { formatDate } from "../../shared/utils/format";
 
 const MAXLENGTH_PHONENUMBER = 15;
 const MAXLENGTH_EMAIL = 100;
-const MAXDATE_BIRTHDAY = new Date().toUTCString();
+const MAXDATE = new Date().toUTCString();
 const MAXLENGTH_NAME = 50;
 
 export const StepContactInfo = () => {
@@ -103,7 +103,7 @@ export const StepContactInfo = () => {
           {...register('registrationDate', {
             required: 'La fecha de registro es obligatoria',
             max: {
-              value: MAXDATE_BIRTHDAY,
+              value: MAXDATE,
               message: `Debe ingresar una fecha de registro de máximo ${formatDate(new Date())}`
             }
           })}
