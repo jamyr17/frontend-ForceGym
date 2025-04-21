@@ -35,6 +35,8 @@ function ExerciseManagement() {
         searchType,
         searchTerm,
         filterByStatus,
+        filterByCategory,
+        filterByDifficulty,
         fetchExercises,
         getExerciseById,
         changePage,
@@ -53,7 +55,9 @@ function ExerciseManagement() {
         handleOrderByChange,
         handleRestore,
     } = useExercise();
+
     const { fetchExerciseCategories } = useCommonDataStore();
+
     useEffect(() => {
         const fetchData = async () => {
             const { logout } = await fetchExercises();
@@ -66,34 +70,27 @@ function ExerciseManagement() {
         };
         fetchData();
     }, [
-        page,
-        size,
+        page, size,
         searchType,
         searchTerm,
         orderBy,
         directionOrderBy,
         filterByStatus,
+        filterByCategory,
+        filterByDifficulty,
     ]);
 
-    return (
+    return ( 
         <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">Ejercicios</h1>
-                <SearchInput
-                    searchTerm={searchTerm}
-                    handleSearch={handleSearch}
-                    changeSearchType={changeSearchType}
-                >
-                    <option value={1} defaultChecked={searchType === 1}>Nombre</option>
-                    <option value={2} defaultChecked={searchType === 2}>Descripción</option>
+                <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
+                <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Nombre</option>
+                <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===2}>Descripción</option>
                 </SearchInput>
-                <ModalFilter
-                    modalFilter={modalFilter}
-                    closeModalFilter={closeModalFilter}
-                    FilterButton={FilterButton}
-                    FilterSelect={FilterSelect}
-                />
+                <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
+
 
             <main className="justify-items-center ml-12 p-4">
                 <div className="flex flex-col mx-12 mt-4 bg-white text-lg w-full max-h-full overflow-scroll">
@@ -101,7 +98,7 @@ function ExerciseManagement() {
                         <Modal
                             Button={() => (
                                 <button
-                                    className="mt-4 ml-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer"
+                                   className="mt-4 ml-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer"
                                     type="button"
                                     onClick={showModalForm}
                                 >
@@ -122,7 +119,7 @@ function ExerciseManagement() {
                                     <th>#</th>
                                     <th>
                                         <button
-                                            className="inline-flex items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300"
+                                            className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                             onClick={() => handleOrderByChange("name")}
                                         >
                                             NOMBRE
