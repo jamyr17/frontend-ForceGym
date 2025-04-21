@@ -58,6 +58,11 @@ export type NotificationType = {
     idNotificationType: number
     name: string
 }
+
+export type ExerciseCategory = {
+    idExerciseCategory: number
+    name: string
+}
 // -----------------------------------------------------
 
 export type Person = {
@@ -202,16 +207,17 @@ export type ClientOptions = {
 }
 // --------------------------------------------------------
 export type Exercise = {
-    idExercise: number
-    name: string
-    description: string
-    sets: number
-    repetitions: number
-    user: User
-    isDeleted: number
-}
+    idExercise: number;
+    name: string;
+    description: string;
+    difficulty: string;
+    exerciseCategory: ExerciseCategory;
+    paramLoggedIdUser: number;
+    user: User;
+    isDeleted: number;
+};
 
-export type ExerciseDataForm = Omit<Exercise, 'user'> & Pick<User, 'idUser'>
+export type ExerciseDataForm = Omit<Exercise, 'user' | 'exerciseCategory'> & Pick<ExerciseCategory, 'idExerciseCategory'> & Pick<User, 'idUser'>
 // --------------------------------------------------------
 export type NotificationTemplate = {
     idNotificationTemplate: number

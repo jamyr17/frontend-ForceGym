@@ -1,17 +1,19 @@
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
-import { ExerciseDataForm } from "../shared/types"; // Crear este tipo similar al de CategoryDataForm
+import { ExerciseDataForm } from "../shared/types";
 import ErrorForm from "../shared/components/ErrorForm";
 import useExerciseStore from "./Store";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 const MAXLENGTH_NAME = 100;
 const MAXLENGTH_DESCRIPTION = 255;
 
 function FormExercise() {
   const navigate = useNavigate();
+  const { exerciseCategories } = useCommonDataStore();
   const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<ExerciseDataForm>();
   const {
     exercises,
@@ -83,8 +85,8 @@ function FormExercise() {
         setValue("idExercise", exercise.idExercise);
         setValue("name", exercise.name);
         setValue("description", exercise.description);
-        setValue("sets", exercise.sets);
-        setValue("repetitions", exercise.repetitions);
+        setValue("difficulty", exercise.difficulty);
+        setValue("idExerciseCategory", exercise.exerciseCategory.idExerciseCategory);
         setValue("isDeleted", exercise.isDeleted);
       }
     }
@@ -147,58 +149,43 @@ function FormExercise() {
         {errors.description && <ErrorForm>{errors.description.message}</ErrorForm>}
       </div>
 
-      {/* Campo series */}
+      {/* Campo dificultad */}
       <div className="mb-5">
-        <label htmlFor="sets" className="text-sm uppercase font-bold">
-          Series
+        <label htmlFor="difficulty" className="text-sm uppercase font-bold">
+          Dificultad
         </label>
-        <input
-          id="sets"
+        <select
+          id="difficulty"
           className="w-full p-3 border border-gray-100"
-          type="number"
-          min="1"
-          placeholder="Ingrese el número de series"
-          onWheel={(e) => {
-            // Prevenir el cambio de valor con la rueda del mouse
-            e.preventDefault();
-            e.currentTarget.blur();
-        }}
-          {...register("sets", {
-            required: "Las series son obligatorias",
-            min: {
-              value: 1,
-              message: "Debe ser al menos 1"
-            }
-          })}
-        />
-        {errors.sets && <ErrorForm>{errors.sets.message}</ErrorForm>}
+          {...register("difficulty", { required: "La dificultad es obligatoria" })}
+        >
+          <option value="">Seleccione una dificultad</option>
+          <option value="Fácil">Fácil</option>
+          <option value="Media">Media</option>
+          <option value="Difícil">Difícil</option>
+
+        </select>
+        {errors.difficulty && <ErrorForm>{errors.difficulty.message}</ErrorForm>}
       </div>
 
-      {/* Campo repeticiones */}
+      {/* Campo categoría (select) */}
       <div className="mb-5">
-        <label htmlFor="repetitions" className="text-sm uppercase font-bold">
-          Repeticiones
+        <label htmlFor="idExerciseCategory" className="text-sm uppercase font-bold">
+          Categoría
         </label>
-        <input
-          id="repetitions"
+        <select
+          id="idExerciseCategory"
           className="w-full p-3 border border-gray-100"
-          type="number"
-          min="1"
-          placeholder="Ingrese el número de repeticiones"
-          onWheel={(e) => {
-            // Prevenir el cambio de valor con la rueda del mouse
-            e.preventDefault();
-            e.currentTarget.blur();
-        }}
-          {...register("repetitions", {
-            required: "Las repeticiones son obligatorias",
-            min: {
-              value: 1,
-              message: "Debe ser al menos 1"
-            }
-          })}
-        />
-        {errors.repetitions && <ErrorForm>{errors.repetitions.message}</ErrorForm>}
+          {...register("idExerciseCategory", { required: "La categoría es obligatoria" })}
+        >
+          <option value="">Seleccione una categoría</option>
+          {exerciseCategories.map(cat => (
+            <option key={cat.idExerciseCategory} value={cat.idExerciseCategory}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        {errors.idExerciseCategory && <ErrorForm>{errors.idExerciseCategory.message}</ErrorForm>}
       </div>
 
       {/* Botón de submit */}

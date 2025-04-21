@@ -17,6 +17,8 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import Pagination from "../shared/components/Pagination";
 import NoData from "../shared/components/NoData";
+import { useCommonDataStore } from '../shared/CommonDataStore';
+
 
 function ExerciseManagement() {
     const navigate = useNavigate();
@@ -51,7 +53,7 @@ function ExerciseManagement() {
         handleOrderByChange,
         handleRestore,
     } = useExercise();
-
+    const { fetchExerciseCategories } = useCommonDataStore();
     useEffect(() => {
         const fetchData = async () => {
             const { logout } = await fetchExercises();
@@ -60,6 +62,7 @@ function ExerciseManagement() {
                 setAuthUser(null);
                 navigate("/login", { replace: true });
             }
+            await fetchExerciseCategories();
         };
         fetchData();
     }, [

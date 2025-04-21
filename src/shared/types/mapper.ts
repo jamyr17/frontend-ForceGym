@@ -151,9 +151,10 @@ export function mapExerciseToDataForm(exercise: Exercise): ExerciseDataForm {
         idExercise: exercise.idExercise,
         name: exercise.name,
         description: exercise.description,
-        repetitions: exercise.repetitions,
-        sets: exercise.sets,
+        difficulty: exercise.difficulty,
+        idExerciseCategory: exercise.exerciseCategory.idExerciseCategory,
+        paramLoggedIdUser: exercise.paramLoggedIdUser,
         idUser: exercise.user.idUser,
-        isDeleted: exercise.isDeleted
+        isDeleted: exercise.isDeleted,
     }
 }
