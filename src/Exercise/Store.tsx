@@ -18,6 +18,8 @@ type ExerciseStore = {
     searchType: number;
     searchTerm: string;
     filterByStatus: string;
+    filterByDifficulty: string;
+    filterByCategory: number;
 
     fetchExercises: () => Promise<any>;
     getExerciseById: (id: number) => void;
@@ -32,6 +34,8 @@ type ExerciseStore = {
     changeSearchType: (newSearchType: number) => void;
     changeSearchTerm: (newSearchTerm: string) => void;
     changeFilterByStatus: (newFilterByStatus: string) => void;
+    changeFilterByDifficulty: (difficulty: string) => void;
+    changeFilterByCategory: (idCategory: number) => void;
 
     showModalForm: () => void;
     closeModalForm: () => void;
@@ -57,10 +61,14 @@ export const useExerciseStore = create<ExerciseStore>()(
         searchType: 1,
         searchTerm: "",
         filterByStatus: "",
+        filterByDifficulty: "",
+        filterByCategory: 0,
 
         clearAllFilters: () => set(() => ({
             searchTerm: "",
             filterByStatus: "",
+            filterByDifficulty: "",
+            filterByCategory: 0,
         })),
 
         fetchExercises: async () => {
@@ -76,6 +84,12 @@ export const useExerciseStore = create<ExerciseStore>()(
             }
             if (state.filterByStatus !== "") {
                 filters += `&filterByStatus=${state.filterByStatus}`;
+            }
+            if (state.filterByDifficulty !== "") {
+                filters += `&filterByDifficulty=${state.filterByDifficulty}`;
+            }
+            if (state.filterByCategory !== 0) {
+            filters += `&filterByCategory=${state.filterByCategory}`;
             }
 
             const result = await getData(
@@ -120,7 +134,9 @@ export const useExerciseStore = create<ExerciseStore>()(
         changeSearchType: (newSearchType) => set(() => ({ searchType: newSearchType })),
         changeSearchTerm: (newSearchTerm) => set(() => ({ searchTerm: newSearchTerm })),
         changeFilterByStatus: (newFilterByStatus) => set(() => ({ filterByStatus: newFilterByStatus })),
-
+        changeFilterByDifficulty: (difficulty) => set(() => ({ filterByDifficulty: difficulty })),
+        changeFilterByCategory: (idCategory) => set(() => ({ filterByCategory: idCategory })),
+        
         showModalForm: () => set(() => ({ modalForm: true })),
         closeModalForm: () => set(() => ({ modalForm: false })),
         showModalFilter: () => set(() => ({ modalFilter: true })),
