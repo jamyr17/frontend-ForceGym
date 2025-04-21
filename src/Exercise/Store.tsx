@@ -3,6 +3,7 @@ import { devtools } from "zustand/middleware";
 import { Exercise, ExerciseDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
 
+
 type ExerciseStore = {
     exercises: Exercise[];
     modalForm: boolean;
@@ -102,14 +103,15 @@ export const useExerciseStore = create<ExerciseStore>()(
         },
 
         updateExercise: async (data) => {
-            const result = await putData(`${import.meta.env.VITE_URL_API}exercise/update`, data);
+            const result = await putData(`${import.meta.env.VITE_URL_API}exercise/update/${data.idExercise}`, data);
             return result;
         },
 
         deleteExercise: async (id, loggedIdUser) => {
-            const result = await deleteData(`${import.meta.env.VITE_URL_API}exercise/delete/${id}`, loggedIdUser);
+            const result = await deleteData(`${import.meta.env.VITE_URL_API}exercise/delete/${id}?deletedByUser=${loggedIdUser}`, null);
             return result;
         },
+        
 
         changeSize: (newSize) => set(() => ({ size: newSize })),
         changePage: (newPage) => set(() => ({ page: newPage })),
