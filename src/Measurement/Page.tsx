@@ -132,7 +132,7 @@ function MeasurementManagement() {
                                 <tr>
                                     <th>#</th>
                                     <th>
-                                        <button className="inline-flex items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-700 hover:cursor-pointer" onClick={() => handleOrderByChange('measurementDate')}>
+                                        <button className="inline-flex items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer" onClick={() => handleOrderByChange('measurementDate')}>
                                             FECHA DE MEDICIÓN
                                             {orderBy === 'measurementDate' && directionOrderBy === 'DESC' && <FaArrowUp className="text-yellow" />}
                                             {orderBy === 'measurementDate' && directionOrderBy === 'ASC' && <FaArrowDown className="text-yellow" />}
