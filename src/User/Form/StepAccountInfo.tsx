@@ -2,12 +2,15 @@ import { useFormContext } from "react-hook-form";
 import ErrorForm from "../../shared/components/ErrorForm";
 import PasswordInput from "../../shared/components/PasswordInput";
 import { Role } from "../../shared/types";
+import { getAuthUser } from "../../shared/utils/authentication";
 
 const MAXLENGTH_USERNAME = 50;
 
 export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: number, roles: Role[] }) => {
   const { register, formState: { errors }, watch } = useFormContext();
-  
+  const loggedUser = getAuthUser();
+  const isSelfEditing = loggedUser?.idUser === activeEditingId;
+
   const validatePassword = (password: string): true | string => {
     if (activeEditingId !== 0 && !password) {
       return true;
@@ -83,43 +86,48 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
         {errors.username && <ErrorForm>{errors.username.message?.toString()}</ErrorForm>}
       </div>
 
-      <div>
-        <label htmlFor="password" className="text-sm uppercase font-bold">
-          Contraseña
-        </label>
-        <PasswordInput     
-          id="password"
-          className="w-full p-3 border border-gray-100"  
-          type="password" 
-          placeholder="Ingrese la contraseña" 
-          {...register('password', {
-            required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false,
-            validate: validatePassword
-          })}
-        />
-        {errors.password && <ErrorForm>{errors.password.message?.toString()}</ErrorForm>}
-      </div>
+      {(activeEditingId === 0 || isSelfEditing) && (
+  <>
+    <div>
+      <label htmlFor="password" className="text-sm uppercase font-bold">
+        Contraseña
+      </label>
+      <PasswordInput     
+        id="password"
+        className="w-full p-3 border border-gray-100"  
+        type="password" 
+        placeholder="Ingrese la contraseña" 
+        {...register('password', {
+          required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false,
+          validate: validatePassword
+        })}
+      />
+      {errors.password && <ErrorForm>{errors.password.message?.toString()}</ErrorForm>}
+    </div>
 
-      <div>
-        <label htmlFor="confirmPassword" className="text-sm uppercase font-bold">
-          Confirmar Contraseña
-        </label>
-        <PasswordInput     
-          id="confirmPassword"
-          className="w-full p-3 border border-gray-100"  
-          type="password" 
-          placeholder="Confirme la contraseña" 
-          {...register('confirmPassword', {
-            validate: value => {
-              if (activeEditingId === 0 && value !== watch('password')) {
-                return 'Las contraseñas no coinciden';
-              }
-              return true;
+    <div>
+      <label htmlFor="confirmPassword" className="text-sm uppercase font-bold">
+        Confirmar Contraseña
+      </label>
+      <PasswordInput     
+        id="confirmPassword"
+        className="w-full p-3 border border-gray-100"  
+        type="password" 
+        placeholder="Confirme la contraseña" 
+        {...register('confirmPassword', {
+          validate: value => {
+            if (activeEditingId === 0 && value !== watch('password')) {
+              return 'Las contraseñas no coinciden';
             }
-          })}
-        />
-        {errors.confirmPassword && <ErrorForm>{errors.confirmPassword.message?.toString()}</ErrorForm>}
-      </div>
+            return true;
+          }
+        })}
+      />
+      {errors.confirmPassword && <ErrorForm>{errors.confirmPassword.message?.toString()}</ErrorForm>}
+    </div>
+  </>
+)}
+
     </div>
   );
 };
