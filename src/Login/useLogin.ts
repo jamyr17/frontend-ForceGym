@@ -7,63 +7,76 @@ import { CredencialUser } from "../shared/types"
 import ReCAPTCHA from "react-google-recaptcha";
 
 export const useLogin = () => {
-    const [credencialUser, setCredencialUser] = useState<CredencialUser>({username: '', password: '', recaptchaToken: ''})
-    const navigate = useNavigate()
+    const [credencialUser, setCredencialUser] = useState<CredencialUser>({
+        username: '', 
+        password: '', 
+        recaptchaToken: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        setAuthHeader(null)
-        setAuthUser(null)
-    }, [])
+        setAuthHeader(null);
+        setAuthUser(null);
+    }, []);
 
-    const handleLoginSubmit = async (e:any, refReCaptcha: React.RefObject<ReCAPTCHA>) => {
-        e.preventDefault()
+    const handleLoginSubmit = async (e: React.FormEvent, refReCaptcha: React.RefObject<ReCAPTCHA>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
 
-        const captchaValue = refReCaptcha.current?.getValue()
-        if (!captchaValue) {
+        try {
+            const captchaValue = refReCaptcha.current?.getValue();
+            
+            if (!captchaValue) {
+                await Swal.fire({
+                    title: 'Acceso no autorizado',
+                    text: 'Debe completar el ReCaptcha',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    width: 300,
+                    confirmButtonColor: '#CFAD04'
+                });
+                return;
+            }
+
+            const response = await postData(`${import.meta.env.VITE_URL_API}login`, {
+                ...credencialUser,
+                recaptchaToken: captchaValue
+            });
+
+            if (response.data?.loggedUser) {
+                setAuthHeader(response.data.loggedUser.token);
+                setAuthUser(response.data.loggedUser);
+                navigate('/gestion/usuarios', { replace: true });
+            } else {
+                throw new Error('Credenciales incorrectas');
+            }
+        } catch (error) {
+            // Resetear todo el estado
+            setCredencialUser({ username: '', password: '', recaptchaToken: '' });
+            refReCaptcha.current?.reset();
+            
             await Swal.fire({
-                title: 'Acceso no autorizado',
-                text: 'Debe completar el ReCaptcha',
+                title: 'Error de autenticación',
+                text: 'Usuario y/o contraseña incorrectos. Por favor, intente nuevamente.',
                 icon: 'error',
                 confirmButtonText: 'OK',
                 timer: 3000,
                 timerProgressBar: true,
                 width: 300,
                 confirmButtonColor: '#CFAD04'
-            })
-
-            return
+            });
+        } finally {
+            setIsSubmitting(false);
         }
+    };
 
-        credencialUser.recaptchaToken = captchaValue
-        const res = await postData(`${import.meta.env.VITE_URL_API}login`, credencialUser)
-
-        if(res.data.loggedUser){
-            setAuthHeader(res.data.loggedUser.token)
-            setAuthUser(res.data.loggedUser)
-            navigate('/gestion/usuarios', { replace: true })
-        }else{
-            setAuthHeader(null)
-            setAuthUser(null)
-
-            await Swal.fire({
-                title: 'Usuario y/o contraseña incorrectos',
-                text: 'Inténtelo de nuevo',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                timer: 3000,
-                timerProgressBar: true,
-                width: 300,
-                confirmButtonColor: '#CFAD04'
-            })
-
-            return
-        }
-        
-    }
-
-    return{
+    return {
         credencialUser,
         setCredencialUser,
-        handleLoginSubmit
-    }
-}
+        handleLoginSubmit,
+        isSubmitting
+    };
+};
