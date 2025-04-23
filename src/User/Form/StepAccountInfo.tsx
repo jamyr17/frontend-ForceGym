@@ -49,11 +49,13 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
         <select
           id="idRole"
           className="w-full p-3 border border-gray-100" 
+          defaultValue=""
           {...register("idRole", {
             required: 'El rol es obligatorio',
             validate: value => value !== '0' || 'Debe seleccionar un rol'
           })}  
         >
+          <option value="">Seleccione un rol</option>
           {roles.map((role) => (
             <option key={role.idRole} value={role.idRole}>
               {role.name}
