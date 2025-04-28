@@ -17,6 +17,7 @@ import CategoryManagement from "../Category/Page";
 import ClientTypeManagement from "../ClientType/Page";
 import ExerciseManagement from "../Exercise/Page";
 import ActivityTypeManagement from "../ActivityType/Page";
+import RoutineManagement from "../Routine/page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -143,6 +144,12 @@ function PrivateRoutes () {
                 path="tipos-actividad" 
                 element={
                     <ActivityTypeManagement/>
+                }
+            />
+            <Route 
+                path="rutinas" 
+                element={
+                    <RoutineManagement/>
                 }
             />
         </Routes>

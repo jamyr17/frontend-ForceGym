@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { ActivityType, TypeClient, MeanOfPayment, Role, Gender, ClientOptions, Category, NotificationType, ExerciseCategory} from "./types";
+import { ActivityType, TypeClient, MeanOfPayment, Role, Gender, ClientOptions, Category, NotificationType, ExerciseCategory, Exercise, DifficultyRoutine} from "./types";
 import { getData } from "./services/gym";
 
 type CommonDataStore = {
@@ -14,6 +14,8 @@ type CommonDataStore = {
     categories: Category[]
     notificationTypes: NotificationType[]
     exerciseCategories: ExerciseCategory[]
+    exercise: Exercise[]
+    difficultyRoutine: DifficultyRoutine[]
     fetchRoles: () => Promise<any>
     fetchMeansOfPayment: () => Promise<any>
     fetchActivityTypes: () => Promise<any>
@@ -23,6 +25,8 @@ type CommonDataStore = {
     fetchCategories: () => Promise<any>
     fetchNotificationTypes: () => Promise<any>
     fetchExerciseCategories: () => Promise<any>
+    fetchExercise: () => Promise<any>
+    fetchDifficultyRoutine: () => Promise<any>
 }
 
 export const useCommonDataStore = create<CommonDataStore>()(
@@ -36,6 +40,8 @@ export const useCommonDataStore = create<CommonDataStore>()(
         categories: [],
         notificationTypes: [],
         exerciseCategories: [],
+        exercise: [],
+        difficultyRoutine: [],
 
         fetchRoles: async () => {
             const result = await getData(`${import.meta.env.VITE_URL_API}role/list`) 
@@ -84,7 +90,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
             return result
         },
 
-        fetchNotificationTypes: async() => {
+        fetchDifficultyRoutine: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}notificationType/list`)
             set(() => ({ notificationTypes: result.data.notificationTypes }))
             return result
@@ -94,6 +100,18 @@ export const useCommonDataStore = create<CommonDataStore>()(
             const result = await getData(`${import.meta.env.VITE_URL_API}exercisecategory/list`);
             set(() => ({ exerciseCategories: result.data }));
             return result;
-        }
+        },
+
+        fetchExercise: async() => {
+            const result = await getData(`${import.meta.env.VITE_URL_API}exercise/listAll`);
+            set(() => ({ exercise: result.data }));
+            return result;
+        },
+        
+        fetchNotificationTypes: async() => {
+            const result = await getData(`${import.meta.env.VITE_URL_API}difficultyRoutine/list`)
+            set(() => ({ difficultyRoutine: result.data }))
+            return result
+        },
     })
 ))

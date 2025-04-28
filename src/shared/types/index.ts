@@ -9,6 +9,11 @@ export type Role = {
     name: string
 }
 
+export type DifficultyRoutine = {
+    idDifficultyRoutine: number;
+    name: string;
+};
+
 export type MeanOfPayment = {
     idMeanOfPayment: number
     name: string
@@ -234,3 +239,14 @@ export type ClientTypeDataForm = {
     name: string;
     isDeleted: number; 
 }
+
+
+export type Routine = {
+    idRoutine: number;
+    name: string;
+    user: User
+    difficultyRoutine: DifficultyRoutine;
+    isDeleted: number;
+};
+
+export type RoutineDataForm = Omit<Routine, 'user' |'difficultyRoutine'> & Pick<User, 'idUser'> & Pick<DifficultyRoutine, 'idDifficultyRoutine'>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt, FaBalanceScale, FaSlidersH } from 'react-icons/fa';
 import { FaRegCircleUser } from "react-icons/fa6";
-import { GiWeightLiftingUp } from "react-icons/gi";
+import { GiWeightLiftingUp, GiGymBag } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown, MdOutlineGroups, MdOutlineCategory } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
@@ -158,6 +158,7 @@ function AsideBar() {
         <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos de Cliente" text="Tipos de Cliente" allowedRoles={['Administrador']} />
         <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos de Actividad" text="Tipos de Actividad" allowedRoles={['Administrador']} />
         <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificación" text="Plantillas de Notificación" />
+        <NavItem to="/gestion/rutinas" icon={<GiGymBag  />} title="Rutinas" text="Rutinas" />
       </div>
     )}
 
