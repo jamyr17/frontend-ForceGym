@@ -104,10 +104,10 @@ function AsideBar() {
           <NavItem to="/gestion/dashboard" icon={<PiHouseSimpleFill />} title="Dashboard" text="Dashboard" />
           <NavItem to="/gestion/usuarios" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/clientes" icon={<GiWeightLiftingUp />} title="Clientes" text="Clientes" />
-          <NavItem to="/gestion/ingresos" icon={<MdOutlineTrendingUp />} title="Ingresos" text="Ingresos" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/ingresos" icon={<MdOutlineTrendingUp />} title="Ingresos" text="Ingresos"  />
+          <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']}/>
+          <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" />
+          <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" />
           <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios" />
 
           {/* Botón más opciones */}
@@ -155,8 +155,8 @@ function AsideBar() {
         }}
       >
         <NavItem to="/gestion/categorias" icon={<MdOutlineCategory />} title="Categorías de Gastos" text="Categorías de Gastos" />
-        <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos de Cliente" text="Tipos de Cliente" allowedRoles={['Administrador']} />
-        <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos de Actividad" text="Tipos de Actividad" allowedRoles={['Administrador']} />
+        <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos de Cliente" text="Tipos de Cliente" />
+        <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos de Actividad" text="Tipos de Actividad"/>
         <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificación" text="Plantillas de Notificación" />
       </div>
     )}
