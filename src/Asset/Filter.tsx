@@ -1,9 +1,9 @@
 import { IoFilterOutline } from "react-icons/io5";
-import useProductInventoryStore from "./Store";
+import useAssetStore from "./Store";
 import { MdOutlineCancel } from "react-icons/md";
 
 export function FilterButton() {
-    const { filterByStatus, filterByCostRangeMin, filterByCostRangeMax, filterByQuantityRangeMin, filterByQuantityRangeMax, showModalFilter } = useProductInventoryStore()
+    const { filterByStatus, filterByCostRangeMin, filterByCostRangeMax, filterByQuantityRangeMin, filterByQuantityRangeMax, showModalFilter } = useAssetStore()
     const filteringStyles = (
         filterByStatus!='' || filterByCostRangeMin!=0 || filterByCostRangeMax!=0 || filterByQuantityRangeMin!=0 || filterByQuantityRangeMax!=0
     ) && ' bg-white outline-none'
@@ -32,7 +32,7 @@ export function FilterSelect() {
         changeFilterByQuantityRangeMin,
         changeFilterByQuantityRangeMax,
         clearAllFilters
-    } = useProductInventoryStore()
+    } = useAssetStore()
     const filteredStatusSelectStyles = filterByStatus!='' && ' px-0.5 rounded-md border-2 border-yellow text-yellow'
     const filteredCostRangeStyles = (filterByCostRangeMin!=0 && filterByCostRangeMax!=0)  && ' px-0.5 border-2 border-yellow text-yellow'
     const filteredQuantityRangeStyles = (filterByQuantityRangeMin !=0 && filterByQuantityRangeMax!=0)  && ' px-0.5 border-2 border-yellow text-yellow'

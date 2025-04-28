@@ -1,25 +1,27 @@
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
-import { ProductInventoryDataForm } from "../shared/types";
+import { AssetDataForm } from "../shared/types";
 import ErrorForm from "../shared/components/ErrorForm";
-import useProductInventoryStore from "./Store";
+import useAssetStore from "./Store";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { formatDate } from "../shared/utils/format";
 
 const MAXLENGTH_NAME = 100;
 const MAXLENGTH_CODE = 10;
+const MAXDATE = new Date().toUTCString();
 
 function Form() {
     const navigate = useNavigate();
-    const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<ProductInventoryDataForm>();
-    const { productsInventory, activeEditingId, fetchProductsInventory, addProductInventory, updateProductInventory, closeModalForm } = useProductInventoryStore();
+    const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<AssetDataForm>();
+    const { assets, activeEditingId, fetchAssets, addAsset, updateAsset, closeModalForm } = useAssetStore();
 
     // Observamos los valores de cantidad y costo
     const quantity = watch("quantity");
-    const cost = watch("cost");
+    const cost = watch("initialCost");
 
-    const submitForm = async (data: ProductInventoryDataForm) => {
+    const submitForm = async (data: AssetDataForm) => {
         // Validación adicional para valores negativos
         if (data.quantity <= 0) {
             Swal.fire({
@@ -31,7 +33,7 @@ function Form() {
             return;
         }
 
-        if (data.cost <= 0) {
+        if (data.initialCost <= 0) {
             Swal.fire({
                 title: 'Error',
                 text: 'El costo no puede ser negativo o cero',
@@ -50,10 +52,10 @@ function Form() {
         };
         
         if (activeEditingId === 0) {
-            result = await addProductInventory(reqData);
+            result = await addAsset(reqData);
             action = 'agregado';
         } else {
-            result = await updateProductInventory(reqData);
+            result = await updateAsset(reqData);
             action = 'editado';
         }
 
@@ -61,7 +63,7 @@ function Form() {
         reset();
         
         if (result.ok) {
-            const result2 = await fetchProductsInventory();
+            const result2 = await fetchAssets();
             
             if(result2.logout){
                 setAuthHeader(null);
@@ -69,8 +71,8 @@ function Form() {
                 navigate('/login');
             } else {
                 await Swal.fire({
-                    title: `Producto de inventario ${action}`,
-                    text: `Se ha ${action} el producto ${reqData.name}`,
+                    title: `Activo ${action}`,
+                    text: `Se ha ${action} el activo ${reqData.name}`,
                     icon: 'success',
                     confirmButtonText: 'OK',
                     timer: 3000,
@@ -88,15 +90,17 @@ function Form() {
 
     useEffect(() => {
         if (activeEditingId) {
-            const activeProduct = productsInventory.find(product => product.idProductInventory === activeEditingId);
-            if (activeProduct) {
-                setValue('idProductInventory', activeProduct.idProductInventory);
-                setValue('idUser', activeProduct.user.idUser);
-                setValue('isDeleted', activeProduct.isDeleted);
-                setValue('name', activeProduct.name);
-                setValue('code', activeProduct.code);
-                setValue('quantity', activeProduct.quantity);
-                setValue('cost', activeProduct.cost);
+            const activeAsset = assets.find(asset => asset.idAsset === activeEditingId);
+            if (activeAsset) {
+                setValue('idAsset', activeAsset.idAsset);
+                setValue('idUser', activeAsset.user.idUser);
+                setValue('boughtDate', activeAsset.boughtDate);
+                setValue('isDeleted', activeAsset.isDeleted);
+                setValue('name', activeAsset.name);
+                setValue('code', activeAsset.code);
+                setValue('quantity', activeAsset.quantity);
+                setValue('initialCost', activeAsset.initialCost);
+                setValue('serviceLifeYears', activeAsset.serviceLifeYears);
             }
         }
     }, [activeEditingId]);
@@ -111,7 +115,7 @@ function Form() {
     // Efecto para prevenir valores negativos en costo
     useEffect(() => {
         if (cost !== undefined && cost < 0) {
-            setValue('cost', 0);
+            setValue('initialCost', 0);
         }
     }, [cost]);
 
@@ -122,7 +126,7 @@ function Form() {
             onSubmit={handleSubmit(submitForm)}
         >
             <legend className="uppercase text-center text-yellow text-2xl font-black border-b-2 py-2 border-yellow">
-                {activeEditingId ? 'Actualizar producto' : 'Registrar producto'}
+                {activeEditingId ? 'Actualizar activo' : 'Registrar activo'}
             </legend>
 
             {/* inputs ocultos para la funcionalidad de actualizar */}
@@ -132,15 +136,34 @@ function Form() {
                 {...register('idUser')}
             />
             <input  
-                id="idProductInventory" 
+                id="idAsset" 
                 type="hidden" 
-                {...register('idProductInventory')}
+                {...register('idAsset')}
             />
             <input  
                 id="isDeleted" 
                 type="hidden" 
                 {...register('isDeleted')}
             />
+
+            <div className="mb-5">
+                <label htmlFor="boughtDate" className="text-sm uppercase font-bold">
+                    Fecha de compra
+                </label>
+                <input  
+                    id="registrationDate"
+                    className="w-full p-3 border border-gray-100"  
+                    type="date" 
+                    {...register('boughtDate', {
+                        required: 'La fecha de compra es obligatoria',
+                        max: {
+                        value: MAXDATE,
+                        message: `Debe ingresar una fecha de compra de máximo ${formatDate(new Date())}`
+                        }
+                    })}
+                    />
+                {errors.boughtDate && <ErrorForm>{errors.boughtDate.message?.toString()}</ErrorForm>}
+            </div>
 
             <div className="mb-5">
                 <label htmlFor="code" className="text-sm uppercase font-bold">
@@ -229,7 +252,7 @@ function Form() {
 
             <div className="mb-5">
                 <label htmlFor="cost" className="text-sm uppercase font-bold">
-                    Costo
+                    Costo unitario
                 </label>
                 <input  
                     id="cost"
@@ -242,7 +265,7 @@ function Form() {
                         e.preventDefault();
                         e.currentTarget.blur();
                     }}
-                    {...register('cost', {
+                    {...register('initialCost', {
                         required: 'El costo es obligatorio', 
                         min: {
                             value: 0,
@@ -257,9 +280,46 @@ function Form() {
                         }
                     }}
                 />
-                {errors.cost && 
+                {errors.initialCost && 
                     <ErrorForm>
-                        {errors.cost.message}
+                        {errors.initialCost.message}
+                    </ErrorForm>
+                }
+            </div>
+
+            <div className="mb-5">
+                <label htmlFor="serviceLifeYears" className="text-sm uppercase font-bold">
+                    Años de vida útil
+                </label>
+                <input  
+                    id="serviceLifeYears"
+                    className="w-full p-3 border border-gray-100"  
+                    type="number" 
+                    min="0"
+                    step="1"
+                    placeholder="Ingrese los años de vida útil" 
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                    }}
+                    {...register('serviceLifeYears', {
+                        required: 'Los años de vida útil son obligatorios', 
+                        min: {
+                            value: 0,
+                            message: 'Los ños de vida útil no pueden ser negativos'
+                        },
+                        valueAsNumber: true
+                    })}
+                    onKeyDown={(e) => {
+                        // Prevenir la entrada de caracteres negativos
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                            e.preventDefault();
+                        }
+                    }}
+                />
+                {errors.serviceLifeYears && 
+                    <ErrorForm>
+                        {errors.serviceLifeYears.message}
                     </ErrorForm>
                 }
             </div>

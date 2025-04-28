@@ -107,7 +107,7 @@ function AsideBar() {
           <NavItem to="/gestion/ingresos" icon={<MdOutlineTrendingUp />} title="Ingresos" text="Ingresos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" allowedRoles={['Administrador']} />
-          <NavItem to="/gestion/inventario" icon={<MdOutlineInventory />} title="Inventario" text="Inventario" allowedRoles={['Administrador']} />
+          <NavItem to="/gestion/activos" icon={<MdOutlineInventory />} title="Activos" text="Activos" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios" />
 
           {/* Botón más opciones */}

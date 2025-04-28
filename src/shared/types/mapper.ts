@@ -1,4 +1,4 @@
-import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, ProductInventory, ProductInventoryDataForm, User, UserDataForm, ClientType, Category, CategoryDataForm, Exercise, ExerciseDataForm} from ".";
+import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, Asset, AssetDataForm, User, UserDataForm, ClientType, Category, CategoryDataForm, Exercise, ExerciseDataForm} from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -50,15 +50,17 @@ export function mapEconomicExpenseToDataForm(economicExpense: EconomicExpense): 
     };
 }
 
-export function mapProductInventoryToDataForm(product: ProductInventory): ProductInventoryDataForm {
+export function mapAssetToDataForm(asset: Asset): AssetDataForm {
     return {
-        idProductInventory: product.idProductInventory,
-        idUser: product.user.idUser,
-        code: product.code,
-        name: product.name,
-        cost: product.cost,
-        quantity: product.quantity,
-        isDeleted: product.isDeleted
+        idAsset: asset.idAsset,
+        idUser: asset.user.idUser,
+        boughtDate: asset.boughtDate,
+        code: asset.code,
+        name: asset.name,
+        initialCost: asset.initialCost,
+        serviceLifeYears: asset.serviceLifeYears,
+        quantity: asset.quantity,
+        isDeleted: asset.isDeleted
     };
 }
 
