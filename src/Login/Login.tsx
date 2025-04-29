@@ -21,7 +21,7 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
             [name]: value
         }));
 
-        // Resetear el ReCAPTCHA si hay cambios después de un error
+        // Resetear el captcha si hay cambios después de un error
         if (recaptcha.current?.getValue()) {
             recaptcha.current.reset();
         }

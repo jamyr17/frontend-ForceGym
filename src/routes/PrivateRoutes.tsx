@@ -17,6 +17,7 @@ import CategoryManagement from "../Category/Page";
 import ClientTypeManagement from "../ClientType/Page";
 import ExerciseManagement from "../Exercise/Page";
 import ActivityTypeManagement from "../ActivityType/Page";
+import LandingPage from "../LandingPage/page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
@@ -58,7 +59,7 @@ function PrivateRoutes () {
             <Route 
                 path="dashboard" 
                 element={
-                    <DashboardManagement/>
+                    <LandingPage/>
                 }
             />
 
@@ -73,9 +74,7 @@ function PrivateRoutes () {
             <Route 
                 path="ingresos" 
                 element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
                 <EconomicIncomeManagement/>
-                </ProtectedRoute>
                 }
             />
             <Route 
@@ -88,19 +87,15 @@ function PrivateRoutes () {
             />
              <Route 
                 path="balance" 
-                element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
+                element={              
                 <EconomicBalanceDashboard/>
-                </ProtectedRoute>
                 }
             />
 
             <Route 
                 path="activos" 
                 element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
-                <AssetManagement/>
-                </ProtectedRoute>
+                    <AssetManagement/>
                 }
             />
             <Route 
