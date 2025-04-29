@@ -73,9 +73,7 @@ function PrivateRoutes () {
             <Route 
                 path="ingresos" 
                 element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
                 <EconomicIncomeManagement/>
-                </ProtectedRoute>
                 }
             />
             <Route 
@@ -88,19 +86,15 @@ function PrivateRoutes () {
             />
              <Route 
                 path="balance" 
-                element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
+                element={              
                 <EconomicBalanceDashboard/>
-                </ProtectedRoute>
                 }
             />
 
             <Route 
                 path="inventario" 
                 element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
                 <ProductInventoryManagement/>
-                </ProtectedRoute>
                 }
             />
             <Route 
