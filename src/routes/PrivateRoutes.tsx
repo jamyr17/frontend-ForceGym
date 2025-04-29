@@ -5,7 +5,7 @@ import DashboardManagement from "../Dashboard/Page";
 import UserManagement from "../User/Page";
 import EconomicIncomeManagement from "../Income/Page";
 import EconomicExpenseManagement from "../Expense/Page";
-import ProductInventoryManagement from "../Product/Page";
+import AssetManagement from "../Asset/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
@@ -93,9 +93,9 @@ function PrivateRoutes () {
             />
 
             <Route 
-                path="inventario" 
+                path="activos" 
                 element={
-                <ProductInventoryManagement/>
+                    <AssetManagement/>
                 }
             />
             <Route 

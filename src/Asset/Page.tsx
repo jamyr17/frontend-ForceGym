@@ -6,21 +6,21 @@ import NoData from "../shared/components/NoData";
 import Pagination from "../shared/components/Pagination";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
-import { mapProductInventoryToDataForm } from "../shared/types/mapper";
+import { mapAssetToDataForm } from "../shared/types/mapper";
 import DataInfo from "./DataInfo";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
-import useProductInventoryStore from "./Store";
+import useAssetStore from "./Store";
 import Form from "./Form";
-import { useProductInventory } from "./useProduct";
+import { useAsset } from "./useAsset";
 import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
 import FileTypeDecision from "../shared/components/ModalFileType";
 
-function ProductInventoryManagement() {
+function AssetManagement() {
     const {
-        productsInventory,
+        assets,
         modalForm,
         modalFilter,
         modalInfo,
@@ -37,8 +37,8 @@ function ProductInventoryManagement() {
         filterByCostRangeMax,
         filterByQuantityRangeMin,
         filterByQuantityRangeMax,
-        fetchProductsInventory,
-        getProductInventoryById,
+        fetchAssets,
+        getAssetById,
         changePage,
         changeSize,
         changeSearchType,
@@ -49,16 +49,16 @@ function ProductInventoryManagement() {
         closeModalInfo,
         showModalFileType, 
         closeModalFileType
-    } = useProductInventoryStore()
+    } = useAssetStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useProductInventory()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useAsset()
     const navigate = useNavigate()
     
-    useEffect(() => {}, [productsInventory])
+    useEffect(() => {}, [assets])
     
     useEffect(() => {
         const fetchData = async () => {
-            const { logout } = await fetchProductsInventory()
+            const { logout } = await fetchAssets()
 
             if(logout){
                 setAuthHeader(null)
@@ -74,7 +74,7 @@ function ProductInventoryManagement() {
     return ( 
         <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
-                <h1 className="text-4xl uppercase">INVENTARIO</h1>
+                <h1 className="text-4xl uppercase">ACTIVOS</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Código</option>
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Nombre</option>
@@ -96,12 +96,12 @@ function ProductInventoryManagement() {
                                 </button>
                             )}
                             modal={modalForm}
-                            getDataById={getProductInventoryById}
+                            getDataById={getAssetById}
                             closeModal={closeModalForm}
                             Content={Form}
                         />
                         
-            {productsInventory?.length > 0 && (
+            {assets?.length > 0 && (
             <div className="flex gap-2">
                 <Modal
                     Button={() => (
@@ -112,21 +112,21 @@ function ProductInventoryManagement() {
                         </button>
                     )}
                     modal={modalFileTypeDecision}
-                    getDataById={getProductInventoryById}
+                    getDataById={getAssetById}
                     closeModal={closeModalFileType}
                     Content={() => <FileTypeDecision 
-                                        modulo="Inventario" 
-                                        closeModal={closeModalFileType} 
-                                        exportToPDF={exportToPDF}
-                                        exportToExcel={exportToExcel}
-                    />}
+                            modulo="Inventario" 
+                            closeModal={closeModalFileType} 
+                            exportToPDF={exportToPDF}
+                            exportToExcel={exportToExcel}
+                        />}
                 />  
             </div>
             )}          
 
                     </div>
                     
-                    {productsInventory?.length>0 ? (
+                    {assets?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
                         <thead>
                             <tr>
@@ -159,7 +159,7 @@ function ProductInventoryManagement() {
                                     className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('cost')}}
                                 >
-                                    COSTO  
+                                    COSTO UNITARIO
                                     {(orderBy==='cost' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
                                     {(orderBy==='cost' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
@@ -171,16 +171,16 @@ function ProductInventoryManagement() {
                         </thead>
                         <tbody>
                         
-                            {productsInventory?.map((product, index) => (
-                            <tr key={product.idProductInventory} className="text-center py-8">
+                            {assets?.map((asset, index) => (
+                            <tr key={asset.idAsset} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
-                                <td className="py-2">{product.code}</td>
-                                <td className="py-2">{product.name}</td>
-                                <td className="py-2">{product.quantity}</td>
-                                <td className="py-2">{formatAmountToCRC(product.cost)}</td>
+                                <td className="py-2">{asset.code}</td>
+                                <td className="py-2">{asset.name}</td>
+                                <td className="py-2">{asset.quantity}</td>
+                                <td className="py-2">{formatAmountToCRC(asset.initialCost)}</td>
                                 {filterByStatus && (
                                 <td>
-                                    {product.isDeleted ? (
+                                    {asset.isDeleted ? (
                                     <button className="py-0.5 px-2 rounded-lg bg-red-500 text-white">Inactivo</button>
                                     ) : (
                                     <button className="py-0.5 px-2 rounded-lg bg-green-500 text-white">Activo</button>
@@ -192,7 +192,7 @@ function ProductInventoryManagement() {
                                     Button={() => (
                                         <button
                                             onClick={() => {
-                                                getProductInventoryById(product.idProductInventory);
+                                                getAssetById(asset.idAsset);
                                                 showModalInfo();
                                             }}
                                             className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
@@ -202,13 +202,13 @@ function ProductInventoryManagement() {
                                         </button>
                                     )}
                                     modal={modalInfo}
-                                    getDataById={getProductInventoryById}
+                                    getDataById={getAssetById}
                                     closeModal={closeModalInfo}
                                     Content={DataInfo}
                                 />
                                 <button
                                     onClick={() => {
-                                        getProductInventoryById(product.idProductInventory);
+                                        getAssetById(asset.idAsset);
                                         showModalForm();
                                     }}
                                     className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
@@ -216,12 +216,12 @@ function ProductInventoryManagement() {
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
-                                {product.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapProductInventoryToDataForm(product))} className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer">
+                                {asset.isDeleted ? (
+                                    <button onClick={() => handleRestore(mapAssetToDataForm(asset))} className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(product)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    <button onClick={() => handleDelete(asset)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
                                     title="Eliminar">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
@@ -234,7 +234,7 @@ function ProductInventoryManagement() {
                     </table>
                     ) : 
                     (
-                        <NoData module="productos del inventario" />
+                        <NoData module="activos del inventario" />
                     )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                 </div>
@@ -243,4 +243,4 @@ function ProductInventoryManagement() {
     );
 }
 
-export default ProductInventoryManagement;
+export default AssetManagement;

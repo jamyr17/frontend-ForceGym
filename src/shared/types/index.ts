@@ -114,7 +114,7 @@ export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPaymen
     hasDelay: boolean
 }
 
-export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client" | "delayDays"> & {
+export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client" | "delayDays" | "hasDelay"> & {
     user: User
     idEconomicExpense: number
     category: Category
@@ -128,17 +128,20 @@ export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityTy
 
 // -----------------------------------------------------
 
-export type ProductInventory = {
-    idProductInventory: number
+export type Asset = {
+    idAsset: number
+    boughtDate: Date
     user: User
     code: string
     name: string
     quantity: number
-    cost: number
+    initialCost: number
+    serviceLifeYears: number
+    deprecationPerYear: number
     isDeleted: number
 }
 
-export type ProductInventoryDataForm = Omit<ProductInventory, 'user'> & Pick<User, 'idUser'>
+export type AssetDataForm = Omit<Asset, "user" | "deprecationPerYear"> & Pick<User, "idUser">
 // --------------------------------------------------------
 export type HealthQuestionnaire = Pick<Client, 'idClient'> & {
     idHealthQuestionnaire: number
