@@ -28,7 +28,7 @@ export function FilterSelect() {
         changeFilterByDifficultyRoutine,
         clearAllFilters
     } = useRoutineStore();
-    const { difficultyRoutine } = useCommonDataStore();
+    const { difficultyRoutines } = useCommonDataStore();
 
     const filteredStatusSelectStyles = filterByStatus !== '' && ' px-0.5 rounded-md border-2 border-yellow text-yellow';
     const filteredRoutineTypeStyles = filterByDifficultyRoutine !== 0 && ' px-0.5 border-2 border-yellow text-yellow';
@@ -86,7 +86,7 @@ export function FilterSelect() {
                     onChange={(e) => changeFilterByDifficultyRoutine(+e.target.value)}
                 >
                     <option value={0}>Todos</option>
-                    {difficultyRoutine.map((routine) => (
+                    {difficultyRoutines.map((routine) => (
                         <option key={routine.idDifficultyRoutine} value={routine.idDifficultyRoutine}>
                             {routine.name}
                         </option>

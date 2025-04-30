@@ -15,7 +15,7 @@ type CommonDataStore = {
     notificationTypes: NotificationType[]
     exerciseCategories: ExerciseCategory[]
     exercise: Exercise[]
-    difficultyRoutine: DifficultyRoutine[]
+    difficultyRoutines: DifficultyRoutine[]
     fetchRoles: () => Promise<any>
     fetchMeansOfPayment: () => Promise<any>
     fetchActivityTypes: () => Promise<any>
@@ -26,7 +26,7 @@ type CommonDataStore = {
     fetchNotificationTypes: () => Promise<any>
     fetchExerciseCategories: () => Promise<any>
     fetchExercise: () => Promise<any>
-    fetchDifficultyRoutine: () => Promise<any>
+    fetchDifficultyRoutines: () => Promise<any>
 }
 
 export const useCommonDataStore = create<CommonDataStore>()(
@@ -41,7 +41,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
         notificationTypes: [],
         exerciseCategories: [],
         exercise: [],
-        difficultyRoutine: [],
+        difficultyRoutines: [],
 
         fetchRoles: async () => {
             const result = await getData(`${import.meta.env.VITE_URL_API}role/list`) 
@@ -89,8 +89,8 @@ export const useCommonDataStore = create<CommonDataStore>()(
             set(() => ({ categories: result.data }))
             return result
         },
-
-        fetchDifficultyRoutine: async() => {
+        
+        fetchNotificationTypes: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}notificationType/list`)
             set(() => ({ notificationTypes: result.data.notificationTypes }))
             return result
@@ -107,11 +107,10 @@ export const useCommonDataStore = create<CommonDataStore>()(
             set(() => ({ exercise: result.data }));
             return result;
         },
-        
-        fetchNotificationTypes: async() => {
+        fetchDifficultyRoutines: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}difficultyRoutine/list`)
-            set(() => ({ difficultyRoutine: result.data }))
+            set(() => ({ difficultyRoutines: result.data }))
             return result
-        },
+        }
     })
 ))

@@ -62,7 +62,7 @@ export const useNotificationTemplateStore = create<NotificationTemplateStore>()(
         filterByAmountRangeMax: 0,
         filterByAmountRangeMin: 0,
         filterByDateRangeMax: null,
-        filterByDateRangeMin: null ,
+        filterByDateRangeMin: null,
         filterByMeanOfPayment: 0,
         filterByNotificationType: 0,
 

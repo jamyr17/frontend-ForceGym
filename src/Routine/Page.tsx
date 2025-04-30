@@ -1,52 +1,30 @@
 import { useEffect } from "react";
-import useRoutineStore from "./Store";
 import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore } from "react-icons/md";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
-import Pagination from "../shared/components/Pagination";
-import { useRoutine } from "./useRoutine";
-import SearchInput from "../shared/components/SearchInput";
-import ModalFilter from "../shared/components/ModalFilter";
-import { FilterButton, FilterSelect } from "./Filter";
 import Modal from "../shared/components/Modal";
-import Form from "./Form";
-import DataInfo from "./DataInfo";
-import { mapRoutineToDataForm } from "../shared/types/mapper";
-import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
 import NoData from "../shared/components/NoData";
+import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { useRoutineStore } from "./Store";
+import { useRoutine } from "./useRoutine";
+import Form from "./Form";
+import DataInfo from "./DataInfo";
 
 function RoutineManagement() {
     const {
         routines,
         modalForm,
-        modalFilter,
         modalInfo,
-        page,
-        size,
-        totalRecords,
-        orderBy,
-        directionOrderBy,
-        searchType,
-        searchTerm,
-        filterByStatus,
-        filterByDifficultyRoutine,
         fetchRoutines,
         getRoutineById,
-        changePage,
-        changeSize,
-        changeSearchType,
         showModalForm,
         showModalInfo,
         closeModalForm,
-        closeModalFilter,
         closeModalInfo,
     } = useRoutineStore();
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore } = useRoutine();
+    const { handleDelete, handleRestore } = useRoutine();
     const navigate = useNavigate();
-
-    useEffect(() => {}, [routines]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -54,20 +32,16 @@ function RoutineManagement() {
             if (logout) {
                 setAuthHeader(null);
                 setAuthUser(null);
-                navigate('/login', { replace: true });
+                navigate('/login');
             }
         };
         fetchData();
-    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByDifficultyRoutine]);
+    }, []);
 
     return (
         <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">Rutinas</h1>
-                <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType}>
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType === 1}>Nombre</option>
-                </SearchInput>
-                <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
 
             <main className="justify-items-center ml-12 p-4">
@@ -95,27 +69,8 @@ function RoutineManagement() {
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>
-                                        <button
-                                            className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
-                                            onClick={() => handleOrderByChange('name')}
-                                        >
-                                            NOMBRE
-                                            {(orderBy === 'name' && directionOrderBy === 'DESC') && <FaArrowUp className="text-yellow" />}
-                                            {(orderBy === 'name' && directionOrderBy === 'ASC') && <FaArrowDown className="text-yellow" />}
-                                        </button>
-                                    </th>
-                                    <th>
-                                        <button
-                                            className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
-                                            onClick={() => handleOrderByChange('difficultyRoutine')}
-                                        >
-                                            DIFICULTAD
-                                            {(orderBy === 'difficultyRoutine' && directionOrderBy === 'DESC') && <FaArrowUp className="text-yellow" />}
-                                            {(orderBy === 'difficultyRoutine' && directionOrderBy === 'ASC') && <FaArrowDown className="text-yellow" />}
-                                        </button>
-                                    </th>
-                                    {filterByStatus && <th>ESTADO</th>}
+                                    <th>NOMBRE</th>
+                                    <th>DIFICULTAD</th>
                                     <th>ACCIONES</th>
                                 </tr>
                             </thead>
@@ -125,15 +80,6 @@ function RoutineManagement() {
                                         <td className="py-2">{index + 1}</td>
                                         <td className="py-2">{routine.name}</td>
                                         <td className="py-2">{routine.difficultyRoutine.name}</td>
-                                        {filterByStatus && (
-                                            <td>
-                                                {routine.isDeleted ? (
-                                                    <button className="py-0.5 px-2 rounded-lg bg-red-500 text-white">Inactivo</button>
-                                                ) : (
-                                                    <button className="py-0.5 px-2 rounded-lg bg-green-500 text-white">Activo</button>
-                                                )}
-                                            </td>
-                                        )}
                                         <td className="flex gap-4 justify-center py-2">
                                             <Modal
                                                 Button={() => (
@@ -164,7 +110,10 @@ function RoutineManagement() {
                                                 <MdModeEdit className="text-white" />
                                             </button>
                                             {routine.isDeleted ? (
-                                                <button onClick={() => handleRestore(mapRoutineToDataForm(routine))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
+                                                <button 
+                                                    onClick={() => handleRestore(routine)} 
+                                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                >
                                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                                 </button>
                                             ) : (
@@ -184,7 +133,6 @@ function RoutineManagement() {
                     ) : (
                         <NoData module="rutinas" />
                     )}
-                    <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
                 </div>
             </main>
         </div>

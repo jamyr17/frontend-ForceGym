@@ -166,5 +166,10 @@ export function mapRoutineToDataForm(routine: Routine): RoutineDataForm {
         idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine,
         idUser: routine.user.idUser,
         isDeleted: routine.isDeleted,
-    }
+        exercises: routine.exercises.map(ex => ({
+            idExercise: Array.isArray(ex.idExercise) ? ex.idExercise : [ex.idExercise],
+            series: ex.series,
+            repetitions: ex.repetitions
+        }))
+    };
 }

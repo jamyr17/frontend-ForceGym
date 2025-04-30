@@ -1,18 +1,21 @@
-import { FormEvent } from "react";
-import Swal from "sweetalert2";
-import { Routine, RoutineDataForm } from "../shared/types";
+import Swal from 'sweetalert2';
+import { Routine } from "../shared/types";
+import { useRoutineStore } from "./Store";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
-import useRoutineStore from "./Store";
 import { useNavigate } from "react-router";
 
 export const useRoutine = () => {
     const navigate = useNavigate();
-    const { fetchRoutines, deleteRoutine, updateRoutine, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useRoutineStore();
+    const { 
+        fetchRoutines, 
+        deleteRoutine, 
+        updateRoutine 
+    } = useRoutineStore();
 
-    const handleDelete = async ({ idRoutine }: Routine) => {
+    const handleDelete = async ({ idRoutine, name }: Routine) => {
         await Swal.fire({
-            title: '¿Desea eliminar esta rutina?',
-            text: `Está eliminando la rutina`,
+            title: '¿Desea eliminar la rutina?',
+            text: `Estaría eliminando "${name}"`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -24,12 +27,17 @@ export const useRoutine = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser();
-                const response = await deleteRoutine(idRoutine, loggedUser?.idUser);
-
-                if (response.ok) {
-                    Swal.fire({
+                if (!loggedUser?.idUser) {
+                    console.error("No user ID available");
+                    return;
+                }
+                
+                const response = await deleteRoutine(idRoutine, loggedUser.idUser);
+                
+                if (response?.ok) {
+                    await Swal.fire({
                         title: 'Rutina eliminada',
-                        text: `Se ha eliminado la rutina`,
+                        text: `Ha eliminado "${name}"`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -37,41 +45,33 @@ export const useRoutine = () => {
                         width: 500,
                         confirmButtonColor: '#CFAD04'
                     });
-                    fetchRoutines();
+
+                    await fetchRoutines();
                 }
 
-                if (response.logout) {
+                if (response?.logout) {
                     setAuthHeader(null);
                     setAuthUser(null);
-                    navigate('/login', { replace: true });
+                    navigate('/login', {replace: true});
                 }
-            }
+            } 
         });
     };
 
-    const handleSearch = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const form = e.target as HTMLFormElement;
-        const { searchTerm } = Object.fromEntries(new FormData(form));
-        changeSearchTerm(searchTerm.toString());
-    };
-
-    const handleOrderByChange = (orderByTerm: string) => {
-        changeOrderBy(orderByTerm);
-        changeDirectionOrderBy(directionOrderBy === 'DESC' ? 'ASC' : 'DESC');
-    };
-
-    const handleRestore = async (routine: RoutineDataForm) => {
+    const handleRestore = async (routine: Routine) => {
         const loggedUser = getAuthUser();
         const reqRoutine = {
-            ...routine,
+            ...routine, 
             isDeleted: 0,
+            difficultyRoutine: {
+                idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine
+            },
             paramLoggedIdUser: loggedUser?.idUser
         };
-
+            
         await Swal.fire({
-            title: '¿Desea restaurar esta rutina?',
-            text: `Está restaurando la rutina`,
+            title: '¿Desea restaurar la rutina?',
+            text: `Estaría restaurando "${routine.name}"`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -84,10 +84,10 @@ export const useRoutine = () => {
             if (result.isConfirmed) {
                 const response = await updateRoutine(reqRoutine);
 
-                if (response.ok) {
-                    Swal.fire({
+                if (response?.ok) {
+                    await Swal.fire({
                         title: 'Rutina restaurada',
-                        text: `Se ha restaurado la rutina`,
+                        text: `Ha restaurado "${routine.name}"`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -95,22 +95,21 @@ export const useRoutine = () => {
                         width: 500,
                         confirmButtonColor: '#CFAD04'
                     });
-                    fetchRoutines();
+
+                    await fetchRoutines();
                 }
 
-                if (response.logout) {
+                if (response?.logout) {
                     setAuthHeader(null);
                     setAuthUser(null);
-                    navigate('/login', { replace: true });
+                    navigate('/login', {replace: true});
                 }
-            }
+            } 
         });
     };
 
     return {
         handleDelete,
-        handleSearch,
-        handleOrderByChange,
         handleRestore
     };
 };

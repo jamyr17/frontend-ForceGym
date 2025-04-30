@@ -14,6 +14,11 @@ export type DifficultyRoutine = {
     name: string;
 };
 
+export type ExerciseOption = {
+    value: number;
+    label: string;
+};
+
 export type MeanOfPayment = {
     idMeanOfPayment: number
     name: string
@@ -216,6 +221,8 @@ export type Exercise = {
     name: string;
     description: string;
     difficulty: string;
+    series: number;
+    repetitions: number;
     exerciseCategory: ExerciseCategory;
     paramLoggedIdUser: number;
     user: User;
@@ -247,6 +254,32 @@ export type Routine = {
     user: User
     difficultyRoutine: DifficultyRoutine;
     isDeleted: number;
+    exercises: Exercise[];
 };
 
-export type RoutineDataForm = Omit<Routine, 'user' |'difficultyRoutine'> & Pick<User, 'idUser'> & Pick<DifficultyRoutine, 'idDifficultyRoutine'>
+export type RoutineWithExercisesDTO = {
+    idRoutine?: number;
+    name: string;
+    date: string;
+    idUser: number;
+    difficultyRoutine: {
+        idDifficultyRoutine: number;
+    };
+    exercises: {
+        idExercise: number[];
+        series: number;
+        repetitions: number;
+    }[];
+    isDeleted: number;
+    paramLoggedIdUser?: number;
+};
+
+export type RoutineDataForm = Omit<Routine, 'user' | 'difficultyRoutine' | 'exercises'> & {
+    idUser: number;
+    idDifficultyRoutine: number;
+    exercises: {
+        idExercise: number[];
+        series: number;
+        repetitions: number;
+    }[];
+};
