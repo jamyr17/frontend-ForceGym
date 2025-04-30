@@ -1,22 +1,22 @@
 import { FormEvent } from "react"
 import Swal from 'sweetalert2'
-import { ProductInventory, ProductInventoryDataForm } from "../shared/types"
+import { Asset, AssetDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
-import useProductInventoryStore from "./Store"
+import useAssetStore from "./Store"
 import { useNavigate } from "react-router"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from 'xlsx';
 import { formatAmountToCRC } from "../shared/utils/format"
 
-export const useProductInventory = () => {
+export const useAsset = () => {
     const navigate = useNavigate()
-    const { productsInventory, fetchProductsInventory, deleteProductInventory, updateProductInventory, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useProductInventoryStore()
+    const { assets, fetchAssets, deleteAsset, updateAsset, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useAssetStore()
 
-    const handleDelete = async ({ idProductInventory, name } : ProductInventory) => {
+    const handleDelete = async ({ idAsset, name } : Asset) => {
         await Swal.fire({
-            title: '¿Desea eliminar este producto?',
-            text: `Está eliminando el producto ${name}`,
+            title: '¿Desea eliminar este activo?',
+            text: `Está eliminando el activo ${name}`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -28,12 +28,12 @@ export const useProductInventory = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteProductInventory(idProductInventory, loggedUser?.idUser)
+                const response = await deleteAsset(idAsset, loggedUser?.idUser)
 
                 if(response.ok){
                     Swal.fire({
-                        title: 'Producto eliminado',
-                        text: `Se ha eliminado el producto ${name}`,
+                        title: 'Activo eliminado',
+                        text: `Se ha eliminado el activo ${name}`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -42,7 +42,7 @@ export const useProductInventory = () => {
                         confirmButtonColor: '#CFAD04'
                     })
 
-                    fetchProductsInventory()
+                    fetchAssets()
                 }
 
                 if(response.logout){
@@ -66,17 +66,17 @@ export const useProductInventory = () => {
         changeDirectionOrderBy(directionOrderBy === 'DESC' ? 'ASC' : 'DESC')
     }
 
-    const handleRestore = async (productInventory: ProductInventoryDataForm) => {
+    const handleRestore = async (asset: AssetDataForm) => {
         const loggedUser = getAuthUser()
-        const reqProductInventory = {
-            ...productInventory, 
+        const reqAsset = {
+            ...asset, 
             isDeleted: 0,
             paramLoggedIdUser: loggedUser?.idUser
         }
         
         await Swal.fire({
-            title: '¿Desea restaurar este producto?',
-            text: `Está restaurando el producto ${productInventory.name}`,
+            title: '¿Desea restaurar este activo?',
+            text: `Está restaurando el activo ${asset.name}`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -87,12 +87,12 @@ export const useProductInventory = () => {
             reverseButtons: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const response = await updateProductInventory(reqProductInventory)
+                const response = await updateAsset(reqAsset)
 
                 if(response.ok){
                     Swal.fire({
-                        title: 'Producto restaurado',
-                        text: `Se ha restaurado el producto ${productInventory.name}`,
+                        title: 'Activo restaurado',
+                        text: `Se ha restaurado el activo ${asset.name}`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -101,7 +101,7 @@ export const useProductInventory = () => {
                         confirmButtonColor: '#CFAD04'
                     })
                     
-                    fetchProductsInventory()
+                    fetchAssets()
                 }
 
                 if(response.logout){
@@ -115,15 +115,15 @@ export const useProductInventory = () => {
 
     const exportToPDF = () => {
         const doc = new jsPDF();
-        doc.text("Inventario de Productos", 14, 10);
+        doc.text("Registro de Activos", 14, 10);
     
         const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
-        const tableRows = productsInventory.map((product, index) => [
+        const tableRows = assets.map((asset, index) => [
             index + 1,
-            product.code,
-            product.name,
-            product.quantity,
-            formatAmountToCRC(product.cost),
+            asset.code,
+            asset.name,
+            asset.quantity,
+            formatAmountToCRC(asset.initialCost),
         ]);
         autoTable(doc, {
             head: [tableColumn],
@@ -132,7 +132,7 @@ export const useProductInventory = () => {
         });
     
     
-        doc.save("Inventario.pdf");
+        doc.save("Activos.pdf");
     };
     
     const exportToExcel = () => {
@@ -140,21 +140,21 @@ export const useProductInventory = () => {
         const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
     
         // Mapeo de los datos
-        const tableRows = productsInventory.map((product, index) => [
+        const tableRows = assets.map((asset, index) => [
             index + 1,
-            product.code,
-            product.name,
-            product.quantity,
-            formatAmountToCRC(product.cost)
+            asset.code,
+            asset.name,
+            asset.quantity,
+            formatAmountToCRC(asset.initialCost)
         ]);
     
         // Crear worksheet y workbook
         const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Productos Inventario");
+        XLSX.utils.book_append_sheet(wb, ws, "Activos");
     
         // Descargar
-        XLSX.writeFile(wb, "Inventario_Productos.xlsx");
+        XLSX.writeFile(wb, "Activos.xlsx");
     };
 
     return {

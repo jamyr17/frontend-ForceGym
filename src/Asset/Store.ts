@@ -1,15 +1,15 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { ProductInventory, ProductInventoryDataForm } from "../shared/types";
+import { Asset, AssetDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
 
-type ProductInventoryStore = {
-    productsInventory: ProductInventory[];
+type AssetStore = {
+    assets: Asset[];
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
     modalFileTypeDecision: boolean;
-    activeEditingId: ProductInventory['idProductInventory'];
+    activeEditingId: Asset['idAsset'];
     size: number;
     page: number;
     totalRecords: number;
@@ -23,11 +23,11 @@ type ProductInventoryStore = {
     filterByQuantityRangeMax: number;
     filterByQuantityRangeMin: number;
 
-    fetchProductsInventory: () => Promise<any>;
-    getProductInventoryById: (id: number) => void;
-    addProductInventory: (data: ProductInventoryDataForm) => Promise<any>;
-    updateProductInventory: (data: ProductInventoryDataForm) => Promise<any>;
-    deleteProductInventory: (id: number, loggedIdUser: number) => Promise<any>;
+    fetchAssets: () => Promise<any>;
+    getAssetById: (id: number) => void;
+    addAsset: (data: AssetDataForm) => Promise<any>;
+    updateAsset: (data: AssetDataForm) => Promise<any>;
+    deleteAsset: (id: number, loggedIdUser: number) => Promise<any>;
 
     changeSize: (newSize: number) => void;
     changePage: (newPage: number) => void;
@@ -54,9 +54,9 @@ type ProductInventoryStore = {
 
 };
 
-export const useProductInventoryStore = create<ProductInventoryStore>()(
+export const useAssetStore = create<AssetStore>()(
     devtools((set) => ({
-        productsInventory: [],
+        assets: [],
         modalForm: false,
         modalFilter: false,
         modalInfo: false,
@@ -85,8 +85,8 @@ export const useProductInventoryStore = create<ProductInventoryStore>()(
         })),
         
 
-        fetchProductsInventory: async () => {
-            const state = useProductInventoryStore.getState();
+        fetchAssets: async () => {
+            const state = useAssetStore.getState();
             let newPage = state.page;
             let filters = `&searchType=${state.searchType}`;
 
@@ -107,36 +107,36 @@ export const useProductInventoryStore = create<ProductInventoryStore>()(
             }
 
             const result = await getData(
-                `${import.meta.env.VITE_URL_API}productInventory/list?size=${state.size}&page=${state.page}${filters}`
+                `${import.meta.env.VITE_URL_API}asset/list?size=${state.size}&page=${state.page}${filters}`
             );
 
             if (state.page > (Math.trunc(result.data.totalRecords / state.size) + 1)) {
                 newPage = 1;
             }
 
-            const products = result.data?.products ?? []
+            const assets = result.data?.assets ?? []
             const totalRecords = result.data?.totalRecords ?? 0
 
-            set({ productsInventory: [...products], totalRecords: totalRecords, page: newPage });
+            set({ assets: [...assets], totalRecords: totalRecords, page: newPage });
             return result;
         },
 
-        getProductInventoryById: (id) => {
+        getAssetById: (id) => {
             set(() => ({ activeEditingId: id }));
         },
 
-        addProductInventory: async (data) => {
-            const result = await postData(`${import.meta.env.VITE_URL_API}productInventory/add`, data);
+        addAsset: async (data) => {
+            const result = await postData(`${import.meta.env.VITE_URL_API}asset/add`, data);
             return result;
         },
 
-        updateProductInventory: async (data) => {
-            const result = await putData(`${import.meta.env.VITE_URL_API}productInventory/update`, data);
+        updateAsset: async (data) => {
+            const result = await putData(`${import.meta.env.VITE_URL_API}asset/update`, data);
             return result;
         },
 
-        deleteProductInventory: async (id, loggedIdUser) => {
-            const result = await deleteData(`${import.meta.env.VITE_URL_API}productInventory/delete/${id}`, loggedIdUser);
+        deleteAsset: async (id, loggedIdUser) => {
+            const result = await deleteData(`${import.meta.env.VITE_URL_API}asset/delete/${id}`, loggedIdUser);
             return result;
         },
 
@@ -163,4 +163,4 @@ export const useProductInventoryStore = create<ProductInventoryStore>()(
     }))
 );
 
-export default useProductInventoryStore;
+export default useAssetStore;

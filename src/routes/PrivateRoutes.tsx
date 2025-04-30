@@ -5,7 +5,7 @@ import DashboardManagement from "../Dashboard/Page";
 import UserManagement from "../User/Page";
 import EconomicIncomeManagement from "../Income/Page";
 import EconomicExpenseManagement from "../Expense/Page";
-import ProductInventoryManagement from "../Product/Page";
+import AssetManagement from "../Asset/Page";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import AsideBar from "../shared/components/AsideBar";
 import ClientManagement from "../Client/Page";
@@ -17,6 +17,7 @@ import CategoryManagement from "../Category/Page";
 import ClientTypeManagement from "../ClientType/Page";
 import ExerciseManagement from "../Exercise/Page";
 import ActivityTypeManagement from "../ActivityType/Page";
+import LandingPage from "../LandingPage/page";
 import RoutineManagement from "../Routine/Page";
 
 function PrivateRoutes () {
@@ -61,7 +62,7 @@ function PrivateRoutes () {
             <Route 
                 path="dashboard" 
                 element={
-                    <DashboardManagement/>
+                    <LandingPage/>
                 }
             />
 
@@ -76,9 +77,7 @@ function PrivateRoutes () {
             <Route 
                 path="ingresos" 
                 element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
                 <EconomicIncomeManagement/>
-                </ProtectedRoute>
                 }
             />
             <Route 
@@ -91,19 +90,15 @@ function PrivateRoutes () {
             />
              <Route 
                 path="balance" 
-                element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
+                element={              
                 <EconomicBalanceDashboard/>
-                </ProtectedRoute>
                 }
             />
 
             <Route 
-                path="inventario" 
+                path="activos" 
                 element={
-                <ProtectedRoute allowedRoles={['Administrador']}>
-                <ProductInventoryManagement/>
-                </ProtectedRoute>
+                    <AssetManagement/>
                 }
             />
             <Route 
