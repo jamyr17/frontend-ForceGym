@@ -251,13 +251,43 @@ export type ClientTypeDataForm = {
 }
 
 
+export type RoutineExercise = {
+    idRoutineExercise?: number;
+    exercise: Exercise;
+    series: number;
+    repetitions: number;
+};
+
+export type RoutineAssignment = {
+    idRoutineAssignment?: number;
+    client: Client;
+    assignmentDate: Date;
+};
+
 export type Routine = {
     idRoutine: number;
     name: string;
-    user: User
+    date: Date;
+    user: User;
     difficultyRoutine: DifficultyRoutine;
     isDeleted: number;
-    exercises: Exercise[];
+    createdAt?: Date;
+    createdByUser?: number;
+    updatedAt?: Date;
+    updatedByUser?: number;
+    routineExercises: RoutineExercise[];
+    routineAssignments: RoutineAssignment[];
+};
+
+export type RoutineExerciseDTO = {
+    idExercise: number; 
+    series: number;
+    repetitions: number;
+};
+
+export type RoutineAssignmentDTO = {
+    idClient: number;
+    assignmentDate?: string;
 };
 
 export type RoutineWithExercisesDTO = {
@@ -268,21 +298,26 @@ export type RoutineWithExercisesDTO = {
     difficultyRoutine: {
         idDifficultyRoutine: number;
     };
-    exercises: {
-        idExercise: number[];
-        series: number;
-        repetitions: number;
-    }[];
+    exercises: RoutineExerciseDTO[];
+    assignments: RoutineAssignmentDTO[];
     isDeleted: number;
     paramLoggedIdUser?: number;
 };
 
-export type RoutineDataForm = Omit<Routine, 'user' | 'difficultyRoutine' | 'exercises'> & {
-    idUser: number;
+export type RoutineDataForm = {
+    idRoutine?: number;
+    name: string;
+    date: string;
     idDifficultyRoutine: number;
+    idUser: number;
+    isDeleted: number;
     exercises: {
-        idExercise: number[];
+        idExercise: number;
         series: number;
         repetitions: number;
+    }[];
+    assignments: {
+        idClient: number;
+        assignmentDate?: string;
     }[];
 };

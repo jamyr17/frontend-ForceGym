@@ -165,13 +165,18 @@ export function mapRoutineToDataForm(routine: Routine): RoutineDataForm {
     return {
         idRoutine: routine.idRoutine,
         name: routine.name,
+        date: routine.date.toISOString().split('T')[0], 
         idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine,
         idUser: routine.user.idUser,
         isDeleted: routine.isDeleted,
-        exercises: routine.exercises.map(ex => ({
-            idExercise: Array.isArray(ex.idExercise) ? ex.idExercise : [ex.idExercise],
+        exercises: routine.routineExercises.map(ex => ({
+            idExercise: ex.exercise.idExercise,
             series: ex.series,
             repetitions: ex.repetitions
+        })),
+        assignments: routine.routineAssignments.map(assignment => ({
+            idClient: assignment.client.idClient,
+            assignmentDate: assignment.assignmentDate.toISOString().split('T')[0]
         }))
     };
 }

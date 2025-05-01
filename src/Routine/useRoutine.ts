@@ -32,7 +32,7 @@ export const useRoutine = () => {
                     return;
                 }
                 
-                const response = await deleteRoutine(idRoutine, loggedUser.idUser);
+                const response = await deleteRoutine(idRoutine, loggedUser?.idUser);
                 
                 if (response?.ok) {
                     await Swal.fire({

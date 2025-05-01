@@ -28,15 +28,21 @@ function RoutineManagement() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const { logout } = await fetchRoutines();
-            if (logout) {
-                setAuthHeader(null);
-                setAuthUser(null);
-                navigate('/login');
+            try {
+                const response = await fetchRoutines();
+                
+                if (response?.logout) {
+                    setAuthHeader(null);
+                    setAuthUser(null);
+                    navigate("/login", { replace: true });
+                }
+            } catch (error) {
+                console.error("Error fetching routines:", error);
             }
         };
+        
         fetchData();
-    }, []);
+    }, [fetchRoutines, navigate]);
 
     return (
         <div className="bg-black min-h-screen">
@@ -52,7 +58,10 @@ function RoutineManagement() {
                                 <button
                                     className="mt-4 ml-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer"
                                     type="button"
-                                    onClick={showModalForm}
+                                    onClick={() => {
+                                        getRoutineById(0);
+                                        showModalForm();
+                                    }}
                                 >
                                     + Añadir
                                 </button>
@@ -80,51 +89,53 @@ function RoutineManagement() {
                                         <td className="py-2">{index + 1}</td>
                                         <td className="py-2">{routine.name}</td>
                                         <td className="py-2">{routine.difficultyRoutine.name}</td>
-                                        <td className="flex gap-4 justify-center py-2">
-                                            <Modal
-                                                Button={() => (
+                                        <td className="py-2">
+                                            <div className="flex gap-4 justify-center">
+                                                <Modal
+                                                    Button={() => (
+                                                        <button
+                                                            onClick={() => {
+                                                                getRoutineById(routine.idRoutine);
+                                                                showModalInfo();
+                                                            }}
+                                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                            title="Ver detalles"
+                                                        >
+                                                            <IoIosMore className="text-white" />
+                                                        </button>
+                                                    )}
+                                                    modal={modalInfo}
+                                                    getDataById={getRoutineById}
+                                                    closeModal={closeModalInfo}
+                                                    Content={DataInfo}
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        getRoutineById(routine.idRoutine);
+                                                        showModalForm();
+                                                    }}
+                                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                    title="Editar"
+                                                >
+                                                    <MdModeEdit className="text-white" />
+                                                </button>
+                                                {routine.isDeleted ? (
                                                     <button
-                                                        onClick={() => {
-                                                            getRoutineById(routine.idRoutine);
-                                                            showModalInfo();
-                                                        }}
+                                                        onClick={() => handleRestore(routine)}
                                                         className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                                        title="Ver detalles"
                                                     >
-                                                        <IoIosMore className="text-white" />
+                                                        <MdOutlineSettingsBackupRestore className="text-white" />
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleDelete(routine)}
+                                                        className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                        title="Eliminar"
+                                                    >
+                                                        <MdOutlineDelete className="text-white" />
                                                     </button>
                                                 )}
-                                                modal={modalInfo}
-                                                getDataById={getRoutineById}
-                                                closeModal={closeModalInfo}
-                                                Content={DataInfo}
-                                            />
-                                            <button
-                                                onClick={() => {
-                                                    getRoutineById(routine.idRoutine);
-                                                    showModalForm();
-                                                }}
-                                                className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                                title="Editar"
-                                            >
-                                                <MdModeEdit className="text-white" />
-                                            </button>
-                                            {routine.isDeleted ? (
-                                                <button 
-                                                    onClick={() => handleRestore(routine)} 
-                                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                                >
-                                                    <MdOutlineSettingsBackupRestore className="text-white" />
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleDelete(routine)}
-                                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                                    title="Eliminar"
-                                                >
-                                                    <MdOutlineDelete className="text-white" />
-                                                </button>
-                                            )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
