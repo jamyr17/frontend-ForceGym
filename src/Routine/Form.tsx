@@ -77,7 +77,7 @@ function Form() {
     loadData();
   }, [fetchExerciseCategories, fetchAllClients, fetchRoutines]);
 
-  // Resetear ejercicios cuando se cargan las categorías
+  // Precargar ejercicios cuando se cargan las categorías
   useEffect(() => {
     if (exerciseCategories.length > 0) {
       const initialExercises = exerciseCategories.map(category => ({
@@ -92,10 +92,10 @@ function Form() {
     }
   }, [exerciseCategories]);
 
-  // Cargar datos para edición
+  // Precargar datos para edición basado en routineToEdit
   useEffect(() => {
     if (activeEditingId && !loading && routineToEdit) {
-      console.log('Cargando datos para edición:', routineToEdit);
+      console.log('Precargando datos para edición:', routineToEdit);
       
       // Cargar datos básicos
       setValue('idRoutine', routineToEdit.idRoutine);
@@ -106,41 +106,46 @@ function Form() {
       if (routineToEdit.assignments?.length > 0) {
         const clientOptions = routineToEdit.assignments.map(assignment => ({
           value: assignment.idClient,
-          label: `${assignment.client.person.name} ${assignment.client.person.firstLastName}`
+          label: `${assignment.client?.person?.name || ''} ${assignment.client?.person?.firstLastName || ''}`.trim()
         }));
         setSelectedClients(clientOptions);
       }
       
-      // Cargar ejercicios
-      if (routineToEdit.routineExercises?.length > 0 && exerciseCategories.length > 0) {
-        const loadedExercises = exerciseCategories.map(category => {
-          const exerciseData = routineToEdit.routineExercises.find(
-            ex => ex.exercise.exerciseCategory?.idExerciseCategory === category.idExerciseCategory
-          );
+      // Cargar ejercicios - versión simplificada basada en la estructura vista
+      if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
+        const loadedExercises = routineToEdit.exercises.map(ex => {
+          const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
+          const category = exerciseData?.exerciseCategory;
           
-          return exerciseData ? {
-            idExercise: exerciseData.exercise.idExercise,
-            name: exerciseData.exercise.name,
-            series: exerciseData.series,
-            repetitions: exerciseData.repetitions,
-            category: category.name,
-            categoryId: category.idExerciseCategory
-          } : {
+          return {
+            idExercise: ex.idExercise,
+            name: exerciseData?.name || `Ejercicio ${ex.idExercise}`,
+            series: ex.series || 0,
+            repetitions: ex.repetitions || 0,
+            category: category?.name || "Sin categoría",
+            categoryId: category?.idExerciseCategory || 0
+          };
+        });
+        
+        // Agregamos también las categorías vacías que no están en los ejercicios
+        const categoriesWithExercises = loadedExercises.map(ex => ex.categoryId);
+        const emptyCategories = exerciseCategories
+          .filter(cat => !categoriesWithExercises.includes(cat.idExerciseCategory))
+          .map(cat => ({
             idExercise: 0,
             name: "",
             series: 0,
             repetitions: 0,
-            category: category.name,
-            categoryId: category.idExerciseCategory
-          };
-        });
+            category: cat.name,
+            categoryId: cat.idExerciseCategory
+          }));
         
-        setSelectedExercises(loadedExercises);
+        setSelectedExercises([...loadedExercises, ...emptyCategories]);
       }
     } else if (!activeEditingId && !loading) {
       resetForm();
     }
-  }, [activeEditingId, loading, routineToEdit, setValue]);
+  }, [activeEditingId, loading, routineToEdit, setValue, exercise]);
 
   const submitForm = async (data: RoutineDataForm) => {
     const loggedUser = getAuthUser();
@@ -172,7 +177,7 @@ function Form() {
     // Preparar datos para enviar
     const reqRoutine: RoutineWithExercisesDTO = {
       name: data.name,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString(),
       idUser: loggedUser?.idUser || 0,
       difficultyRoutine: {
         idDifficultyRoutine: data.idDifficultyRoutine
@@ -184,7 +189,7 @@ function Form() {
       })),
       assignments: selectedClients.map(client => ({
         idClient: client.value,
-        assignmentDate: new Date().toISOString().split('T')[0]
+        assignmentDate: new Date().toISOString()
       })),
       isDeleted: 0,
       paramLoggedIdUser: loggedUser?.idUser
@@ -194,7 +199,6 @@ function Form() {
       let result;
       let action = '';
       
-      // Determinar si estamos editando o creando
       const isEditing = activeEditingId !== null && activeEditingId !== 0;
 
       if (isEditing) {
@@ -269,7 +273,7 @@ function Form() {
 
   const getAvailableExercises = (categoryId: number, currentExerciseId: number = 0) => {
     return exercise.filter(ex => 
-      ex.exerciseCategory.idExerciseCategory === categoryId &&
+      ex.exerciseCategory?.idExerciseCategory === categoryId &&
       (currentExerciseId === ex.idExercise ||
       !selectedExercises.some(sel => sel.idExercise === ex.idExercise && sel.idExercise !== 0))
     );
@@ -283,7 +287,7 @@ function Form() {
       if (exerciseId > 0) {
         const selectedExercise = exercise.find(ex => 
           ex.idExercise === exerciseId && 
-          ex.exerciseCategory.idExerciseCategory === categoryId
+          ex.exerciseCategory?.idExerciseCategory === categoryId
         );
         
         if (selectedExercise) {
@@ -296,7 +300,6 @@ function Form() {
           };
         }
       } else {
-        // Resetear si se selecciona la opción vacía
         newExercises[index] = {
           ...newExercises[index],
           idExercise: 0,
@@ -314,7 +317,6 @@ function Form() {
     const category = exerciseCategories.find(c => c.idExerciseCategory === categoryId);
     if (!category) return;
 
-    // Verificar si hay ejercicios disponibles
     const availableExercises = getAvailableExercises(categoryId);
     if (availableExercises.length === 0) {
       Swal.fire({
@@ -407,7 +409,11 @@ function Form() {
         >
           <option value="">--Seleccione--</option>
           {difficultyRoutines.map(difficulty => (
-            <option key={difficulty.idDifficultyRoutine} value={difficulty.idDifficultyRoutine}>
+            <option 
+              key={difficulty.idDifficultyRoutine} 
+              value={difficulty.idDifficultyRoutine}
+              selected={routineToEdit?.difficultyRoutine?.idDifficultyRoutine === difficulty.idDifficultyRoutine}
+            >
               {difficulty.name}
             </option>
           ))}
@@ -426,7 +432,10 @@ function Form() {
           className="w-full p-3 border border-gray-100"
           type="text"
           placeholder="Nombre de la rutina"
-          {...register('name', { required: 'El nombre es obligatorio' })}
+          {...register('name', { 
+            required: 'El nombre es obligatorio',
+            value: routineToEdit?.name || ''
+          })}
           disabled={loading}
         />
         {errors.name && <ErrorForm>{errors.name.message}</ErrorForm>}
@@ -456,7 +465,11 @@ function Form() {
                         >
                           <option value="0">Escoja un ejercicio</option>
                           {exercisesForSelect.map(opt => (
-                            <option key={opt.idExercise} value={opt.idExercise} className="text-yellow-800">
+                            <option 
+                              key={opt.idExercise} 
+                              value={opt.idExercise} 
+                              className="text-yellow-800"
+                            >
                               {opt.name}
                             </option>
                           ))}

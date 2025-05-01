@@ -7,11 +7,8 @@ function DataInfo() {
 
     if (!routineToEdit) return <div className="text-gray-500 p-4">No hay rutina seleccionada</div>;
 
-    console.log("🟡 Rutina activa:", routineToEdit);
 
-    // Función para obtener detalles del ejercicio
     const getExerciseDetails = (ex) => {
-        // Busca el ejercicio en la lista global
         const globalExercise = exercise.find(e => e.idExercise === ex.idExercise);
         
         return {
@@ -26,12 +23,10 @@ function DataInfo() {
         return difficulty?.name || `Dificultad #${idDifficulty}`;
     };
 
-    // Obtiene los ejercicios de la rutina
     const exercises = routineToEdit.exercises || [];
 
     return (
         <div className="grid grid-cols-2 gap-6 p-4">
-            {/* Columna izquierda - Información básica */}
             <div className="flex flex-col gap-2">
                 <h1 className="text-yellow font-black text-2xl uppercase mb-4 underline">RUTINA</h1>
 
@@ -57,7 +52,6 @@ function DataInfo() {
                 </div>
             </div>
 
-            {/* Columna derecha - Ejercicios */}
             <div className="flex flex-col gap-2">
                 <h1 className="text-yellow font-black text-2xl uppercase mb-4 underline">EJERCICIOS</h1>
 
