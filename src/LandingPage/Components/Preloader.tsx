@@ -11,6 +11,7 @@ const Preloader = () => {
       if (window.scrollY > 10) setIsLoading(false);
     };
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener("scroll", handleScroll);
@@ -25,29 +26,29 @@ const Preloader = () => {
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
-            scale: 1.5,
-            transition: { duration: 1, ease: [0.22, 1, 0.36, 1] },
+            scale: 1.2,
+            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
           }}
         >
-          {/* Logo "FORCE GYM" con animación */}
+          {/* Contenedor principal de la imagen */}
           <motion.div
-            className="text-white text-center"
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
+            className="flex flex-col items-center justify-center"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{
+              duration: 0.6,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
-            <motion.h1
-              className="text-6xl md:text-8xl font-bold mb-4 tracking-tighter"
-              style={{ fontFamily: "Arial Black, sans-serif" }}
-            >
-              FORCE
-            </motion.h1>
-            <motion.h2
-              className="text-4xl md:text-6xl font-bold text-yellow"
-              style={{ fontFamily: "Arial, sans-serif" }}
-            >
-              GYM
-            </motion.h2>
+            {/* Imagen del logo - Reemplaza con tu imagen */}
+            <motion.img
+              src="/LogoBlack.jpg" // Cambia esta ruta
+              alt="Force Gym Logo"
+              className="w-64 md:w-80 h-auto mb-8" // Ajusta el tamaño
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+            />
           </motion.div>
 
           {/* Indicador de scroll (flecha animada) */}
@@ -57,10 +58,8 @@ const Preloader = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 0.5 }}
           >
-            <motion.p 
-              className="text-white mb-2 text-sm"
-            >
-              Scroll
+            <motion.p className="text-white mb-2 text-sm">
+              Scroll para continuar
             </motion.p>
             <motion.div
               animate={{ y: [0, 10, 0] }}
