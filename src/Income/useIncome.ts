@@ -4,8 +4,6 @@ import { EconomicIncome, EconomicIncomeDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicIncomeStore from "./Store"
 import { useNavigate } from "react-router"
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import * as XLSX from 'xlsx';
 import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
@@ -113,33 +111,6 @@ export const useEconomicIncome = () => {
         })
     }
 
-    const exportToPDF = () => {
-        const doc = new jsPDF();   
-        doc.setFont("helvetica");
-        doc.text("Reporte de Ingresos Económicos", 14, 10);
-    
-        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago", "Tipo de actividad","Detalle"];
-        
-        const tableRows = economicIncomes.map((income, index) => [
-            index + 1,
-            income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
-            `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
-            formatDate(new Date(income.registrationDate)),
-            formatAmountToCRC(income.amount),  // Aquí formateas con ₡
-            income.meanOfPayment.name,
-            income.activityType.name,  // Tipo de actividad
-            income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
-        ]);
-    
-         autoTable(doc, { 
-             head: [tableColumn],
-             body: tableRows,
-             startY: 20,
-         });
-
-        doc.save("ingresos.pdf");
-    };
-
     const exportToExcel = () => {
         // Encabezados de la tabla
         const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago","Tipo de actividad","Detalle"];
@@ -165,12 +136,25 @@ export const useEconomicIncome = () => {
         XLSX.writeFile(wb, "ingresos.xlsx");
     };
 
+    const pdfTableHeaders = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago", "Tipo de actividad","Detalle"]; 
+    const pdfTableRows = economicIncomes.map((income, index) => [
+        index + 1,
+        income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
+        `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
+        formatDate(new Date(income.registrationDate)),
+        formatAmountToCRC(income.amount),  // Aquí formateas con ₡
+        income.meanOfPayment.name,
+        income.activityType.name,  // Tipo de actividad
+        income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
+    ]);
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
         handleRestore, 
-        exportToPDF,
+        pdfTableHeaders,
+        pdfTableRows,
         exportToExcel
     }
 }

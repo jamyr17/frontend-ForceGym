@@ -15,6 +15,52 @@ export const formatDateForParam = (date: Date): string => {
     return `${year}-${month}-${day}`;
 }
 
+export const formatCurrentDateWithHourForTitle = () => {
+    const now = new Date();
+        
+    // Ajustar a hora del pais
+    const offsetCR = -6; 
+    now.setHours(now.getUTCHours() + offsetCR);
+    
+    // Formatear la fecha
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const year = now.getFullYear();
+        
+    return `${hours}.${minutes}h ${day}.${month}.${year}`;
+}
+
+export const formatCurrentDateForDocument = () => {
+    const now = new Date();
+        
+    // Ajustar a hora del pais
+    const offsetCR = -6; 
+    now.setHours(now.getUTCHours() + offsetCR);
+    
+    // Formatear la fecha c
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const year = now.getFullYear();
+        
+    return `${day}/${month}/${year}`;
+}
+
+export const formatCurrentHourForDocument = () => {
+    const now = new Date();
+        
+    // Ajustar a hora del pais
+    const offsetCR = -6; 
+    now.setHours(now.getUTCHours() + offsetCR);
+    
+    // Formatear la fecha 
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+    return `${hours}:${minutes}`;
+}
+
 export const formatAmountToCRC = (amount: number) => {
     return `CRC ${amount.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
   };  

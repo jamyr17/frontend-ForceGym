@@ -18,6 +18,7 @@ import Form from "./Form";
 import DataInfo from "./DataInfo";
 import FileTypeDecision from "../shared/components/ModalFileType";
 import ExpenseDashboard from './ExpenseDashboard';
+import { exportToPDF } from "../shared/utils/pdf";
 
 function EconomicExpenseManagement() {
     const {
@@ -54,7 +55,7 @@ function EconomicExpenseManagement() {
         closeModalFileType
     } = useEconomicExpenseStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useEconomicExpense()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useEconomicExpense()
     const navigate = useNavigate()
 
     useEffect(() => {}, [economicExpenses])
@@ -117,12 +118,14 @@ function EconomicExpenseManagement() {
                             modal={modalFileTypeDecision}
                             getDataById={getEconomicExpenseById}
                             closeModal={closeModalFileType}
-                            Content={() => <FileTypeDecision 
-                                                modulo="Gastos económicos" 
-                                                closeModal={closeModalFileType} 
-                                                exportToPDF={exportToPDF}
-                                                exportToExcel={exportToExcel}
-                            />}
+                            Content={() => 
+                                        <FileTypeDecision 
+                                            modulo="Gastos económicos" 
+                                            closeModal={closeModalFileType} 
+                                            exportToPDF={() => exportToPDF('Gastos', pdfTableHeaders, pdfTableRows)}
+                                            exportToExcel={exportToExcel}
+                                        />
+                                    }
                         />  
                     </div>
                     )} 

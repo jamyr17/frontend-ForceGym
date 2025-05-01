@@ -4,8 +4,6 @@ import { EconomicExpense, EconomicExpenseDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicExpenseStore from "./Store"
 import { useNavigate } from "react-router"
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
@@ -113,30 +111,6 @@ export const useEconomicExpense = () => {
         })
     }
 
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.setFont("helvetica");
-        doc.text("Reporte de Gastos", 14, 10);
-
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
-        const tableRows = economicExpenses.map((expense, index) => [
-            index + 1,
-            expense.voucherNumber || "No adjunto",
-            formatDate(new Date(expense.registrationDate)),
-            formatAmountToCRC(expense.amount), 
-            expense.meanOfPayment.name,
-            expense.category.name,
-            expense.detail ? expense.detail : 'Sin detalle' // Detalle del ingreso
-        ]);
-        autoTable(doc, { 
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-
-        doc.save("gastos.pdf");
-    };
-
     const exportToExcel = () => {
         // Encabezados de la tabla
         const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
@@ -161,12 +135,24 @@ export const useEconomicExpense = () => {
         XLSX.writeFile(wb, "gastos.xlsx");
     };
 
+    const pdfTableHeaders = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
+    const pdfTableRows = economicExpenses.map((expense, index) => [
+        index + 1,
+        expense.voucherNumber || "No adjunto",
+        formatDate(new Date(expense.registrationDate)),
+        formatAmountToCRC(expense.amount), 
+        expense.meanOfPayment.name,
+        expense.category.name,
+        expense.detail ? expense.detail : 'Sin detalle'
+    ]);
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
         handleRestore,
-        exportToPDF,
+        pdfTableHeaders,
+        pdfTableRows,
         exportToExcel
     }
 }

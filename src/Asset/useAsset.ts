@@ -4,8 +4,6 @@ import { Asset, AssetDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useAssetStore from "./Store"
 import { useNavigate } from "react-router"
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import * as XLSX from 'xlsx';
 import { formatAmountToCRC } from "../shared/utils/format"
 
@@ -112,28 +110,6 @@ export const useAsset = () => {
             } 
         })
     }
-
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text("Registro de Activos", 14, 10);
-    
-        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
-        const tableRows = assets.map((asset, index) => [
-            index + 1,
-            asset.code,
-            asset.name,
-            asset.quantity,
-            formatAmountToCRC(asset.initialCost),
-        ]);
-        autoTable(doc, {
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
-        });
-    
-    
-        doc.save("Activos.pdf");
-    };
     
     const exportToExcel = () => {
         // Encabezados de la tabla
@@ -157,12 +133,31 @@ export const useAsset = () => {
         XLSX.writeFile(wb, "Activos.xlsx");
     };
 
+    const pdfTableHeaders = ["#", "Código", "Nombre", "Cantidad", "Costo inicial por unidad", "Años de vida útil", "Valor actual por unidad", "Valor actual en total"];
+    const pdfTableRows = assets.map((asset, index) => {
+        const yearsSincePurchase = new Date().getFullYear() - new Date(asset.boughtDate).getFullYear();
+        const currentValue = asset.initialCost - (asset.deprecationPerYear * yearsSincePurchase);
+        const totalValue = currentValue * asset.quantity;
+        
+        return [
+            index + 1,
+            asset.code,
+            asset.name,
+            asset.quantity,
+            formatAmountToCRC(asset.initialCost),
+            asset.serviceLifeYears,
+            formatAmountToCRC(currentValue),
+            formatAmountToCRC(totalValue)
+        ];
+    });
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
         handleRestore,
-        exportToPDF,
+        pdfTableHeaders,
+        pdfTableRows,
         exportToExcel
     }
 }
