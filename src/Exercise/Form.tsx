@@ -13,7 +13,7 @@ const MAXLENGTH_DESCRIPTION = 255;
 
 function FormExercise() {
   const navigate = useNavigate();
-  const { exerciseCategories } = useCommonDataStore();
+  const { exerciseCategories, exerciseDifficulty } = useCommonDataStore();
   const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<ExerciseDataForm>();
   const {
     exercises,
@@ -85,7 +85,7 @@ function FormExercise() {
         setValue("idExercise", exercise.idExercise);
         setValue("name", exercise.name);
         setValue("description", exercise.description);
-        setValue("difficulty", exercise.difficulty);
+        setValue("idDifficulty", exercise.exerciseDifficulty.idDifficulty);
         setValue("idExerciseCategory", exercise.exerciseCategory.idExerciseCategory);
         setValue("isDeleted", exercise.isDeleted);
       }
@@ -149,23 +149,24 @@ function FormExercise() {
         {errors.description && <ErrorForm>{errors.description.message}</ErrorForm>}
       </div>
 
-      {/* Campo dificultad */}
+      {/* Campo Dificultad (select) */}
       <div className="mb-5">
-        <label htmlFor="difficulty" className="text-sm uppercase font-bold">
-          Dificultad
+        <label htmlFor="idDifficulty" className="text-sm uppercase font-bold">
+          Categoría
         </label>
         <select
-          id="difficulty"
+          id="idDifficulty"
           className="w-full p-3 border border-gray-100"
-          {...register("difficulty", { required: "La dificultad es obligatoria" })}
+          {...register("idDifficulty", { required: "La categoría es obligatoria" })}
         >
-          <option value="">Seleccione una dificultad</option>
-          <option value="Fácil">Fácil</option>
-          <option value="Media">Media</option>
-          <option value="Difícil">Difícil</option>
-
+          <option value="">Seleccione una Dificultad</option>
+          {exerciseDifficulty.map(cat => (
+            <option key={cat.idDifficulty} value={cat.idDifficulty}>
+              {cat.difficulty}
+            </option>
+          ))}
         </select>
-        {errors.difficulty && <ErrorForm>{errors.difficulty.message}</ErrorForm>}
+        {errors.idDifficulty && <ErrorForm>{errors.idDifficulty.message}</ErrorForm>}
       </div>
 
       {/* Campo categoría (select) */}

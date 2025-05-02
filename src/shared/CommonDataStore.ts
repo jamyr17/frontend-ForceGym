@@ -38,7 +38,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
         categories: [],
         notificationTypes: [],
         exerciseCategories: [],
-        difficulty: [],
+        exerciseDifficulty: [],
 
         fetchRoles: async () => {
             const result = await getData(`${import.meta.env.VITE_URL_API}role/list`) 
