@@ -19,6 +19,7 @@ import { useNavigate } from "react-router";
 import FileTypeDecision from "../shared/components/ModalFileType";
 import IncomeDashboard from './IncomeDashboard';
 import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function EconomicIncomeManagement() {
     const {
@@ -55,7 +56,7 @@ function EconomicIncomeManagement() {
         closeModalFileType
     } = useEconomicIncomeStore()
     
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useEconomicIncome()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useEconomicIncome()
    
     const navigate = useNavigate()
 
@@ -128,7 +129,7 @@ function EconomicIncomeManagement() {
                                             modulo="Ingresos económicos" 
                                             closeModal={closeModalFileType} 
                                             exportToPDF={() => exportToPDF('Ingresos', pdfTableHeaders, pdfTableRows)}
-                                            exportToExcel={exportToExcel}
+                                            exportToExcel={() => exportToExcel('Ingresos', pdfTableHeaders, pdfTableRows)}
                                         />
                                     }
                         />  

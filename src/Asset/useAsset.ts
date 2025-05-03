@@ -4,7 +4,6 @@ import { Asset, AssetDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useAssetStore from "./Store"
 import { useNavigate } from "react-router"
-import * as XLSX from 'xlsx';
 import { formatAmountToCRC } from "../shared/utils/format"
 
 export const useAsset = () => {
@@ -111,28 +110,6 @@ export const useAsset = () => {
         })
     }
     
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Código", "Nombre", "Cantidad", "Costo"];
-    
-        // Mapeo de los datos
-        const tableRows = assets.map((asset, index) => [
-            index + 1,
-            asset.code,
-            asset.name,
-            asset.quantity,
-            formatAmountToCRC(asset.initialCost)
-        ]);
-    
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Activos");
-    
-        // Descargar
-        XLSX.writeFile(wb, "Activos.xlsx");
-    };
-
     const pdfTableHeaders = ["#", "Código", "Nombre", "Cantidad", "Costo inicial por unidad", "Años de vida útil", "Valor actual por unidad", "Valor actual en total"];
     const pdfTableRows = assets.map((asset, index) => {
         const yearsSincePurchase = new Date().getFullYear() - new Date(asset.boughtDate).getFullYear();
@@ -157,7 +134,6 @@ export const useAsset = () => {
         handleOrderByChange, 
         handleRestore,
         pdfTableHeaders,
-        pdfTableRows,
-        exportToExcel
+        pdfTableRows
     }
 }

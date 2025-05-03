@@ -19,6 +19,7 @@ import { useClient } from "./useClient";
 import Form from "./Form/MultiStepForm";
 import DataInfo from "./DataInfo";
 import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function ClientManagement() {
     const {
@@ -59,7 +60,7 @@ function ClientManagement() {
         closeModalFileType
     } = useClientStore()
     
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useClient()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useClient()
     const navigate = useNavigate()
     
     useEffect(() => {}, [clients])
@@ -128,7 +129,7 @@ function ClientManagement() {
                                                 modulo="Clientes" 
                                                 closeModal={closeModalFileType} 
                                                 exportToPDF={() => exportToPDF('Clientes', pdfTableHeaders, pdfTableRows)}
-                                                exportToExcel={exportToExcel}
+                                                exportToExcel={() => exportToExcel('Clientes', pdfTableHeaders, pdfTableRows)}
                                             />
                                         }
                             />

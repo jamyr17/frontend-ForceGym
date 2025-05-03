@@ -16,6 +16,8 @@ import DataInfo from "./DataInfo";
 import { mapMeasurementToDataForm } from "../shared/types/mapper";
 import { FilterButton, FilterSelect } from "./Filter";
 import FileTypeDecision from "../shared/components/ModalFileType";
+import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function MeasurementManagement() {
     const location = useLocation();
@@ -57,7 +59,7 @@ function MeasurementManagement() {
         }
     }, [idClient]);
 
-    const { handleDelete, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useMeasurement();
+    const { handleDelete, handleOrderByChange, handleRestore, tableColumn, tableRows, clientData} = useMeasurement();
     
     useEffect(() => {}, [measurements]);
     
@@ -118,8 +120,8 @@ function MeasurementManagement() {
                                 Content={() => <FileTypeDecision 
                                                     modulo="Medidas corporales" 
                                                     closeModal={closeModalFileType} 
-                                                    exportToPDF={exportToPDF}
-                                                    exportToExcel={exportToExcel}
+                                                    exportToPDF={() => exportToPDF('Medidas', tableColumn, tableRows)}
+                                                    exportToExcel={() => exportToExcel('Medidas', tableColumn, tableRows, true, clientData)}
                                 />}
                             />
                         </div>

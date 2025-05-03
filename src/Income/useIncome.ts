@@ -4,7 +4,6 @@ import { EconomicIncome, EconomicIncomeDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicIncomeStore from "./Store"
 import { useNavigate } from "react-router"
-import * as XLSX from 'xlsx';
 import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
 export const useEconomicIncome = () => {
@@ -111,31 +110,6 @@ export const useEconomicIncome = () => {
         })
     }
 
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago","Tipo de actividad","Detalle"];
-    
-        // Mapeo de los datos
-        const tableRows = economicIncomes.map((income, index) => [
-            index + 1,
-            income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
-            `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
-            formatDate(new Date(income.registrationDate)),
-            formatAmountToCRC(income.amount), 
-            income.meanOfPayment.name,
-            income.activityType.name, 
-            income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
-        ]);
-    
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Ingresos Económicos");
-    
-        // Descargar
-        XLSX.writeFile(wb, "ingresos.xlsx");
-    };
-
     const pdfTableHeaders = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago", "Tipo de actividad","Detalle"]; 
     const pdfTableRows = economicIncomes.map((income, index) => [
         index + 1,
@@ -154,7 +128,6 @@ export const useEconomicIncome = () => {
         handleOrderByChange, 
         handleRestore, 
         pdfTableHeaders,
-        pdfTableRows,
-        exportToExcel
+        pdfTableRows
     }
 }

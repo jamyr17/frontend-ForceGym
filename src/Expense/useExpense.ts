@@ -4,7 +4,6 @@ import { EconomicExpense, EconomicExpenseDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicExpenseStore from "./Store"
 import { useNavigate } from "react-router"
-import * as XLSX from "xlsx";
 import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
 export const useEconomicExpense = () => {
@@ -111,30 +110,6 @@ export const useEconomicExpense = () => {
         })
     }
 
-    const exportToExcel = () => {
-        // Encabezados de la tabla
-        const tableColumn = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
-
-        // Mapeo de los datos
-        const tableRows = economicExpenses.map((expense, index) => [
-            index + 1,
-            expense.voucherNumber !== '' ? expense.voucherNumber : "No adjunto",
-            formatDate(new Date(expense.registrationDate)),
-            formatAmountToCRC(expense.amount),
-            expense.meanOfPayment.name,
-            expense.category.name,
-            expense.detail ? expense.detail : 'Sin detalle' // Detalle del ingreso
-        ]);
-
-        // Crear worksheet y workbook
-        const ws = XLSX.utils.aoa_to_sheet([tableColumn, ...tableRows]);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Gastos Económicos");
-
-        // Descargar
-        XLSX.writeFile(wb, "gastos.xlsx");
-    };
-
     const pdfTableHeaders = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
     const pdfTableRows = economicExpenses.map((expense, index) => [
         index + 1,
@@ -152,7 +127,6 @@ export const useEconomicExpense = () => {
         handleOrderByChange, 
         handleRestore,
         pdfTableHeaders,
-        pdfTableRows,
-        exportToExcel
+        pdfTableRows
     }
 }
