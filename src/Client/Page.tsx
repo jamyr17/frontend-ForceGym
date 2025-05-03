@@ -18,6 +18,7 @@ import { useNavigate, Link } from "react-router";
 import { useClient } from "./useClient";
 import Form from "./Form/MultiStepForm";
 import DataInfo from "./DataInfo";
+import { exportToPDF } from "../shared/utils/pdf";
 
 function ClientManagement() {
     const {
@@ -58,7 +59,7 @@ function ClientManagement() {
         closeModalFileType
     } = useClientStore()
     
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useClient()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useClient()
     const navigate = useNavigate()
     
     useEffect(() => {}, [clients])
@@ -122,12 +123,14 @@ function ClientManagement() {
                                 modal={modalFileTypeDecision}
                                 getDataById={getClientById}
                                 closeModal={closeModalFileType}
-                                Content={() => <FileTypeDecision 
-                                                    modulo="Clientes" 
-                                                    closeModal={closeModalFileType} 
-                                                    exportToPDF={exportToPDF}
-                                                    exportToExcel={exportToExcel}
-                                />}
+                                Content={() => 
+                                            <FileTypeDecision 
+                                                modulo="Clientes" 
+                                                closeModal={closeModalFileType} 
+                                                exportToPDF={() => exportToPDF('Clientes', pdfTableHeaders, pdfTableRows)}
+                                                exportToExcel={exportToExcel}
+                                            />
+                                        }
                             />
                         </div>
                         )}          

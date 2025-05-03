@@ -17,6 +17,7 @@ import { useAsset } from "./useAsset";
 import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
 import FileTypeDecision from "../shared/components/ModalFileType";
+import { exportToPDF } from "../shared/utils/pdf";
 
 function AssetManagement() {
     const {
@@ -51,7 +52,7 @@ function AssetManagement() {
         closeModalFileType
     } = useAssetStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useAsset()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useAsset()
     const navigate = useNavigate()
     
     useEffect(() => {}, [assets])
@@ -114,12 +115,14 @@ function AssetManagement() {
                     modal={modalFileTypeDecision}
                     getDataById={getAssetById}
                     closeModal={closeModalFileType}
-                    Content={() => <FileTypeDecision 
-                            modulo="Inventario" 
-                            closeModal={closeModalFileType} 
-                            exportToPDF={exportToPDF}
-                            exportToExcel={exportToExcel}
-                        />}
+                    Content={() => 
+                                <FileTypeDecision 
+                                    modulo="Activos" 
+                                    closeModal={closeModalFileType} 
+                                    exportToPDF={() => exportToPDF('Activos', pdfTableHeaders, pdfTableRows)}
+                                    exportToExcel={exportToExcel}
+                                />
+                            }
                 />  
             </div>
             )}          

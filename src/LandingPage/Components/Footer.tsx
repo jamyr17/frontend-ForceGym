@@ -6,23 +6,10 @@ const Footer = () => {
   return (
     <footer className="bg-black text-gray-400 py-12 relative">
       <div className="container mx-auto px-4">
-        {/* Icono de inicio de sesión */}
-        <div className="absolute right-4 top-4 md:right-8 md:top-8">
-          <Link to="/login" aria-label="Iniciar sesión">
-            <button
-              className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-full p-3 shadow-lg transition-all duration-300 transform hover:scale-110"
-            >
-              <FaUser className="h-6 w-6" />
-            </button>
-          </Link>
-
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Columna 1 */}
-          <div className="mb-6 sm:mb-0">
-            <h3 className="text-2xl font-bold text-yellow-600 mb-4">FORCE GYM</h3>
-            <p className="text-gray-300">Transformando cuerpos desde 2022.</p>
+        <div className="grid md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="text-2xl font-bold text-yellow mb-4">FORCE GYM</h3>
+            <p>Transformando cuerpos desde 2022.</p>
           </div>
 
           {/* Columna 2 */}
@@ -67,4 +54,4 @@ const Footer = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

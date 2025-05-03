@@ -18,8 +18,7 @@ import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
 import FileTypeDecision from "../shared/components/ModalFileType";
 import IncomeDashboard from './IncomeDashboard';
-
-
+import { exportToPDF } from "../shared/utils/pdf";
 
 function EconomicIncomeManagement() {
     const {
@@ -56,7 +55,7 @@ function EconomicIncomeManagement() {
         closeModalFileType
     } = useEconomicIncomeStore()
     
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToPDF, exportToExcel } = useEconomicIncome()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useEconomicIncome()
    
     const navigate = useNavigate()
 
@@ -124,12 +123,14 @@ function EconomicIncomeManagement() {
                             modal={modalFileTypeDecision}
                             getDataById={getEconomicIncomeById}
                             closeModal={closeModalFileType}
-                            Content={() => <FileTypeDecision 
-                                                modulo="Ingresos económicos" 
-                                                closeModal={closeModalFileType} 
-                                                exportToPDF={exportToPDF}
-                                                exportToExcel={exportToExcel}
-                            />}
+                            Content={() => 
+                                        <FileTypeDecision 
+                                            modulo="Ingresos económicos" 
+                                            closeModal={closeModalFileType} 
+                                            exportToPDF={() => exportToPDF('Ingresos', pdfTableHeaders, pdfTableRows)}
+                                            exportToExcel={exportToExcel}
+                                        />
+                                    }
                         />  
                     </div>
                     )} 
