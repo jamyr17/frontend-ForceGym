@@ -65,7 +65,7 @@ export type ExerciseCategory = {
 }
 
 export type ExerciseDifficulty = {
-    idDifficulty: number
+    idExerciseDifficulty: number
     difficulty: string
 }
 // -----------------------------------------------------
@@ -225,7 +225,7 @@ export type Exercise = {
     isDeleted: number;
 };
 
-export type ExerciseDataForm = Omit<Exercise, 'user' | 'exerciseCategory' | 'difficulty'> & Pick<ExerciseCategory, 'idExerciseCategory'> & Pick<ExerciseDifficulty, 'idDifficulty'> & Pick<User, 'idUser'>
+export type ExerciseDataForm = Omit<Exercise, 'user' | 'exerciseCategory' | 'exerciseDifficulty'> & Pick<ExerciseCategory, 'idExerciseCategory'> & Pick<ExerciseDifficulty, 'idExerciseDifficulty'> & Pick<User, 'idUser'>
 // --------------------------------------------------------
 export type NotificationTemplate = {
     idNotificationTemplate: number

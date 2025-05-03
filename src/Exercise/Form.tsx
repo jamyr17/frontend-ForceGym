@@ -85,12 +85,13 @@ function FormExercise() {
         setValue("idExercise", exercise.idExercise);
         setValue("name", exercise.name);
         setValue("description", exercise.description);
-        setValue("idDifficulty", exercise.exerciseDifficulty.idDifficulty);
-        setValue("idExerciseCategory", exercise.exerciseCategory.idExerciseCategory);
+        // Cambios realizados aquí:
+        setValue("idExerciseDifficulty", exercise.idExerciseDifficulty || exercise.exerciseDifficulty?.idDifficulty);
+        setValue("idExerciseCategory", exercise.idExerciseCategory || exercise.exerciseCategory?.idExerciseCategory);
         setValue("isDeleted", exercise.isDeleted);
       }
     }
-  }, [activeEditingId]);
+  }, [activeEditingId, exercises, setValue]);
 
   return (
     <form
@@ -151,22 +152,22 @@ function FormExercise() {
 
       {/* Campo Dificultad (select) */}
       <div className="mb-5">
-        <label htmlFor="idDifficulty" className="text-sm uppercase font-bold">
-          Categoría
+        <label htmlFor="idExerciseDifficulty" className="text-sm uppercase font-bold">
+        Dificultad
         </label>
         <select
-          id="idDifficulty"
+          id="idExerciseDifficulty"
           className="w-full p-3 border border-gray-100"
-          {...register("idDifficulty", { required: "La categoría es obligatoria" })}
+          {...register("idExerciseDifficulty", { required: "La Dificultad es obligatoria" })}
         >
           <option value="">Seleccione una Dificultad</option>
           {exerciseDifficulty.map(cat => (
-            <option key={cat.idDifficulty} value={cat.idDifficulty}>
+            <option key={cat.idExerciseDifficulty} value={cat.idExerciseDifficulty}>
               {cat.difficulty}
             </option>
           ))}
         </select>
-        {errors.idDifficulty && <ErrorForm>{errors.idDifficulty.message}</ErrorForm>}
+        {errors.idExerciseDifficulty && <ErrorForm>{errors.idExerciseDifficulty.message}</ErrorForm>}
       </div>
 
       {/* Campo categoría (select) */}
