@@ -13,7 +13,7 @@ const MAXLENGTH_DESCRIPTION = 255;
 
 function FormExercise() {
   const navigate = useNavigate();
-  const { exerciseCategories } = useCommonDataStore();
+  const { exerciseCategories, exerciseDifficulty } = useCommonDataStore();
   const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<ExerciseDataForm>();
   const {
     exercises,
@@ -85,12 +85,13 @@ function FormExercise() {
         setValue("idExercise", exercise.idExercise);
         setValue("name", exercise.name);
         setValue("description", exercise.description);
-        setValue("difficulty", exercise.difficulty);
-        setValue("idExerciseCategory", exercise.exerciseCategory.idExerciseCategory);
+        // Cambios realizados aquí:
+        setValue("idExerciseDifficulty", exercise.idExerciseDifficulty || exercise.exerciseDifficulty?.idDifficulty);
+        setValue("idExerciseCategory", exercise.idExerciseCategory || exercise.exerciseCategory?.idExerciseCategory);
         setValue("isDeleted", exercise.isDeleted);
       }
     }
-  }, [activeEditingId]);
+  }, [activeEditingId, exercises, setValue]);
 
   return (
     <form
@@ -149,23 +150,24 @@ function FormExercise() {
         {errors.description && <ErrorForm>{errors.description.message}</ErrorForm>}
       </div>
 
-      {/* Campo dificultad */}
+      {/* Campo Dificultad (select) */}
       <div className="mb-5">
-        <label htmlFor="difficulty" className="text-sm uppercase font-bold">
-          Dificultad
+        <label htmlFor="idExerciseDifficulty" className="text-sm uppercase font-bold">
+        Dificultad
         </label>
         <select
-          id="difficulty"
+          id="idExerciseDifficulty"
           className="w-full p-3 border border-gray-100"
-          {...register("difficulty", { required: "La dificultad es obligatoria" })}
+          {...register("idExerciseDifficulty", { required: "La Dificultad es obligatoria" })}
         >
-          <option value="">Seleccione una dificultad</option>
-          <option value="Fácil">Fácil</option>
-          <option value="Media">Media</option>
-          <option value="Difícil">Difícil</option>
-
+          <option value="">Seleccione una Dificultad</option>
+          {exerciseDifficulty.map(cat => (
+            <option key={cat.idExerciseDifficulty} value={cat.idExerciseDifficulty}>
+              {cat.difficulty}
+            </option>
+          ))}
         </select>
-        {errors.difficulty && <ErrorForm>{errors.difficulty.message}</ErrorForm>}
+        {errors.idExerciseDifficulty && <ErrorForm>{errors.idExerciseDifficulty.message}</ErrorForm>}
       </div>
 
       {/* Campo categoría (select) */}

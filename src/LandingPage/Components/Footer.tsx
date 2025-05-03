@@ -1,4 +1,6 @@
 import { FaUser, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+
 
 const Footer = () => {
   return (
@@ -6,12 +8,14 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         {/* Icono de inicio de sesión */}
         <div className="absolute right-4 top-4 md:right-8 md:top-8">
-          <button 
-            className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-full p-3 shadow-lg transition-all duration-300 transform hover:scale-110"
-            aria-label="Iniciar sesión"
-          >
-            <FaUser className="h-6 w-6" />
-          </button>
+          <Link to="/login" aria-label="Iniciar sesión">
+            <button
+              className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-full p-3 shadow-lg transition-all duration-300 transform hover:scale-110"
+            >
+              <FaUser className="h-6 w-6" />
+            </button>
+          </Link>
+
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">

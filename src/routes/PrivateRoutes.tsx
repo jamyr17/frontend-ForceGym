@@ -21,7 +21,7 @@ import LandingPage from "../LandingPage/page";
 
 function PrivateRoutes () {
     // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
-    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes } = useCommonDataStore()
+    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty } = useCommonDataStore()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -34,6 +34,7 @@ function PrivateRoutes () {
                 fetchGenders,
                 fetchTypesClient,
                 fetchCategories,
+                fetchExerciseDifficulty,
                 fetchNotificationTypes
             ];
     
@@ -59,7 +60,7 @@ function PrivateRoutes () {
             <Route 
                 path="dashboard" 
                 element={
-                    <LandingPage/>
+                    <DashboardManagement/>
                 }
             />
 

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { ActivityType, TypeClient, MeanOfPayment, Role, Gender, ClientOptions, Category, NotificationType, ExerciseCategory} from "./types";
+import { ActivityType, TypeClient, MeanOfPayment, Role, Gender, ClientOptions, Category, NotificationType, ExerciseCategory, ExerciseDifficulty} from "./types";
 import { getData } from "./services/gym";
 
 type CommonDataStore = {
@@ -14,6 +14,7 @@ type CommonDataStore = {
     categories: Category[]
     notificationTypes: NotificationType[]
     exerciseCategories: ExerciseCategory[]
+    exerciseDifficulty: ExerciseDifficulty[]
     fetchRoles: () => Promise<any>
     fetchMeansOfPayment: () => Promise<any>
     fetchActivityTypes: () => Promise<any>
@@ -23,6 +24,7 @@ type CommonDataStore = {
     fetchCategories: () => Promise<any>
     fetchNotificationTypes: () => Promise<any>
     fetchExerciseCategories: () => Promise<any>
+    fetchExerciseDifficulty: () => Promise<any>
 }
 
 export const useCommonDataStore = create<CommonDataStore>()(
@@ -36,6 +38,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
         categories: [],
         notificationTypes: [],
         exerciseCategories: [],
+        exerciseDifficulty: [],
 
         fetchRoles: async () => {
             const result = await getData(`${import.meta.env.VITE_URL_API}role/list`) 
@@ -93,6 +96,12 @@ export const useCommonDataStore = create<CommonDataStore>()(
         fetchExerciseCategories: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}exercisecategory/list`);
             set(() => ({ exerciseCategories: result.data }));
+            return result;
+        },
+
+        fetchExerciseDifficulty: async() => {
+            const result = await getData(`${import.meta.env.VITE_URL_API}exercisedifficulty/list`);
+            set(() => ({ exerciseDifficulty: result.data }));
             return result;
         }
     })
