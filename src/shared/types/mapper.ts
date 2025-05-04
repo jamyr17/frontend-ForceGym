@@ -1,4 +1,4 @@
-import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, Asset, AssetDataForm, User, UserDataForm, ClientType, Category, CategoryDataForm, Exercise, ExerciseDataForm} from ".";
+import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, Asset, AssetDataForm, User, UserDataForm, ClientType, Category, CategoryDataForm, Exercise, ExerciseDataForm, Routine, RoutineDataForm} from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -159,4 +159,24 @@ export function mapExerciseToDataForm(exercise: Exercise): ExerciseDataForm {
         idUser: exercise.user.idUser,
         isDeleted: exercise.isDeleted,
     }
+
+}
+export function mapRoutineToDataForm(routine: Routine): RoutineDataForm {
+    return {
+        idRoutine: routine.idRoutine,
+        name: routine.name,
+        date: routine.date.toISOString().split('T')[0], 
+        idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine,
+        idUser: routine.user.idUser,
+        isDeleted: routine.isDeleted,
+        exercises: routine.routineExercises.map(ex => ({
+            idExercise: ex.exercise.idExercise,
+            series: ex.series,
+            repetitions: ex.repetitions
+        })),
+        assignments: routine.routineAssignments.map(assignment => ({
+            idClient: assignment.client.idClient,
+            assignmentDate: assignment.assignmentDate.toISOString().split('T')[0]
+        }))
+    };
 }

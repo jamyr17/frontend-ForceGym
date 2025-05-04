@@ -9,6 +9,16 @@ export type Role = {
     name: string
 }
 
+export type DifficultyRoutine = {
+    idDifficultyRoutine: number;
+    name: string;
+};
+
+export type ExerciseOption = {
+    value: number;
+    label: string;
+};
+
 export type MeanOfPayment = {
     idMeanOfPayment: number
     name: string
@@ -218,6 +228,9 @@ export type Exercise = {
     idExercise: number;
     name: string;
     description: string;
+    difficulty: string;
+    series: number;
+    repetitions: number;
     exerciseDifficulty: ExerciseDifficulty;
     exerciseCategory: ExerciseCategory;
     paramLoggedIdUser: number;
@@ -242,3 +255,75 @@ export type ClientTypeDataForm = {
     name: string;
     isDeleted: number; 
 }
+
+
+export type RoutineExercise = {
+    idRoutineExercise?: number;
+    exercise: Exercise;
+    series: number;
+    repetitions: number;
+};
+
+export type RoutineAssignment = {
+    idRoutineAssignment?: number;
+    client: Client;
+    assignmentDate: Date;
+};
+
+export type Routine = {
+    idRoutine: number;
+    name: string;
+    date: Date;
+    user: User;
+    difficultyRoutine: DifficultyRoutine;
+    isDeleted: number;
+    createdAt?: Date;
+    createdByUser?: number;
+    updatedAt?: Date;
+    updatedByUser?: number;
+    routineExercises: RoutineExercise[];
+    routineAssignments: RoutineAssignment[];
+};
+
+export type RoutineExerciseDTO = {
+    idExercise: number; 
+    series: number;
+    repetitions: number;
+};
+
+export type RoutineAssignmentDTO = {
+    idClient: number;
+    assignmentDate?: string;
+};
+
+export type RoutineWithExercisesDTO = {
+    idRoutine?: number;
+    name: string;
+    date: string;
+    idUser: number;
+    difficultyRoutine: {
+        idDifficultyRoutine: number;
+    };
+    exercises: RoutineExerciseDTO[];
+    assignments: RoutineAssignmentDTO[];
+    isDeleted: number;
+    paramLoggedIdUser?: number;
+};
+
+export type RoutineDataForm = {
+    idRoutine?: number;
+    name: string;
+    date: string;
+    idDifficultyRoutine: number;
+    idUser: number;
+    isDeleted: number;
+    exercises: {
+        idExercise: number;
+        series: number;
+        repetitions: number;
+    }[];
+    assignments: {
+        idClient: number;
+        assignmentDate?: string;
+    }[];
+};

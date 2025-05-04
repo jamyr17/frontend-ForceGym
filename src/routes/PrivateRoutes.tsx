@@ -18,10 +18,12 @@ import ClientTypeManagement from "../ClientType/Page";
 import ExerciseManagement from "../Exercise/Page";
 import ActivityTypeManagement from "../ActivityType/Page";
 import LandingPage from "../LandingPage/page";
+import RoutineManagement from "../Routine/Page";
+import ClientRoutineManagement from "../Client/Page";
 
 function PrivateRoutes () {
-    // fetchear los datos comunes: roles, tipos de pago, etc. para solo hacerlo 1 vez
-    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty } = useCommonDataStore()
+    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty, fetchDifficultyRoutines, fetchExercise } = useCommonDataStore()
+
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -34,6 +36,9 @@ function PrivateRoutes () {
                 fetchGenders,
                 fetchTypesClient,
                 fetchCategories,
+                fetchNotificationTypes,
+                fetchDifficultyRoutines,
+                fetchExercise,
                 fetchExerciseDifficulty,
                 fetchNotificationTypes
             ];
@@ -141,6 +146,13 @@ function PrivateRoutes () {
                     <ActivityTypeManagement/>
                 }
             />
+            <Route 
+                path="rutinas" 
+                element={
+                    <RoutineManagement/>
+                }
+            />
+
         </Routes>
         </>
     );
