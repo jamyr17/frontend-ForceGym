@@ -73,6 +73,11 @@ export type ExerciseCategory = {
     idExerciseCategory: number
     name: string
 }
+
+export type ExerciseDifficulty = {
+    idExerciseDifficulty: number
+    difficulty: string
+}
 // -----------------------------------------------------
 
 export type Person = {
@@ -226,13 +231,14 @@ export type Exercise = {
     difficulty: string;
     series: number;
     repetitions: number;
+    exerciseDifficulty: ExerciseDifficulty;
     exerciseCategory: ExerciseCategory;
     paramLoggedIdUser: number;
     user: User;
     isDeleted: number;
 };
 
-export type ExerciseDataForm = Omit<Exercise, 'user' | 'exerciseCategory'> & Pick<ExerciseCategory, 'idExerciseCategory'> & Pick<User, 'idUser'>
+export type ExerciseDataForm = Omit<Exercise, 'user' | 'exerciseCategory' | 'exerciseDifficulty'> & Pick<ExerciseCategory, 'idExerciseCategory'> & Pick<ExerciseDifficulty, 'idExerciseDifficulty'> & Pick<User, 'idUser'>
 // --------------------------------------------------------
 export type NotificationTemplate = {
     idNotificationTemplate: number
