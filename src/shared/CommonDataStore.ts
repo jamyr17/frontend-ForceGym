@@ -112,11 +112,13 @@ export const useCommonDataStore = create<CommonDataStore>()(
         fetchDifficultyRoutines: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}difficultyRoutine/list`)
             set(() => ({ difficultyRoutines: result.data }))
-            return result
+            return result;
+        }
+        ,
         fetchExerciseDifficulty: async() => {
             const result = await getData(`${import.meta.env.VITE_URL_API}exercisedifficulty/list`);
             set(() => ({ exerciseDifficulty: result.data }));
             return result;
-        }
+        },
     })
 ))

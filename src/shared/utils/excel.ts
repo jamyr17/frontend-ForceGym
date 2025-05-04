@@ -35,7 +35,6 @@ export const exportToExcel = async (
     ext: { width: 160, height: 63 }
   });
 
-  // Configuración inicial del documento
   worksheet.getRow(1).height = 50; 
   worksheet.getRow(2).height = 16;   
   worksheet.getRow(3).height = 20; 
@@ -79,7 +78,6 @@ export const exportToExcel = async (
     name: 'Arial'
   };
 
-  // Agregar datos del cliente si están disponibles
   if (clientData) {
     const clientRow1 = worksheet.getRow(6);
     clientRow1.getCell(1).value = `Cliente: ${clientData.name}`;
@@ -111,7 +109,6 @@ export const exportToExcel = async (
     worksheet.getRow(6).height = 5;
   }
 
-  // Agregar encabezados de la tabla principal
   const headerRow = worksheet.addRow(tableHeaders);
   headerRow.height = 25;
   headerRow.eachCell((cell) => {
@@ -139,7 +136,6 @@ export const exportToExcel = async (
     };
   });
 
-  // Agregar filas de datos
   tableRows.forEach((rowData) => {
     const row = worksheet.addRow(rowData);
     row.eachCell((cell, colNumber) => {
@@ -170,12 +166,9 @@ export const exportToExcel = async (
     });
   });
 
-  // TABLA DE REFERENCIA MEJORADA (como en la imagen)
-  if (includeReferenceTable) {
-    // Dejar 3 filas de espacio después de los datos
+  if (includeReferenceTable && title.toLowerCase() === "medidas") {
     const startRow = worksheet.rowCount + 3;
     
-    // Encabezados de la tabla de referencia (exactamente como en la imagen)
     const headerLabels = ["", "BAJO", "NORMAL", "ELEVADO", "MUY ELEVADO"];
     const headerRow = worksheet.getRow(startRow);
     
@@ -205,7 +198,6 @@ export const exportToExcel = async (
       };
     });
 
-    // Datos de la tabla de referencia (formato exacto como imagen)
     const referenceData = [
       ["IMC", "<18.5", "18.5 a 25", "25 a 30", "30 o +"],
       ["VISCERAL", "", "<9", "10 a 14", "15 o +"],
@@ -253,7 +245,6 @@ export const exportToExcel = async (
       });
     });
 
-    // Ajustar anchos de columna para la tabla de referencia
     worksheet.getColumn(1).width = 12; // Primera columna más ancha
     for (let i = 2; i <= 5; i++) {
       worksheet.getColumn(i).width = 15; // Columnas de valores

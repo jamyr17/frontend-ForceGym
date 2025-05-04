@@ -126,64 +126,6 @@ export const useMeasurement = () => {
         age: calculateAge(measurements[0].client.person.birthday),
         height: measurements[0].height
     } : null;
-
-    const referenceTables = [
-        {
-            title: "Índice de Masa Corporal (IMC)",
-            headers: ["Categoría", "Rango"],
-            rows: [
-                ["BAJO", "<18.5"],
-                ["NORMAL", "18.5 a 25"],
-                ["ELEVADO", "25 a 30"],
-                ["MUY ELEVADO", "30 o +"]
-            ]
-        },
-        {
-            title: "Grasa Visceral",
-            headers: ["Categoría", "Rango"],
-            rows: [
-                ["NORMAL", "<9"],
-                ["ELEVADO", "10 a 14"],
-                ["MUY ELEVADO", "15 o +"]
-            ]
-        },
-        {
-            title: "Grasa Corporal (%) por Edad y Sexo",
-            headers: ["Edad", "Categoría", "FEM", "MAS"],
-            rows: [
-                ["20-39", "NORMAL", "<21%", "<8%"],
-                ["20-39", "ELEVADO", "21-22.9%", "8-19.9%"],
-                ["20-39", "ALTO", "33-38.9%", "20-24.9%"],
-                ["20-39", "MUY ALTO", ">39%", ">25%"],
-                ["40-59", "NORMAL", "<23%", "<11%"],
-                ["40-59", "ELEVADO", "23-33.9%", "11-21.9%"],
-                ["40-59", "ALTO", "34-39.9%", "22-24.9%"],
-                ["40-59", "MUY ALTO", ">40%", ">28%"],
-                ["60-79", "NORMAL", "<24%", "<13%"],
-                ["60-79", "ELEVADO", "24-35.9%", "13-24.9%"],
-                ["60-79", "ALTO", "36-41.9%", "25-29.9%"],
-                ["60-79", "MUY ALTO", ">42%", ">30%"]
-            ]
-        },
-        {
-            title: "Masa Muscular (M.M) por Edad y Sexo",
-            headers: ["Edad", "Categoría", "FEM", "MAS"],
-            rows: [
-                ["18-39", "BAJO", "<24.3", "<33.3"],
-                ["18-39", "NORMAL", "24.3-30.3", "33.3-39.3"],
-                ["18-39", "ELEVADO", "30.4-35.3", "39.4-44"],
-                ["18-39", "MUY ELEVADO", ">35.4", ">44.1"],
-                ["40-59", "BAJO", "<24.1", "<33.1"],
-                ["40-59", "NORMAL", "24.1-30.1", "33.1-39.1"],
-                ["40-59", "ELEVADO", "30.2-35.1", "39.2-43.8"],
-                ["40-59", "MUY ELEVADO", ">35.2", ">43.9"],
-                ["60-80", "BAJO", "<23.9", "<32.9"],
-                ["60-80", "NORMAL", "23.9-29.9", "32.9-38.9"],
-                ["60-80", "ELEVADO", "30-34.9", "39-43.6"],
-                ["60-80", "MUY ELEVADO", ">35", ">43.7"]
-            ]
-        }
-    ];
     
     const tableColumn = [
         "Fecha",
@@ -202,24 +144,6 @@ export const useMeasurement = () => {
     ];
 
     const tableRows = measurements.map(measurement => {
-        const heightInMeters = measurement.height / 100;
-        
-        const piernaFormat = measurement.leftLegSize && measurement.rightLegSize 
-            ? `${measurement.rightLegSize}/${measurement.leftLegSize}`
-            : "/";
-            
-        const pantorrillaFormat = measurement.leftCalfSize && measurement.rightCalfSize
-            ? `${measurement.rightCalfSize}/${measurement.leftCalfSize}`
-            : "/";
-            
-        const antebrazoFormat = measurement.leftForeArmSize && measurement.rightForeArmSize
-            ? `${measurement.rightForeArmSize}/${measurement.leftForeArmSize}`
-            : "/";
-            
-        const brazoFormat = measurement.leftArmSize && measurement.rightArmSize
-            ? `${measurement.rightArmSize}/${measurement.leftArmSize}`
-            : "/";
-
         return [
             formatDate(new Date(measurement.measurementDate)), // Fecha
             measurement.weight, // Peso
@@ -245,7 +169,6 @@ export const useMeasurement = () => {
         handleRestore,
         tableColumn,
         tableRows,
-        clientData,
-        referenceTables
+        clientData
     };
 };

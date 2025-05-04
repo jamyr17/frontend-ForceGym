@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore } from "react-icons/md";
+import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore, MdOutlineFileDownload } from "react-icons/md";
 import { IoIosMore } from "react-icons/io";
 import Modal from "../shared/components/Modal";
 import { useNavigate } from "react-router";
@@ -9,28 +9,31 @@ import { useRoutineStore } from "./Store";
 import { useRoutine } from "./useRoutine";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
+import FileTypeDecision from "../shared/components/ModalFileType";
 
 function RoutineManagement() {
     const {
         routines,
         modalForm,
         modalInfo,
+        modalFileTypeDecision,
         fetchRoutines,
         getRoutineById,
         showModalForm,
         showModalInfo,
         closeModalForm,
         closeModalInfo,
+        showModalFileType,
+        closeModalFileType
     } = useRoutineStore();
 
-    const { handleDelete, handleRestore } = useRoutine();
+    const { handleDelete, handleRestore, handleExportRoutine } = useRoutine();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fetchRoutines();
-                
                 if (response?.logout) {
                     setAuthHeader(null);
                     setAuthUser(null);
@@ -40,7 +43,7 @@ function RoutineManagement() {
                 console.error("Error fetching routines:", error);
             }
         };
-        
+
         fetchData();
     }, [fetchRoutines, navigate]);
 
@@ -90,7 +93,7 @@ function RoutineManagement() {
                                         <td className="py-2">{routine.name}</td>
                                         <td className="py-2">{routine.difficultyRoutine.name}</td>
                                         <td className="py-2">
-                                            <div className="flex gap-4 justify-center">
+                                            <div className="flex gap-2 justify-center flex-wrap">
                                                 <Modal
                                                     Button={() => (
                                                         <button
@@ -109,6 +112,7 @@ function RoutineManagement() {
                                                     closeModal={closeModalInfo}
                                                     Content={DataInfo}
                                                 />
+
                                                 <button
                                                     onClick={() => {
                                                         getRoutineById(routine.idRoutine);
@@ -119,22 +123,56 @@ function RoutineManagement() {
                                                 >
                                                     <MdModeEdit className="text-white" />
                                                 </button>
-                                                {routine.isDeleted ? (
+
+                                                <button
+                                                    onClick={() => handleDelete(routine)}
+                                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                    title="Eliminar"
+                                                >
+                                                    <MdOutlineDelete className="text-white" />
+                                                </button>
+
+                                                {routine.isDeleted === 1 && (
                                                     <button
                                                         onClick={() => handleRestore(routine)}
                                                         className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                        title="Restaurar"
                                                     >
                                                         <MdOutlineSettingsBackupRestore className="text-white" />
                                                     </button>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => handleDelete(routine)}
-                                                        className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                                        title="Eliminar"
-                                                    >
-                                                        <MdOutlineDelete className="text-white" />
-                                                    </button>
                                                 )}
+
+                                                <Modal
+                                                    Button={() => (
+                                                        <button
+                                                            onClick={() => {
+                                                                getRoutineById(routine.idRoutine);
+                                                                showModalFileType();
+                                                            }}
+                                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                                            title="Exportar"
+                                                        >
+                                                            <MdOutlineFileDownload className="text-white" />
+                                                        </button>
+                                                    )}
+                                                    modal={modalFileTypeDecision}
+                                                    getDataById={getRoutineById}
+                                                    closeModal={closeModalFileType}
+                                                    Content={() => 
+                                                        <FileTypeDecision 
+                                                            modulo="Rutina" 
+                                                            closeModal={closeModalFileType} 
+                                                            exportToPDF={async () => {
+                                                                const result = await handleExportRoutine(routine.idRoutine);
+                                                                result?.exportToPDF();
+                                                            }}
+                                                            exportToExcel={async () => {
+                                                                const result = await handleExportRoutine(routine.idRoutine);
+                                                                result?.exportToExcel();
+                                                            }}
+                                                        />
+                                                    }
+                                                />
                                             </div>
                                         </td>
                                     </tr>
@@ -142,7 +180,7 @@ function RoutineManagement() {
                             </tbody>
                         </table>
                     ) : (
-                        <NoData module="rutinas" />
+                        <NoData text="No hay rutinas disponibles." />
                     )}
                 </div>
             </main>
