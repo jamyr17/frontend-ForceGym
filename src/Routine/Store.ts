@@ -8,24 +8,26 @@ type RoutineStore = {
     routines: Routine[];
     modalForm: boolean;
     modalInfo: boolean;
+    modalFileTypeDecision: boolean;
     activeEditingId: number | null;
     routineToEdit: RoutineWithExercisesDTO | null;
     isLoading: boolean;
     error: string | null;
+    currentRoutine: RoutineWithExercisesDTO  | null;
 
-    // Actions
     fetchRoutines: () => Promise<any>;
-    getRoutineById: (id: number) => Promise<void>; // Cambiado a async
+    getRoutineById: (id: number) => Promise<void>;
     addRoutine: (data: RoutineWithExercisesDTO) => Promise<any>;
     updateRoutine: (data: RoutineWithExercisesDTO) => Promise<any>;
     deleteRoutine: (id: number) => Promise<any>;
     restoreRoutine: (id: number) => Promise<any>;
 
-    // Modal handlers
     showModalForm: (id?: number) => void;
     closeModalForm: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    showModalFileType: () => void; 
+    closeModalFileType: () => void;
 };
 
 const convertRoutineToDTO = (routine: Routine): RoutineWithExercisesDTO => {
@@ -68,8 +70,10 @@ const convertRoutineToDTO = (routine: Routine): RoutineWithExercisesDTO => {
 export const useRoutineStore = create<RoutineStore>()(
     devtools((set, get) => ({
         routines: [],
+        currentRoutine: null,
         modalForm: false,
         modalInfo: false,
+        modalFileTypeDecision: false,
         activeEditingId: null,
         routineToEdit: null,
         isLoading: false,
@@ -92,11 +96,13 @@ export const useRoutineStore = create<RoutineStore>()(
                 return { ok: false };
             }
         },
+        
         getRoutineById: async (id) => {
             if (!id || id <= 0) {
                 set({ 
                     activeEditingId: null,
                     routineToEdit: null,
+                    currentRoutine: null,
                     isLoading: false
                 });
                 return;
@@ -105,8 +111,7 @@ export const useRoutineStore = create<RoutineStore>()(
             set({ isLoading: true });
             try {
                 const result = await getData(`${import.meta.env.VITE_URL_API}routine/${id}`);
-                console.log("Aquiiiiiiiiiiiiiiiiiiiiiii");
-                console.log(result);
+                
                 if (result?.logout) {
                     set({ isLoading: false });
                     return;
@@ -117,6 +122,7 @@ export const useRoutineStore = create<RoutineStore>()(
                 set({ 
                     activeEditingId: id,
                     routineToEdit: routineDTO,
+                    currentRoutine: routineDTO,
                     isLoading: false
                 });
             } catch (error) {
@@ -124,7 +130,8 @@ export const useRoutineStore = create<RoutineStore>()(
                 set({ 
                     error: 'Error al cargar rutina',
                     isLoading: false,
-                    routineToEdit: null
+                    routineToEdit: null,
+                    currentRoutine: null
                 });
             }
         },
@@ -236,6 +243,14 @@ export const useRoutineStore = create<RoutineStore>()(
 
         closeModalInfo: () => {
             set({ modalInfo: false });
+        },
+
+        showModalFileType: () => {
+            set({ modalFileTypeDecision: true });
+        },
+
+        closeModalFileType: () => {
+            set({ modalFileTypeDecision: false });
         }
     }))
 );
