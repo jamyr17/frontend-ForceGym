@@ -19,6 +19,7 @@ import DataInfo from "./DataInfo";
 import FileTypeDecision from "../shared/components/ModalFileType";
 import ExpenseDashboard from './ExpenseDashboard';
 import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function EconomicExpenseManagement() {
     const {
@@ -55,7 +56,7 @@ function EconomicExpenseManagement() {
         closeModalFileType
     } = useEconomicExpenseStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useEconomicExpense()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useEconomicExpense()
     const navigate = useNavigate()
 
     useEffect(() => {}, [economicExpenses])
@@ -123,7 +124,7 @@ function EconomicExpenseManagement() {
                                             modulo="Gastos económicos" 
                                             closeModal={closeModalFileType} 
                                             exportToPDF={() => exportToPDF('Gastos', pdfTableHeaders, pdfTableRows)}
-                                            exportToExcel={exportToExcel}
+                                            exportToExcel={() => exportToExcel('Gastos', pdfTableHeaders, pdfTableRows)}
                                         />
                                     }
                         />  

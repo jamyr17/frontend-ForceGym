@@ -18,6 +18,7 @@ import { FilterButton, FilterSelect } from "./Filter";
 import { formatAmountToCRC } from "../shared/utils/format";
 import FileTypeDecision from "../shared/components/ModalFileType";
 import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function AssetManagement() {
     const {
@@ -52,7 +53,7 @@ function AssetManagement() {
         closeModalFileType
     } = useAssetStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, exportToExcel, pdfTableHeaders, pdfTableRows } = useAsset()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useAsset()
     const navigate = useNavigate()
     
     useEffect(() => {}, [assets])
@@ -120,7 +121,7 @@ function AssetManagement() {
                                     modulo="Activos" 
                                     closeModal={closeModalFileType} 
                                     exportToPDF={() => exportToPDF('Activos', pdfTableHeaders, pdfTableRows)}
-                                    exportToExcel={exportToExcel}
+                                    exportToExcel={() => exportToExcel('Activos', pdfTableHeaders, pdfTableRows)}
                                 />
                             }
                 />  
