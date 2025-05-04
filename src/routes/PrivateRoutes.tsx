@@ -17,9 +17,8 @@ import CategoryManagement from "../Category/Page";
 import ClientTypeManagement from "../ClientType/Page";
 import ExerciseManagement from "../Exercise/Page";
 import ActivityTypeManagement from "../ActivityType/Page";
-import LandingPage from "../LandingPage/page";
 import RoutineManagement from "../Routine/Page";
-import ClientRoutineManagement from "../Client/Page";
+import ExerciseCategoryManagement from "../ExerciseCategory/Page";
 
 function PrivateRoutes () {
     const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty, fetchDifficultyRoutines, fetchExercise } = useCommonDataStore()
@@ -150,6 +149,12 @@ function PrivateRoutes () {
                 path="rutinas" 
                 element={
                     <RoutineManagement/>
+                }
+            />
+            <Route 
+                path="categorias-ejercicios" 
+                element={
+                    <ExerciseCategoryManagement/>
                 }
             />
 

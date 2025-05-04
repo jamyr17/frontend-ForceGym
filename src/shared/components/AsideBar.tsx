@@ -159,6 +159,7 @@ function AsideBar() {
         <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos de Actividad" text="Tipos de Actividad"/>
         <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificación" text="Plantillas de Notificación" />
         <NavItem to="/gestion/rutinas" icon={<GiGymBag  />} title="Rutinas" text="Rutinas" />
+        <NavItem to="/gestion/categorias-ejercicios" icon={<GiGymBag  />} title="Categorías de Ejercicios" text="Categorías de Ejercicios" />
       </div>
     )}
 

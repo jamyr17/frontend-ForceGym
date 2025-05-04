@@ -72,6 +72,7 @@ export type NotificationType = {
 export type ExerciseCategory = {
     idExerciseCategory: number
     name: string
+    isDeleted: number
 }
 
 export type ExerciseDifficulty = {
