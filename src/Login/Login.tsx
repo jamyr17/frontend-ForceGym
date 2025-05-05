@@ -69,7 +69,7 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
 
                         <ReCAPTCHA 
                             ref={recaptcha} 
-                            sitekey={`${import.meta.env.NEXT_PUBLIC__RECAPTCHA_SITE_KEY}`}
+                            sitekey={`${import.meta.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
                         />
 
                         <button 
