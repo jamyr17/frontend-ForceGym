@@ -52,10 +52,10 @@ function Form() {
         };
         
         if (activeEditingId === 0) {
-            result = await addAsset(reqData);
+            result = await addAsset(reqData as AssetDataForm);
             action = 'agregado';
         } else {
-            result = await updateAsset(reqData);
+            result = await updateAsset(reqData as AssetDataForm);
             action = 'editado';
         }
 

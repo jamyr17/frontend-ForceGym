@@ -40,11 +40,9 @@ function Form() {
     setValue, 
     formState: { errors }, 
     reset,
-    watch
   } = useForm<RoutineDataForm>();
   
   const { 
-    routines,
     activeEditingId,
     routineToEdit,
     fetchRoutines, 
@@ -106,7 +104,7 @@ function Form() {
       if (routineToEdit.assignments?.length > 0) {
         const clientOptions = routineToEdit.assignments.map(assignment => ({
           value: assignment.idClient,
-          label: `${assignment.client?.person?.name || ''} ${assignment.client?.person?.firstLastName || ''}`.trim()
+          label: assignment.idClient.toString() // Antes era: `${assignment.client?.person?.name || ''} ${assignment.client?.person?.firstLastName || ''}`.trim(), pero el objeto no contiene el atributo client CORREGIR
         }));
         setSelectedClients(clientOptions);
       }

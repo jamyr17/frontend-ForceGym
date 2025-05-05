@@ -161,11 +161,11 @@ function AssetManagement() {
                                 </button></th>
                                 <th><button
                                     className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
-                                    onClick={() => {handleOrderByChange('cost')}}
+                                    onClick={() => {handleOrderByChange('initialCost')}}
                                 >
                                     COSTO UNITARIO
-                                    {(orderBy==='cost' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
-                                    {(orderBy==='cost' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
+                                    {(orderBy==='initialCost' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
+                                    {(orderBy==='initialCost' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
 
                                 {filterByStatus && <th>ESTADO</th>}

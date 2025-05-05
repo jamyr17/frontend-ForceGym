@@ -26,7 +26,7 @@ export const useUser = () => {
             if (result.isConfirmed) {
 
                 const loggedUser = getAuthUser()
-                const response = await deleteUser(idUser, loggedUser?.idUser)
+                const response = await deleteUser(idUser, loggedUser?.idUser as number)
 
                 if(response.ok){
                     Swal.fire({

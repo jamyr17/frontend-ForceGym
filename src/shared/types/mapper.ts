@@ -1,4 +1,4 @@
-import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, Asset, AssetDataForm, User, UserDataForm, ClientType, Category, CategoryDataForm, Exercise, ExerciseDataForm, Routine, RoutineDataForm} from ".";
+import { Client,ClientTypeDataForm,ClientDataForm, EconomicExpense, EconomicExpenseDataForm, EconomicIncome, EconomicIncomeDataForm, NotificationTemplate, NotificationTemplateDataForm, Measurement, MeasurementDataForm, Asset, AssetDataForm, User, UserDataForm, ClientType, Category, CategoryDataForm, Exercise, ExerciseDataForm, Routine, RoutineDataForm, RoutineWithExercisesDTO} from ".";
 
 export function mapUserToDataForm(user: User): UserDataForm {
     return {
@@ -152,7 +152,10 @@ export function mapExerciseToDataForm(exercise: Exercise): ExerciseDataForm {
     return {
         idExercise: exercise.idExercise,
         name: exercise.name,
+        difficulty: exercise.difficulty,
         description: exercise.description,
+        series: exercise.series,
+        repetitions: exercise.repetitions,
         idExerciseDifficulty: exercise.exerciseDifficulty.idExerciseDifficulty,
         idExerciseCategory: exercise.exerciseCategory.idExerciseCategory,
         paramLoggedIdUser: exercise.paramLoggedIdUser,
@@ -178,5 +181,28 @@ export function mapRoutineToDataForm(routine: Routine): RoutineDataForm {
             idClient: assignment.client.idClient,
             assignmentDate: assignment.assignmentDate.toISOString().split('T')[0]
         }))
+    };
+}
+
+export function mapRoutineToDTO(routine: Routine): RoutineWithExercisesDTO {
+    return {
+        idRoutine: routine.idRoutine,
+        name: routine.name,
+        date: routine.date.toISOString(), // Convertir Date a string ISO
+        idUser: routine.user.idUser,
+        difficultyRoutine: {
+            idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine
+        },
+        exercises: routine.routineExercises.map(re => ({
+            idExercise: re.exercise.idExercise,
+            series: re.series,
+            repetitions: re.repetitions
+        })),
+        assignments: routine.routineAssignments.map(ra => ({
+            idClient: ra.client.idClient,
+            assignmentDate: ra.assignmentDate.toISOString()
+        })),
+        isDeleted: routine.isDeleted,
+        paramLoggedIdUser: routine.createdByUser
     };
 }

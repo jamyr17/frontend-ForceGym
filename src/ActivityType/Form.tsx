@@ -31,10 +31,8 @@ function Form() {
     const { 
         register, 
         handleSubmit, 
-        setValue, 
         formState: { errors }, 
         reset,
-        watch
     } = useForm<ActivityType>({
         mode: 'onChange'
     });

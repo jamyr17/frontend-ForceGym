@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 import Swal from 'sweetalert2';
-import { Client, Measurement, MeasurementDataForm } from "../shared/types";
+import { Measurement, MeasurementDataForm } from "../shared/types";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import useMeasurementStore from "./Store";
 import { useNavigate } from "react-router";
@@ -25,7 +25,7 @@ export const useMeasurement = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser();
-                const response = await deleteMeasurement(idMeasurement, loggedUser?.idUser);
+                const response = await deleteMeasurement(idMeasurement, loggedUser?.idUser as number);
 
                 if(response.ok){
                     Swal.fire({
