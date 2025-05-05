@@ -9,8 +9,6 @@ import { useNavigate } from "react-router";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import EmojiPicker from 'emoji-picker-react';
 
-const MAXLENGTH_MESSAGE = 1027;
-
 function Form() {
     const messageInputRef = useRef<HTMLInputElement>(null);
     const [messageValue, setMessageValue] = useState("");
@@ -23,6 +21,7 @@ function Form() {
     const { notificationTemplates, activeEditingId, fetchNotificationTemplates, addNotificationTemplate, updateNotificationTemplate, closeModalForm } = useNotificationTemplateStore();
 
     const submitForm = async (data: NotificationTemplateDataForm) => {
+        cursorPosition
         data.message = messageValue;
 
         let action = '', result;

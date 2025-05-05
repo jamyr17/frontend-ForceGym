@@ -32,7 +32,7 @@ export const useExercise = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser();
-                const response = await deleteExercise(idExercise, loggedUser?.idUser);
+                const response = await deleteExercise(idExercise, loggedUser?.idUser as number);
 
                 if (response.ok) {
                     Swal.fire({
@@ -91,7 +91,7 @@ export const useExercise = () => {
             reverseButtons: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const response = await updateExercise(reqExercise);
+                const response = await updateExercise(reqExercise as ExerciseDataForm);
 
                 if (response.ok) {
                     Swal.fire({

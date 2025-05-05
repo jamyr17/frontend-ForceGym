@@ -19,7 +19,7 @@ const MAXDATE = new Date().toUTCString();
 function Form() {
     const navigate = useNavigate();
     const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<EconomicIncomeDataForm>();
-    const { onChange } = register('idClient');
+    const { } = register('idClient');
     const { meansOfPayment, activityTypes, allClients, fetchAllClients} = useCommonDataStore();
     const { economicIncomes, activeEditingId, fetchEconomicIncomes, addEconomicIncome, updateEconomicIncome, closeModalForm } = useEconomicIncomeStore();
     

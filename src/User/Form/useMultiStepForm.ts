@@ -16,8 +16,8 @@ export const useMultiStepForm = () => {
 
   const getDefaultValues = (): UserDataForm => ({
     idUser: 0,
-    idRole: "",
-    idGender: "",
+    idRole: 0,
+    idGender: 0,
     idPerson: 0,
     identificationNumber: '',
     name: '',

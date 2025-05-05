@@ -74,10 +74,10 @@ function Form() {
         };
         
         if (activeEditingId === 0) {
-            result = await addEconomicExpense(reqUser);
+            result = await addEconomicExpense(reqUser as EconomicExpenseDataForm);
             action = 'agregado';
         } else {
-            result = await updateEconomicExpense(reqUser);
+            result = await updateEconomicExpense(reqUser as EconomicExpenseDataForm);
             action = 'editado';
         }
 

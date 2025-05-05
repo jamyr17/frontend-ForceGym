@@ -180,7 +180,7 @@ function RoutineManagement() {
                             </tbody>
                         </table>
                     ) : (
-                        <NoData text="No hay rutinas disponibles." />
+                        <NoData module="No hay rutinas disponibles." />
                     )}
                 </div>
             </main>

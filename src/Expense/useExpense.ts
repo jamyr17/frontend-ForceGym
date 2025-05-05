@@ -25,7 +25,7 @@ export const useEconomicExpense = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteEconomicExpense(idEconomicExpense, loggedUser?.idUser)
+                const response = await deleteEconomicExpense(idEconomicExpense, loggedUser?.idUser as number)
 
                 if(response.ok){
                     Swal.fire({

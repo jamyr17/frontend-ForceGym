@@ -2,9 +2,10 @@ import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { IoIosClose } from "react-icons/io";
 import useNotificationTemplateStore from "../../TemplateNotification/Store";
-import { NotificationTemplate, Client } from "../../types";
+import { NotificationTemplate  } from "../types";
 import { postData } from "../services/gym";
 import Swal from 'sweetalert2';
+import { ClientNotification } from "./NotificationsModal";
 
 const gymColors = {
   primary: "#cfad04",
@@ -14,9 +15,9 @@ const gymColors = {
 };
 
 interface NotificationTemplateModalProps {
-  clients: Client[];
+  clients: ClientNotification[];
   notificationType: string; // Nuevo prop para identificar el tipo de notificación
-  onSend: (templateId: number, message: string, client: Client) => Promise<void>;
+  onSend: (message: string, client: ClientNotification) => Promise<void>;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -32,9 +33,9 @@ export function NotificationTemplateModal({
   const [selectedTemplate, setSelectedTemplate] = useState<NotificationTemplate | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [selectedClientId, setSelectedClientId] = useState<number | "">("");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [isSending, setIsSending] = useState(false);
-  const [availableClients, setAvailableClients] = useState<Client[]>([]);
+  const [availableClients, setAvailableClients] = useState<ClientNotification[]>([]);
 
   // Filtrar clientes disponibles cuando se abre
   useEffect(() => {
@@ -79,7 +80,6 @@ export function NotificationTemplateModal({
     setIsSending(true);
     try {
       await onSend(
-        selectedTemplate.idNotificationTemplate,
         message,
         selectedClient
       );
@@ -174,7 +174,7 @@ export function NotificationTemplateModal({
                   <select
                     className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                     style={{ borderColor: gymColors.primary }}
-                    onChange={(e) => setSelectedClientId(Number(e.target.value))}
+                    onChange={(e) => setSelectedClientId(e.target.value)}
                     value={selectedClientId}
                     disabled={availableClients.length === 0}
                   >

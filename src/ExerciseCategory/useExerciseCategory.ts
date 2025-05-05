@@ -23,7 +23,7 @@ export const useExerciseCategory = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteExerciseCategory(idExerciseCategory, loggedUser?.idUser)
+                const response = await deleteExerciseCategory(idExerciseCategory, loggedUser?.idUser as number)
 
                 if(response.ok){
                     Swal.fire({

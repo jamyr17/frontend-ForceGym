@@ -23,11 +23,11 @@ export const exportToExcel = async (
   const user = getAuthUser();
   const userName = `${user?.person.name} ${user?.person.firstLastName} ${user?.person.secondLastName}`;
 
-  const logoPath = "/Logo.webp";
+  const logoPath = "/Logo.png";
   const logoBuffer = await fetch(logoPath).then((res) => res.arrayBuffer());
   const logoImage = await workbook.addImage({
     buffer: logoBuffer,
-    extension: "webp",
+    extension: "png",
   });
   
   worksheet.addImage(logoImage, {
@@ -157,7 +157,7 @@ export const exportToExcel = async (
 
       if (colNumber === 1 && typeof cell.value === "number") {
         cell.numFmt = '0'; 
-        cell.value = parseInt(cell.value); 
+        cell.value = parseInt(cell.value.toString()); 
       }
       else if (typeof cell.value === "number") {
         cell.numFmt = '#,##0.00';
@@ -258,7 +258,7 @@ export const exportToExcel = async (
     let maxLength = customWidth || 15;
     
     if (!customWidth) {
-      column.eachCell({ includeEmpty: true }, (cell) => {
+      column.eachCell?.({ includeEmpty: true }, (cell) => {
         const columnLength = cell.value ? cell.value.toString().length + 2 : 10;
         if (columnLength > maxLength) {
           maxLength = columnLength;
