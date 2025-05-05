@@ -59,7 +59,7 @@ function MeasurementManagement() {
         }
     }, [idClient]);
 
-    const { handleDelete, handleOrderByChange, handleRestore, tableColumn, tableRows, clientData} = useMeasurement();
+    const { handleDelete, handleOrderByChange, handleRestore, tableColumn, tableRows} = useMeasurement();
     
     useEffect(() => {}, [measurements]);
     
@@ -121,7 +121,7 @@ function MeasurementManagement() {
                                                     modulo="Medidas corporales" 
                                                     closeModal={closeModalFileType} 
                                                     exportToPDF={() => exportToPDF('Medidas', tableColumn, tableRows)}
-                                                    exportToExcel={() => exportToExcel('Medidas', tableColumn, tableRows, true, clientData)}
+                                                    exportToExcel={() => exportToExcel('Medidas', tableColumn, tableRows, true)}
                                 />}
                             />
                         </div>
