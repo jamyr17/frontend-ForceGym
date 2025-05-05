@@ -1,6 +1,10 @@
-import { PropsWithChildren } from "react";
+import { ReactNode } from "react";
 
-function ErrorForm({ children } : PropsWithChildren) {
+interface ErrorFormProps {
+    children?: ReactNode;
+}
+
+function ErrorForm({ children }: ErrorFormProps) {
     return ( 
         <p className="text-red-600 text-sm">
             {children}

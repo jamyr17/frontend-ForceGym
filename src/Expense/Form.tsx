@@ -6,28 +6,72 @@ import { useCommonDataStore } from "../shared/CommonDataStore";
 import useEconomicExpenseStore from "./Store";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { formatDate } from "../shared/utils/format";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { formatDate } from "../shared/utils/format";
 
-const MAXLENGTH_VOUCHER = 100
-const MAXLENGTH_DETAIL = 100
-const MAXDATE = new Date().toUTCString()
+const MAXLENGTH_VOUCHER = 100;
+const MAXLENGTH_DETAIL = 100;
+//const MAXDATE = new Date().toLocaleDateString('sv-SE');
+const CASH_PAYMENT_ID = 2; 
+const MAXDATE = new Date().toUTCString();
 
 function Form() {
     const navigate = useNavigate();
-    const { meansOfPayment } = useCommonDataStore();
+    const { meansOfPayment, categories } = useCommonDataStore();
     const { register, handleSubmit, setValue, formState: { errors }, reset, watch } = useForm<EconomicExpenseDataForm>();
     const { economicExpenses, activeEditingId, fetchEconomicExpenses, addEconomicExpense, updateEconomicExpense, closeModalForm } = useEconomicExpenseStore();
+    
+    // Observamos los valores del formulario
     const idMeanOfPayment = watch("idMeanOfPayment") ? Number(watch("idMeanOfPayment")) : null;
+    const voucherNumber = watch("voucherNumber");
+    const amount = watch("amount");
+    const isCashPayment = idMeanOfPayment === CASH_PAYMENT_ID;
 
     const submitForm = async (data: EconomicExpenseDataForm) => {
+        // Validación para comprobante con efectivo
+        if (isCashPayment && data.voucherNumber) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se puede ingresar número de comprobante cuando el medio de pago es Efectivo',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Validación para fecha futura
+        const selectedDate = new Date(data.registrationDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Eliminamos la hora para comparar solo fechas
+        
+        if (selectedDate > today) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pueden registrar gastos con fecha futura',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Validación para monto negativo o cero
+        if (data.amount <= 0) {
+            Swal.fire({
+                title: 'Error',
+                text: 'El monto debe ser mayor a cero',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
         let action = '', result;
-        const loggedUser = getAuthUser()
+        const loggedUser = getAuthUser();
         const reqUser = {
             ...data, 
             idUser: loggedUser?.idUser, 
             paramLoggedIdUser: loggedUser?.idUser
-        }
+        };
         
         if (activeEditingId === 0) {
             result = await addEconomicExpense(reqUser);
@@ -37,17 +81,17 @@ function Form() {
             action = 'editado';
         }
 
-        closeModalForm()
-        reset()
+        closeModalForm();
+        reset();
         
         if (result.ok) {
-            const result2 = await fetchEconomicExpenses()
+            const result2 = await fetchEconomicExpenses();
             
             if(result2.logout){
-                setAuthHeader(null)
-                setAuthUser(null)
-                navigate('/login', {replace: true})
-            }else{
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', {replace: true});
+            } else {
                 await Swal.fire({
                     title: `Gasto económico ${action}`,
                     text: `Se ha ${action} el gasto`,
@@ -57,31 +101,45 @@ function Form() {
                     timerProgressBar: true,
                     width: 500,
                     confirmButtonColor: '#CFAD04'
-                })
+                });
             }
-
-        }else if(result.logout){
-            setAuthHeader(null)
-            setAuthUser(null)
-            navigate('/login')
+        } else if(result.logout) {
+            setAuthHeader(null);
+            setAuthUser(null);
+            navigate('/login');
         }
     };
 
     useEffect(() => {
         if (activeEditingId) {
-            const activeIncome = economicExpenses.find(income => income.idEconomicExpense === activeEditingId)
-            if (activeIncome) {
-                setValue('idEconomicExpense', activeIncome.idEconomicExpense)
-                setValue('idUser', activeIncome.user.idUser)
-                setValue('isDeleted', activeIncome.isDeleted)
-                setValue('registrationDate', activeIncome.registrationDate)
-                setValue('amount', activeIncome.amount)
-                setValue('detail', activeIncome.detail)
-                setValue('voucherNumber', activeIncome.voucherNumber)
-                setValue('idMeanOfPayment', activeIncome.meanOfPayment.idMeanOfPayment)
+            const activeExpense = economicExpenses.find(expense => expense.idEconomicExpense === activeEditingId);
+            if (activeExpense) {
+                setValue('idEconomicExpense', activeExpense.idEconomicExpense);
+                setValue('idUser', activeExpense.user.idUser);
+                setValue('isDeleted', activeExpense.isDeleted);
+                setValue('registrationDate', activeExpense.registrationDate);
+                setValue('amount', activeExpense.amount);
+                setValue('detail', activeExpense.detail);
+                setValue('voucherNumber', activeExpense.voucherNumber);
+                setValue('idMeanOfPayment', activeExpense.meanOfPayment.idMeanOfPayment);
+                setValue('idCategory', activeExpense.category.idCategory);
             }
         }
     }, [activeEditingId]);
+
+    // Efecto para limpiar el voucherNumber cuando se selecciona Efectivo
+    useEffect(() => {
+        if (isCashPayment && voucherNumber) {
+            setValue('voucherNumber', '');
+        }
+    }, [isCashPayment, voucherNumber]);
+
+    // Efecto para prevenir valores negativos en el monto
+    useEffect(() => {
+        if (amount !== undefined && amount < 0) {
+            setValue('amount', 0);
+        }
+    }, [amount]);
 
     return (
         <form 
@@ -110,6 +168,31 @@ function Form() {
                 {...register('isDeleted')}
             />
 
+            <div className="my-5">
+                <label htmlFor="idCategory" className="text-sm uppercase font-bold">
+                    Categoría
+                </label>
+                <select
+                    id="idCategory"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idCategory", {
+                        required: 'La categoría es obligatoria'
+                    })}  
+                >
+                    <option value="">Seleccione una categoría</option>
+                    {categories.map((category) => (
+                        <option key={category.idCategory} value={category.idCategory}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+                {errors.idCategory && 
+                    <ErrorForm>
+                        {errors.idCategory.message}
+                    </ErrorForm>
+                }
+            </div>
+
             <div className="mb-5">
                 <label htmlFor="registrationDate" className="text-sm uppercase font-bold">
                     Fecha
@@ -119,20 +202,14 @@ function Form() {
                     className="w-full p-3 border border-gray-100"  
                     type="date" 
                     {...register('registrationDate', {
-                        required: 'La fecha es obligatoria',
+                        required: 'La fecha de registro es obligatoria',
                         max: {
-                            value: MAXDATE,
-                            message: `Debe ingresar una fecha de máximo ${formatDate(new Date())}`
+                        value: MAXDATE,
+                        message: `Debe ingresar una fecha de registro de máximo ${formatDate(new Date())}`
                         }
                     })}
-                />
-
-                {/* mostrar errores del input de la fecha */}
-                {errors.registrationDate && 
-                    <ErrorForm>
-                        {errors.registrationDate.message}
-                    </ErrorForm>
-                }
+                    />
+                {errors.registrationDate && <ErrorForm>{errors.registrationDate.message?.toString()}</ErrorForm>}
             </div>
 
             <div className="mb-5">
@@ -141,19 +218,24 @@ function Form() {
                 </label>
                 <input  
                     id="voucherNumber"
-                    className="w-full p-3 border border-gray-100"  
+                    className={`w-full p-3 border ${isCashPayment ? 'bg-gray-100' : 'border-gray-100'}`}  
                     type="text" 
-                    placeholder="Ingrese el voucher" 
+                    placeholder={isCashPayment ? 'No aplica para efectivo' : 'Ingrese el voucher'} 
+                    disabled={isCashPayment}
                     {...register('voucherNumber', {
-                        required: idMeanOfPayment === 1 ? 'El voucher es obligatorio' : false,
+                        required: isCashPayment ? false : 'El voucher es obligatorio',
                         maxLength: {
                             value: MAXLENGTH_VOUCHER,
                             message: `Debe ingresar un voucher de máximo ${MAXLENGTH_VOUCHER} carácteres`
+                        },
+                        validate: (value) => {
+                            if (isCashPayment && value) {
+                                return 'No se puede ingresar voucher con pago en efectivo';
+                            }
+                            return true;
                         }
                     })}
                 />
-
-                {/* mostrar errores del input deL voucher */}
                 {errors.voucherNumber && 
                     <ErrorForm>
                         {errors.voucherNumber.message}
@@ -178,8 +260,6 @@ function Form() {
                         }
                     })}
                 />
-
-                {/* mostrar errores del input del detalle */}
                 {errors.detail && 
                     <ErrorForm>
                         {errors.detail.message}
@@ -194,14 +274,22 @@ function Form() {
                 <select
                     id="idMeanOfPayment"
                     className="w-full p-3 border border-gray-100" 
-                    {...register("idMeanOfPayment")}  
+                    {...register("idMeanOfPayment", {
+                        required: 'El medio de pago es obligatorio'
+                    })}  
                 >
-                    {meansOfPayment.map((meanOfPayment)=> (
+                    <option value="">Seleccione un medio de pago</option>
+                    {meansOfPayment.map((meanOfPayment) => (
                         <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
                             {meanOfPayment.name}
                         </option>
                     ))}
                 </select>
+                {errors.idMeanOfPayment && 
+                    <ErrorForm>
+                        {errors.idMeanOfPayment.message}
+                    </ErrorForm>
+                }
             </div>
 
             <div className="mb-5">
@@ -212,17 +300,28 @@ function Form() {
                     id="amount"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
+                    min="0"
+                    step="1"
                     placeholder="Ingrese el monto" 
-                    {...register('amount', {
-                        required: 'El monto es obligatorio', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un monto válido`
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                    }}
+                    onKeyDown={(e) => {
+                        // Prevenir la entrada de caracteres no deseados
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                            e.preventDefault();
                         }
+                    }}
+                    {...register('amount', {
+                        required: 'El monto es obligatorio',
+                        min: {
+                            value: 0,
+                            message: 'El monto debe ser mayor a cero'
+                        },
+                        valueAsNumber: true
                     })}
                 />
-
-                {/* mostrar errores del input del monto */}
                 {errors.amount && 
                     <ErrorForm>
                         {errors.amount.message}
@@ -230,7 +329,11 @@ function Form() {
                 }
             </div>
 
-            <input type="submit" className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors" value={activeEditingId ? 'Actualizar' : 'Registrar'} />
+            <input 
+                type="submit" 
+                className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors" 
+                value={activeEditingId ? 'Actualizar' : 'Registrar'} 
+            />
         </form> 
     );
 }

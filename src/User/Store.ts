@@ -40,6 +40,8 @@ type UserStore = {
     closeModalFilter: () => void
     showModalInfo: () => void
     closeModalInfo: () => void
+
+    clearAllFilters: () => void;
 }
 
 const useUserStore = create<UserStore>()(
@@ -58,6 +60,13 @@ const useUserStore = create<UserStore>()(
         searchTerm: '',
         filterByStatus: '',
         filterByRole: '',
+
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByRole: '',
+        })),
+
 
         fetchUsers: async () => {
             // Obtener el estado actual usando get()

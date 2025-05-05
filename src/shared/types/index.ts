@@ -1,6 +1,7 @@
 export type CredencialUser = {
     username: string
     password: string
+    recaptchaToken: string
 }
 
 export type Role = {
@@ -8,16 +9,51 @@ export type Role = {
     name: string
 }
 
+export type DifficultyRoutine = {
+    idDifficultyRoutine: number;
+    name: string;
+};
+
+export type ExerciseOption = {
+    value: number;
+    label: string;
+};
+
 export type MeanOfPayment = {
     idMeanOfPayment: number
     name: string
 }
 
+export type Fee = {
+    idClientType: ClientType['idClientType'][]
+    amount: number
+}
+
 export type ActivityType = {
     idActivityType: number
     name: string
+    fees: Fee[]
+    isDeleted: number
 }
 
+export type Gender = {
+    idGender: number
+    name: string
+}
+
+export type Category = {
+    idCategory: number
+    name: string
+    user: User
+    isDeleted: number
+}
+export type CategoryDataForm = Omit<Category, 'user'> & Pick<User, 'idUser'>
+
+export type ClientType = {  
+    idClientType: number
+    name: string
+    isDeleted: number
+}
 export type TypeClient = {
     idTypeClient: number
     name: string
@@ -28,6 +64,21 @@ export type TypeClient = {
     isDeleted: number
 }
 
+export type NotificationType = {
+    idNotificationType: number
+    name: string
+}
+
+export type ExerciseCategory = {
+    idExerciseCategory: number
+    name: string
+    isDeleted: number
+}
+
+export type ExerciseDifficulty = {
+    idExerciseDifficulty: number
+    difficulty: string
+}
 // -----------------------------------------------------
 
 export type Person = {
@@ -39,7 +90,7 @@ export type Person = {
     identificationNumber: string
     email: string
     phoneNumber: string
-    gender: string
+    gender: Gender
 }
 
 export type User = {
@@ -51,7 +102,8 @@ export type User = {
     token: string
 }
 
-export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Person & {
+export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Omit<Person, 'gender'> & {
+    idGender: number
     password: string
     confirmPassword: string
 }
@@ -60,41 +112,52 @@ export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pic
 
 export type EconomicIncome = {
     idEconomicIncome: number
-    user: User
+    client: Client
     registrationDate: Date
     voucherNumber: string
     detail: string
     meanOfPayment: MeanOfPayment
     amount: number
     activityType: ActivityType
+    hasDelay: boolean
+    delayDays: number | null
     isDeleted: number
 }
 
-export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType'> & Pick<User, 'idUser'> & {
+export type EconomicIncomeDataForm = Omit<EconomicIncome, 'user' | 'meanOfPayment' | 'activityType' | "client"> & Pick<Client, 'idClient'> & {
     idMeanOfPayment: MeanOfPayment['idMeanOfPayment']
     idActivityType: ActivityType['idActivityType']
+    hasDelay: boolean
 }
 
-export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome"> & {
+export type EconomicExpense = Omit<EconomicIncome, "activityType" | "idEconomicIncome" | "client" | "delayDays" | "hasDelay"> & {
+    user: User
     idEconomicExpense: number
+    category: Category
 }
 
-export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome"> & Pick<EconomicExpense, 'idEconomicExpense'>
+export type EconomicExpenseDataForm = Omit<EconomicIncomeDataForm, 'idActivityType' | "idEconomicIncome" | "idClient" | "delayDays" | "hasDelay"> & Omit<EconomicExpense, "meanOfPayment" | "category" | "user">
+    & Pick<EconomicExpense, 'idEconomicExpense'> & {
+        idUser: number
+        idCategory: number
+    }
 
 // -----------------------------------------------------
 
-export type ProductInventory = {
-    idProductInventory: number
+export type Asset = {
+    idAsset: number
+    boughtDate: Date
     user: User
     code: string
     name: string
     quantity: number
-    cost: number
+    initialCost: number
+    serviceLifeYears: number
+    deprecationPerYear: number
     isDeleted: number
 }
 
-export type ProductInventoryDataForm = Omit<ProductInventory, 'user'> & Pick<User, 'idUser'>
-
+export type AssetDataForm = Omit<Asset, "user" | "deprecationPerYear"> & Pick<User, "idUser">
 // --------------------------------------------------------
 export type HealthQuestionnaire = Pick<Client, 'idClient'> & {
     idHealthQuestionnaire: number
@@ -115,10 +178,153 @@ export type Client = {
     typeClient: TypeClient
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
-    emergencyContact: string
+    expirationMembershipDate: string | Date
+    phoneNumberContactEmergency: string
+    nameEmergencyContact: string
     signatureImage: string
     isDeleted: number
 }
+// --------------------------------------------------------
+export type Measurement = {
+    idClient: number
+    idMeasurement: number
+    client: Client
+    measurementDate: Date
+    weight: number
+    height: number
+    muscleMass: number
+    bodyFatPercentage: number 
+    visceralFatPercentage: number
+    chestSize: number
+    backSize: number
+    hipSize: number
+    waistSize: number
+    leftLegSize: number
+    rightLegSize: number
+    leftCalfSize: number
+    rightCalfSize: number
+    leftForeArmSize: number
+    rightForeArmSize: number
+    leftArmSize: number
+    rightArmSize: number
+    isDeleted: number
+}
 
-export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'> & HealthQuestionnaire & Person & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'>
+export type MeasurementDataForm = Omit<Measurement, 'client'> & {
+    idClient: number
+}
 
+export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'| 'registrationDate'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
+    idGender: number
+    registrationDate: string | Date
+}
+
+export type ClientOptions = {
+    value: number
+    label: string
+    idClientType: number
+}
+// --------------------------------------------------------
+export type Exercise = {
+    idExercise: number;
+    name: string;
+    description: string;
+    difficulty: string;
+    series: number;
+    repetitions: number;
+    exerciseDifficulty: ExerciseDifficulty;
+    exerciseCategory: ExerciseCategory;
+    paramLoggedIdUser: number;
+    user: User;
+    isDeleted: number;
+};
+
+export type ExerciseDataForm = Omit<Exercise, 'user' | 'exerciseCategory' | 'exerciseDifficulty'> & Pick<ExerciseCategory, 'idExerciseCategory'> & Pick<ExerciseDifficulty, 'idExerciseDifficulty'> & Pick<User, 'idUser'>
+// --------------------------------------------------------
+export type NotificationTemplate = {
+    idNotificationTemplate: number
+    user: User
+    message: string
+    notificationType: NotificationType
+    isDeleted: number
+}
+
+export type NotificationTemplateDataForm = Omit<NotificationTemplate, 'user' | 'notificationType'> & Pick<NotificationType, 'idNotificationType'> & Pick<User, 'idUser'>
+
+export type ClientTypeDataForm = {
+    idClientType: number;
+    name: string;
+    isDeleted: number; 
+}
+
+
+export type RoutineExercise = {
+    idRoutineExercise?: number;
+    exercise: Exercise;
+    series: number;
+    repetitions: number;
+};
+
+export type RoutineAssignment = {
+    idRoutineAssignment?: number;
+    client: Client;
+    assignmentDate: Date;
+};
+
+export type Routine = {
+    idRoutine: number;
+    name: string;
+    date: Date;
+    user: User;
+    difficultyRoutine: DifficultyRoutine;
+    isDeleted: number;
+    createdAt?: Date;
+    createdByUser?: number;
+    updatedAt?: Date;
+    updatedByUser?: number;
+    routineExercises: RoutineExercise[];
+    routineAssignments: RoutineAssignment[];
+};
+
+export type RoutineExerciseDTO = {
+    idExercise: number; 
+    series: number;
+    repetitions: number;
+};
+
+export type RoutineAssignmentDTO = {
+    idClient: number;
+    assignmentDate?: string;
+};
+
+export type RoutineWithExercisesDTO = {
+    idRoutine?: number;
+    name: string;
+    date: string;
+    idUser: number;
+    difficultyRoutine: {
+        idDifficultyRoutine: number;
+    };
+    exercises: RoutineExerciseDTO[];
+    assignments: RoutineAssignmentDTO[];
+    isDeleted: number;
+    paramLoggedIdUser?: number;
+};
+
+export type RoutineDataForm = {
+    idRoutine?: number;
+    name: string;
+    date: string;
+    idDifficultyRoutine: number;
+    idUser: number;
+    isDeleted: number;
+    exercises: {
+        idExercise: number;
+        series: number;
+        repetitions: number;
+    }[];
+    assignments: {
+        idClient: number;
+        assignmentDate?: string;
+    }[];
+};

@@ -1,4 +1,4 @@
-import { formatAmountToCRC, formatDate } from "../shared/utils/format";
+import { formatAmountToCRC, formatDate, formatNullable } from "../shared/utils/format";
 import useClientStore from "./Store";
 import { CiCircleCheck } from "react-icons/ci";
 import { MdOutlineCancel } from "react-icons/md";
@@ -30,6 +30,11 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
+                    <p><strong>GÉNERO</strong></p>
+                    <p>{client.person.gender.name}</p>
+                </div>
+
+                <div className="flex flex-col gap-2 text-lg">
                     <p><strong>FECHA DE NACIMIENTO</strong></p>
                     <p>{formatDate(new Date(client.person.birthday))}</p>
                 </div>
@@ -45,13 +50,14 @@ function DataInfo() {
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>EMERGENCIA</strong></p>
-                    <p>{client.emergencyContact}</p>
+                    <p><strong>NÚMERO DEL CONTACTO DE EMERGENCIA</strong></p>
+                    <p>{formatNullable(client.phoneNumberContactEmergency)}</p>
                 </div>
 
+                
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>EMAIL</strong></p>
-                    <p>{client.person.email}</p>
+                    <p><strong>NOMBRE DEL CONTACTO EMERGENCIA</strong></p>
+                    <p>{formatNullable(client.nameEmergencyContact)}</p>
                 </div>
                 
             </div>
@@ -138,7 +144,7 @@ function DataInfo() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">TIPO DE CLIENTE</h1>
+                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">TIPO</h1>
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE</strong></p>

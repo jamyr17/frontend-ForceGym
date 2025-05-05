@@ -16,6 +16,10 @@ import { useNavigate } from "react-router";
 import { useEconomicExpense } from "./useExpense";
 import Form from "./Form";
 import DataInfo from "./DataInfo";
+import FileTypeDecision from "../shared/components/ModalFileType";
+import ExpenseDashboard from './ExpenseDashboard';
+import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function EconomicExpenseManagement() {
     const {
@@ -23,6 +27,7 @@ function EconomicExpenseManagement() {
         modalForm,
         modalFilter,
         modalInfo,
+        modalFileTypeDecision,
         page,
         size,
         totalRecords,
@@ -36,6 +41,7 @@ function EconomicExpenseManagement() {
         filterByDateRangeMin,
         filterByDateRangeMax,
         filterByMeanOfPayment,
+        filterByCategory,
         fetchEconomicExpenses,
         getEconomicExpenseById,
         changePage,
@@ -46,9 +52,11 @@ function EconomicExpenseManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
+        showModalFileType, 
+        closeModalFileType
     } = useEconomicExpenseStore()
 
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicExpense()
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useEconomicExpense()
     const navigate = useNavigate()
 
     useEffect(() => {}, [economicExpenses])
@@ -66,10 +74,10 @@ function EconomicExpenseManagement() {
             }
             
             fetchData()
-        }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment ])
+        }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByCategory ])
 
     return ( 
-        <div className="bg-black h-full w-full">
+        <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">GASTOS</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
@@ -97,21 +105,39 @@ function EconomicExpenseManagement() {
                             closeModal={closeModalForm}
                             Content={Form}
                         />
-
-                        {economicExpenses?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
-                        </button>
-                        }
+                        
+                    {economicExpenses?.length > 0 && (
+                    <div className="flex gap-2">
+                        <Modal
+                            Button={() => (
+                                <button 
+                                    onClick={showModalFileType}
+                                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                    <MdOutlineFileDownload /> Descargar
+                                </button>
+                            )}
+                            modal={modalFileTypeDecision}
+                            getDataById={getEconomicExpenseById}
+                            closeModal={closeModalFileType}
+                            Content={() => 
+                                        <FileTypeDecision 
+                                            modulo="Gastos económicos" 
+                                            closeModal={closeModalFileType} 
+                                            exportToPDF={() => exportToPDF('Gastos', pdfTableHeaders, pdfTableRows)}
+                                            exportToExcel={() => exportToExcel('Gastos', pdfTableHeaders, pdfTableRows)}
+                                        />
+                                    }
+                        />  
                     </div>
-                    
+                    )} 
+                </div> 
                     {economicExpenses?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('voucherNumber')}}
                                 >
                                     VOUCHER  
@@ -136,13 +162,13 @@ function EconomicExpenseManagement() {
                                 </button></th>
 
                                 <th>MÉTODO DE PAGO</th>
+                                <th>CATEGORÍA</th>
                                 {filterByStatus && <th>ESTADO</th>}
 
                                 <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
-                        
                             {economicExpenses?.map((economicExpense, index) => (
                             <tr key={economicExpense.idEconomicExpense} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
@@ -150,6 +176,7 @@ function EconomicExpenseManagement() {
                                 <td className="py-2">{formatDate(new Date(economicExpense.registrationDate))}</td>
                                 <td className="py-2">{formatAmountToCRC(economicExpense.amount)}</td>
                                 <td className="py-2">{economicExpense.meanOfPayment.name}</td>
+                                <td className="py-2">{economicExpense.category.name}</td>
                                 {filterByStatus && (
                                 <td>
                                     {economicExpense.isDeleted ? (
@@ -167,7 +194,7 @@ function EconomicExpenseManagement() {
                                                 getEconomicExpenseById(economicExpense.idEconomicExpense);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -182,30 +209,51 @@ function EconomicExpenseManagement() {
                                         getEconomicExpenseById(economicExpense.idEconomicExpense);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {economicExpense.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapEconomicExpenseToDataForm(economicExpense))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapEconomicExpenseToDataForm(economicExpense))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(economicExpense)} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleDelete(economicExpense)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Eliminar">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}
                                 </td>
                             </tr>
                             ))}
-
                         </tbody>
                     </table>
                     ) : 
                     (
                         <NoData module="gastos económicos" />
                     )}
+
+
+                    {economicExpenses?.length > 0 && (
+                        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-lg font-bold">Total de Gastos: 
+                                {economicExpenses.reduce((total, item) => total + item.amount, 0).toLocaleString('es-CR', {
+                                })} CRC
+                                </h3>
+                            </div>
+                        </div>
+                    )}
+
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
+                    {economicExpenses?.length > 0 && (
+                    <>
+                        <hr className="my-6 border-black border-t-6" />
+                        <ExpenseDashboard economicExpenses={economicExpenses} />
+                    </>
+                    )}
+
                 </div>
             </main>
         </div>

@@ -3,12 +3,15 @@ import { devtools } from "zustand/middleware";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
 import { Client, ClientDataForm } from "../shared/types";
 import { formatDateForParam } from "../shared/utils/format";
+import { format } from 'date-fns';
+import { isCompleteDate } from "../shared/utils/validation";
 
 type ClientStore = {
     clients: Client[];
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
+    modalFileTypeDecision: boolean;
     activeEditingId: Client['idClient'];
     size: number;
     page: number;
@@ -59,6 +62,10 @@ type ClientStore = {
     closeModalFilter: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    showModalFileType: () => void;
+    closeModalFileType: () => void;
+    
+    clearAllFilters: () => void;
 };
 
 export const useClientStore = create<ClientStore>()(
@@ -67,6 +74,7 @@ export const useClientStore = create<ClientStore>()(
         modalForm: false,
         modalFilter: false,
         modalInfo: false,
+        modalFileTypeDecision: false,
         activeEditingId: 0,
         size: 5,
         page: 1,
@@ -85,7 +93,24 @@ export const useClientStore = create<ClientStore>()(
         filterByBreathingIssues: null,
         filterByBirthDateRangeMax: null,
         filterByBirthDateRangeMin: null,
-        filterByClientType: 0,
+        filterByClientType: -1,
+
+        
+        clearAllFilters: () => set(() => ({
+            searchTerm: '',
+            filterByStatus: '',
+            filterByDiabetes: null,
+            filterByHypertension: null,
+            filterByMuscleInjuries: null,       
+            filterByBoneJointIssues: null,
+            filterByBalanceLoss: null,
+            filterByCardiovascularDisease: null,
+            filterByBreathingIssues: null,
+            filterByBirthDateRangeMax: null,
+            filterByBirthDateRangeMin: null,
+            filterByClientType: -1,
+        })),
+
 
         fetchClients: async () => {
             const state = useClientStore.getState();
@@ -124,6 +149,17 @@ export const useClientStore = create<ClientStore>()(
             }
             if (state.filterByBirthDateRangeMax !== null && state.filterByBirthDateRangeMin !== null) {
                 filters += `&filterByDateBirthStart=${formatDateForParam(state.filterByBirthDateRangeMin)}&filterByDateBirthEnd=${formatDateForParam(state.filterByBirthDateRangeMax)}`;
+            }
+            if (
+                isCompleteDate(state.filterByBirthDateRangeMax) &&
+                isCompleteDate(state.filterByBirthDateRangeMin)
+            ) {
+                const formattedDateMax = format(state.filterByBirthDateRangeMax!, 'yyyy-MM-dd');
+                const formattedDateMin = format(state.filterByBirthDateRangeMin!, 'yyyy-MM-dd');
+                filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
+            }
+            if(state.filterByClientType != 0){
+                filters += `&filterByTypeClient=${state.filterByClientType}`;
             }
 
             const result = await getData(
@@ -183,7 +219,9 @@ export const useClientStore = create<ClientStore>()(
         showModalFilter: () => set(() => ({ modalFilter: true })),
         closeModalFilter: () => set(() => ({ modalFilter: false })),
         showModalInfo: () => set(() => ({ modalInfo: true })),
-        closeModalInfo: () => set(() => ({ modalInfo: false }))
+        closeModalInfo: () => set(() => ({ modalInfo: false })),
+        showModalFileType: () => set(() => ({ modalFileTypeDecision: true })),
+        closeModalFileType: () => set(() => ({ modalFileTypeDecision: false }))
     }))
 );
 

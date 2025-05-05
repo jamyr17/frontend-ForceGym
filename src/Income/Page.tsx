@@ -16,6 +16,10 @@ import { FilterButton, FilterSelect } from "./Filter";
 import { useEffect } from "react";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
+import FileTypeDecision from "../shared/components/ModalFileType";
+import IncomeDashboard from './IncomeDashboard';
+import { exportToPDF } from "../shared/utils/pdf";
+import { exportToExcel } from "../shared/utils/excel";
 
 function EconomicIncomeManagement() {
     const {
@@ -23,6 +27,7 @@ function EconomicIncomeManagement() {
         modalForm,
         modalFilter,
         modalInfo,
+        modalFileTypeDecision,
         page,
         size,
         totalRecords,
@@ -36,6 +41,7 @@ function EconomicIncomeManagement() {
         filterByDateRangeMin,
         filterByDateRangeMax,
         filterByMeanOfPayment,
+        filterByClientType,
         fetchEconomicIncomes,
         getEconomicIncomeById,
         changePage,
@@ -46,9 +52,12 @@ function EconomicIncomeManagement() {
         closeModalForm,
         closeModalFilter,
         closeModalInfo,
+        showModalFileType,
+        closeModalFileType
     } = useEconomicIncomeStore()
-
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore  } = useEconomicIncome()
+    
+    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useEconomicIncome()
+   
     const navigate = useNavigate()
 
     useEffect(() => {}, [economicIncomes])
@@ -66,15 +75,18 @@ function EconomicIncomeManagement() {
         }
         
         fetchData()
-    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment,])
+    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByClientType])
 
     return ( 
-        <div className="bg-black h-full w-full">
+        
+        <div className="bg-black min-h-screen">
+
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">INGRESOS</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Voucher</option>
                     <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Detalle</option>
+                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={3} defaultChecked={searchType===3}>Cliente</option>
                 </SearchInput>
                 <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
@@ -98,12 +110,32 @@ function EconomicIncomeManagement() {
                             Content={Form}
                         />
 
-                        {economicIncomes?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
-                        </button>
-                        }
+                                        
+                    {economicIncomes?.length > 0 && (
+                    <div className="flex gap-2">
+                        <Modal
+                            Button={() => (
+                                <button 
+                                    onClick={showModalFileType}
+                                    className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
+                                    <MdOutlineFileDownload /> Descargar
+                                </button>
+                            )}
+                            modal={modalFileTypeDecision}
+                            getDataById={getEconomicIncomeById}
+                            closeModal={closeModalFileType}
+                            Content={() => 
+                                        <FileTypeDecision 
+                                            modulo="Ingresos económicos" 
+                                            closeModal={closeModalFileType} 
+                                            exportToPDF={() => exportToPDF('Ingresos', pdfTableHeaders, pdfTableRows)}
+                                            exportToExcel={() => exportToExcel('Ingresos', pdfTableHeaders, pdfTableRows)}
+                                        />
+                                    }
+                        />  
                     </div>
+                    )} 
+                </div>
                     
                     {economicIncomes?.length>0 ? (
                     <table className="w-full mt-8 border-t-2 border-slate-200 overflow-scroll">
@@ -111,13 +143,15 @@ function EconomicIncomeManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('voucherNumber')}}
                                 >
                                     VOUCHER  
                                     {(orderBy==='voucherNumber' && directionOrderBy==='DESC') && <FaArrowUp className="text-yellow"/> } 
                                     {(orderBy==='voucherNumber' && directionOrderBy==='ASC') && <FaArrowDown className="text-yellow"/> } 
                                 </button></th>
+                        
+                                <th>CLIENTE</th>
                                 <th><button
                                     className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('registrationDate')}}
@@ -147,6 +181,7 @@ function EconomicIncomeManagement() {
                             <tr key={economicIncome.idEconomicIncome} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
                                 <td className="py-2">{economicIncome.voucherNumber!='' ? economicIncome.voucherNumber : 'No adjunto'}</td>
+                                <td className="py-2">{economicIncome.client.person.name + ' ' + economicIncome.client.person.firstLastName + ' ' + economicIncome.client.person.secondLastName}</td>
                                 <td className="py-2">{formatDate(new Date(economicIncome.registrationDate))}</td>
                                 <td className="py-2">{formatAmountToCRC(economicIncome.amount)}</td>
                                 <td className="py-2">{economicIncome.meanOfPayment.name}</td>
@@ -167,7 +202,8 @@ function EconomicIncomeManagement() {
                                                 getEconomicIncomeById(economicIncome.idEconomicIncome);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                            title="Ver detalles"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -182,16 +218,18 @@ function EconomicIncomeManagement() {
                                         getEconomicIncomeById(economicIncome.idEconomicIncome);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {economicIncome.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapEconomicIncomeToDataForm(economicIncome))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapEconomicIncomeToDataForm(economicIncome))} className="p-2 bg-black rounded-sm hover:bg-slate-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleDelete(economicIncome)} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleDelete(economicIncome)} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Eliminar">
                                     <MdOutlineDelete className="text-white" />
                                     </button>
                                 )}
@@ -201,11 +239,29 @@ function EconomicIncomeManagement() {
 
                         </tbody>
                     </table>
+                    
                     ) : 
                     (
                         <NoData module="ingresos económicos" />
                     )}
+
+                    {economicIncomes?.length > 0 && (
+                        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-lg font-bold">Total de Ingresos: 
+                                {economicIncomes.reduce((total, item) => total + item.amount, 0).toLocaleString('es-CR', {
+                                })} CRC
+                                </h3>
+                            </div>
+                        </div>
+                    )}
                     <Pagination page={page} size={size} totalRecords={totalRecords} onSizeChange={changeSize} onPageChange={changePage} />
+                    {economicIncomes?.length > 0 && (
+                    <>
+                    <hr className="my-6 border-black border-t-6" />
+                    <IncomeDashboard economicIncomes={economicIncomes} />
+                    </>
+                    )}              
                 </div>
             </main>
         </div>

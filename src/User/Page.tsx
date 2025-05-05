@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import useUserStore from "./Store"
-import { MdOutlineDelete, MdModeEdit, MdOutlineFileDownload, MdOutlineSettingsBackupRestore } from "react-icons/md"
+import { MdOutlineDelete, MdModeEdit, MdOutlineSettingsBackupRestore } from "react-icons/md"
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
 import Pagination from "../shared/components/Pagination"
@@ -9,12 +9,12 @@ import SearchInput from "../shared/components/SearchInput"
 import ModalFilter from "../shared/components/ModalFilter"
 import { FilterButton, FilterSelect } from "./Filter"
 import Modal from "../shared/components/Modal"
-import Form from "./Form"
 import DataInfo from "./DataInfo";
 import { mapUserToDataForm } from "../shared/types/mapper";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
 import NoData from "../shared/components/NoData";
+import Form from "./Form/MultiStepForm";
 
 function UserManagement() {
     const {
@@ -65,7 +65,7 @@ function UserManagement() {
     }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus, filterByRole])
 
     return (
-        <div className="bg-black h-full w-full">
+        <div className="bg-black min-h-screen">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">Usuarios</h1>
                 <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
@@ -95,12 +95,6 @@ function UserManagement() {
                             closeModal={closeModalForm}
                             Content={Form}
                         />
-
-                        {users?.length>0 &&
-                        <button className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                            <MdOutlineFileDownload /> Descargar
-                        </button>
-                        }
                     </div>
                     
                     {users?.length>0 ? (
@@ -109,7 +103,7 @@ function UserManagement() {
                             <tr>
                                 <th>#</th>
                                 <th><button
-                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-slate-300 hover:cursor-pointer"
+                                    className="inline-flex text-center items-center gap-2 py-0.5 px-2 rounded-full hover:bg-gray-300 hover:cursor-pointer"
                                     onClick={() => {handleOrderByChange('identificationNumber')}}
                                 >
                                     CÉDULA  
@@ -145,7 +139,7 @@ function UserManagement() {
                             <tr key={user.idUser} className="text-center py-8">
                                 <td className="py-2">{index + 1}</td>
                                 <td className="py-2">{user.person.identificationNumber}</td>
-                                <td className="py-2">{user.person.name}</td>
+                                <td className="py-2">{user.person.name + ' ' + user.person.firstLastName + ' ' + user.person.secondLastName}</td> 
                                 <td className="py-2">{user.username}</td>
                                 <td className="py-2">{user.role.name}</td>
                                 {filterByStatus && (
@@ -165,7 +159,8 @@ function UserManagement() {
                                                 getUserById(user.idUser);
                                                 showModalInfo();
                                             }}
-                                            className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                            className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                            title="Ver detalles"
                                         >
                                             <IoIosMore className="text-white" />
                                         </button>
@@ -180,12 +175,13 @@ function UserManagement() {
                                         getUserById(user.idUser);
                                         showModalForm();
                                     }}
-                                    className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer"
+                                    className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
+                                    title="Editar"
                                 >
                                     <MdModeEdit className="text-white" />
                                 </button>
                                 {user.isDeleted ? (
-                                    <button onClick={() => handleRestore(mapUserToDataForm(user))} className="p-2 bg-black rounded-sm hover:bg-slate-300 hover:cursor-pointer">
+                                    <button onClick={() => handleRestore(mapUserToDataForm(user))} className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer">
                                     <MdOutlineSettingsBackupRestore className="text-white" />
                                     </button>
                                 ) : ( 
@@ -193,7 +189,8 @@ function UserManagement() {
                                         onClick={() => handleDelete(user)} 
                                         disabled={user.idUser === authUser?.idUser}
                                         className={`p-2 rounded-sm hover:cursor-pointer bg-black
-                                        ${user.idUser === authUser?.idUser ? ' opacity-50 cursor-not-allowed' : 'hover:bg-slate-300'}`}
+                                        ${user.idUser === authUser?.idUser ? ' opacity-50 cursor-not-allowed' : 'hover:bg-gray-700'}`}
+                                        title="Eliminar"
                                     >
                                     <MdOutlineDelete className={`text-white  ${user.idUser === authUser?.idUser && ' cursor-not-allowed'}`} />
                                     </button>

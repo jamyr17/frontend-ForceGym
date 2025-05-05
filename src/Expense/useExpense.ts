@@ -4,10 +4,11 @@ import { EconomicExpense, EconomicExpenseDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicExpenseStore from "./Store"
 import { useNavigate } from "react-router"
+import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
 export const useEconomicExpense = () => {
     const navigate = useNavigate()
-    const { fetchEconomicExpenses, deleteEconomicExpense, updateEconomicExpense, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicExpenseStore()
+    const { economicExpenses, fetchEconomicExpenses,deleteEconomicExpense, updateEconomicExpense, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicExpenseStore()
 
     const handleDelete = async ({ idEconomicExpense, voucherNumber } : EconomicExpense) => {
         await Swal.fire({
@@ -109,10 +110,23 @@ export const useEconomicExpense = () => {
         })
     }
 
+    const pdfTableHeaders = ["#", "Voucher", "Fecha", "Monto", "Método de Pago", "Categoría","Detalle"];
+    const pdfTableRows = economicExpenses.map((expense, index) => [
+        index + 1,
+        expense.voucherNumber || "No adjunto",
+        formatDate(new Date(expense.registrationDate)),
+        formatAmountToCRC(expense.amount), 
+        expense.meanOfPayment.name,
+        expense.category.name,
+        expense.detail ? expense.detail : 'Sin detalle'
+    ]);
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore,
+        pdfTableHeaders,
+        pdfTableRows
     }
 }

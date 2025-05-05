@@ -4,10 +4,11 @@ import { Client, ClientDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useClientStore from "./Store"
 import { useNavigate } from "react-router"
+import { formatDate } from "../shared/utils/format"
 
 export const useClient = () => {
     const navigate = useNavigate()
-    const { fetchClients, deleteClient, updateClient, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientStore()
+    const { clients, fetchClients, deleteClient, updateClient, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientStore()
 
     const handleDelete = async ({ idClient, person } : Client) => {
         await Swal.fire({
@@ -109,10 +110,21 @@ export const useClient = () => {
         })
     }
 
+    const pdfTableHeaders = ["#", "Cédula", "Nombre", "Fecha de Registro", "Tipo de Cliente"];
+    const pdfTableRows = clients.map((client, index) => [
+        index + 1,
+        client.person.identificationNumber,
+        `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
+        formatDate(new Date(client.registrationDate)),
+        client.typeClient.name
+    ]);
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore,
+        pdfTableHeaders,
+        pdfTableRows
     }
 }

@@ -4,10 +4,11 @@ import { EconomicIncome, EconomicIncomeDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useEconomicIncomeStore from "./Store"
 import { useNavigate } from "react-router"
+import { formatAmountToCRC, formatDate } from "../shared/utils/format"
 
 export const useEconomicIncome = () => {
     const navigate = useNavigate()
-    const { fetchEconomicIncomes, deleteEconomicIncome, updateEconomicIncome, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicIncomeStore()
+    const { economicIncomes, fetchEconomicIncomes, deleteEconomicIncome, updateEconomicIncome, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useEconomicIncomeStore()
 
     const handleDelete = async ({ idEconomicIncome, voucherNumber } : EconomicIncome) => {
         await Swal.fire({
@@ -109,10 +110,24 @@ export const useEconomicIncome = () => {
         })
     }
 
+    const pdfTableHeaders = ["#", "Voucher", "Cliente", "Fecha", "Monto", "Método de Pago", "Tipo de actividad","Detalle"]; 
+    const pdfTableRows = economicIncomes.map((income, index) => [
+        index + 1,
+        income.voucherNumber !== '' ? income.voucherNumber : "No adjunto",
+        `${income.client.person.name} ${income.client.person.firstLastName} ${income.client.person.secondLastName}`,
+        formatDate(new Date(income.registrationDate)),
+        formatAmountToCRC(income.amount),  // Aquí formateas con ₡
+        income.meanOfPayment.name,
+        income.activityType.name,  // Tipo de actividad
+        income.detail ? income.detail : 'Sin detalle' // Detalle del ingreso
+    ]);
+
     return {
         handleDelete,
         handleSearch,
         handleOrderByChange, 
-        handleRestore
+        handleRestore, 
+        pdfTableHeaders,
+        pdfTableRows
     }
 }

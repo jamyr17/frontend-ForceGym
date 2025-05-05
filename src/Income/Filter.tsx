@@ -4,9 +4,9 @@ import { MdOutlineCancel } from "react-icons/md";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 
 export function FilterButton() {
-    const { filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, showModalFilter } = useEconomicIncomeStore()
+    const { filterByStatus, filterByAmountRangeMin, filterByAmountRangeMax, filterByDateRangeMin, filterByDateRangeMax, filterByMeanOfPayment, filterByClientType, showModalFilter } = useEconomicIncomeStore()
     const filteringStyles = (
-        filterByStatus!='' || filterByAmountRangeMin!=0 || filterByAmountRangeMax!=0 || filterByDateRangeMin!=null || filterByDateRangeMax!=null || filterByMeanOfPayment!=0
+        filterByStatus!='' || filterByAmountRangeMin!=0 || filterByAmountRangeMax!=0 || filterByDateRangeMin!=null || filterByDateRangeMax!=null || filterByMeanOfPayment!=0 || filterByClientType!=-1
     ) && ' bg-white outline-none'
 
     return (
@@ -28,21 +28,36 @@ export function FilterSelect() {
         filterByDateRangeMin, 
         filterByDateRangeMax, 
         filterByMeanOfPayment,
+        filterByClientType,
         changeFilterByStatus, 
         changeFilterByAmountRangeMin,
         changeFilterByAmountRangeMax,
         changeFilterByDateRangeMin, 
         changeFilterByDateRangeMax,
-        changeFilterByMeanOfPayment
+        changeFilterByMeanOfPayment,
+        changeFilterByClientType,
+        clearAllFilters
     } = useEconomicIncomeStore()
     const filteredStatusSelectStyles = filterByStatus!='' && ' px-0.5 border-yellow text-yellow'
     const filteredMeanOfPaymentStyles = filterByMeanOfPayment!=0 && ' px-0.5 border-yellow text-yellow'
     const filteredAmountRangeStyles = (filterByAmountRangeMin!=0 && filterByAmountRangeMax!=0)  && ' px-0.5 border-yellow text-yellow'
     const filteredDateRangeStyles = (filterByDateRangeMin !=null && filterByDateRangeMax!=null)  && ' px-0.5 border-yellow text-yellow'
-    const { meansOfPayment } = useCommonDataStore()
+    const filteredClientTypeSelectStyles = filterByClientType !== -1 && ' px-0.5 border-yellow text-yellow';
+    const { meansOfPayment, typesClient } = useCommonDataStore()
 
     return (
         <div className="flex flex-col gap-4">
+            
+            {/* Botón de limpiar todos */}
+            <div className="flex justify-end pr-4">
+                <button
+                    className="text-yellow border border-yellow px-3 py-1 rounded-md hover:bg-yellow hover:text-black transition-all"
+                    onClick={clearAllFilters}
+                >
+                    Limpiar todos los filtros
+                </button>
+            </div>
+
             {/* Filtro por Estado */}
             <div className="flex items-center gap-4">
                 <label htmlFor="status" className="w-20">Estado</label>
@@ -95,6 +110,29 @@ export function FilterSelect() {
                         className="text-2xl text-yellow"
                         onClick={() => { changeFilterByMeanOfPayment(0) }}
                     >
+                        <MdOutlineCancel className="hover:cursor-pointer" />
+                    </button>
+                }
+            </div>
+
+            <div className="flex items-center gap-4">
+                <label htmlFor="idTypeClient" className="w-20">Tipo de Cliente</label>
+                <select
+                    id="idTypeClient"
+                    className={"border rounded-md p-2 w-78 text-center" + filteredClientTypeSelectStyles}
+                    value={filterByClientType}
+                    onChange={(e) => changeFilterByClientType(+e.target.value)}
+                >
+                    <option value={-1}>Todos</option>
+
+                    {typesClient.map((type)=> (
+                        <option key={type.idTypeClient} value={type.idTypeClient}>
+                            {type.name}
+                        </option>
+                    ))}
+                </select>
+                {filterByClientType!=-1 && 
+                    <button className="text-2xl text-yellow" onClick={() => changeFilterByClientType(-1)}>
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>
                 }
