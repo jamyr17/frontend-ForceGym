@@ -1,5 +1,6 @@
 import useRoutineStore from "./Store";
 import { useCommonDataStore } from "../shared/CommonDataStore";
+import { RoutineExerciseDTO } from "../shared/types";
 
 function DataInfo() {
     const { routineToEdit } = useRoutineStore();
@@ -8,7 +9,7 @@ function DataInfo() {
     if (!routineToEdit) return <div className="text-gray-500 p-4">No hay rutina seleccionada</div>;
 
 
-    const getExerciseDetails = (ex) => {
+    const getExerciseDetails = (ex: RoutineExerciseDTO) => {
         const globalExercise = exercise.find(e => e.idExercise === ex.idExercise);
         
         return {
@@ -18,7 +19,7 @@ function DataInfo() {
         };
     };
 
-    const getDifficultyName = (idDifficulty) => {
+    const getDifficultyName = (idDifficulty: number) => {
         const difficulty = difficultyRoutines.find(d => d.idDifficultyRoutine === idDifficulty);
         return difficulty?.name || `Dificultad #${idDifficulty}`;
     };

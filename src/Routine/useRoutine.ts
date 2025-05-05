@@ -6,6 +6,7 @@ import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authent
 import { useNavigate } from "react-router";
 import { exportToPDF } from "../shared/utils/pdf";
 import { exportToExcel } from "../shared/utils/excel";
+import { mapRoutineToDTO } from '../shared/types/mapper';
 
 export const useRoutine = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ export const useRoutine = () => {
         getRoutineById
     } = useRoutineStore();
 
-    const { exercise: allExercises, difficultyRoutines } = useCommonDataStore();
+    const { exercise: allExercises } = useCommonDataStore();
 
     const handleDelete = async ({ idRoutine, name }: Routine) => {
         await Swal.fire({
@@ -40,7 +41,7 @@ export const useRoutine = () => {
                     return;
                 }
                 
-                const response = await deleteRoutine(idRoutine, loggedUser.idUser);
+                const response = await deleteRoutine(idRoutine);
                 
                 if (response?.ok) {
                     await Swal.fire({
@@ -71,12 +72,15 @@ export const useRoutine = () => {
 
         const reqRoutine = {
             ...routine, 
-            isDeleted: 0,
+            name: routine.name,
             difficultyRoutine: {
+                name: routine.difficultyRoutine.name,
                 idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine
             },
             paramLoggedIdUser: loggedUser.idUser
         };
+
+        const mappedReqRoutine = mapRoutineToDTO(reqRoutine as Routine)
             
         await Swal.fire({
             title: '¿Desea restaurar la rutina?',
@@ -91,7 +95,7 @@ export const useRoutine = () => {
             reverseButtons: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const response = await updateRoutine(reqRoutine);
+                const response = await updateRoutine(mappedReqRoutine);
                 if (response?.ok) {
                     await Swal.fire({
                         title: 'Rutina restaurada',
@@ -124,10 +128,6 @@ export const useRoutine = () => {
         };
     };
 
-    const getDifficultyName = (id: number) => {
-        return difficultyRoutines.find(d => d.idDifficultyRoutine === id)?.name || `Dificultad #${id}`;
-    };
-
     const handleExportRoutine = async (routineId: number) => {
         try {
             await getRoutineById(routineId);
@@ -148,24 +148,16 @@ export const useRoutine = () => {
                 ];
             }) || [];
 
-            const routineInfo = [
-                ["Nombre:", currentRoutine.name],
-                ["Dificultad:", getDifficultyName(currentRoutine.difficultyRoutine.idDifficultyRoutine)],
-                ["Total ejercicios:", currentRoutine.exercises?.length.toString() || "0"]
-            ];
-
             return {
                 exportToPDF: () => exportToPDF(
                     `Rutina ${currentRoutine.name}`,
                     exerciseHeaders,
-                    exerciseRows,
-                    routineInfo
+                    exerciseRows
                 ),
                 exportToExcel: () => exportToExcel(
                     `Rutina ${currentRoutine.name}`,
                     exerciseHeaders,
-                    exerciseRows,
-                    routineInfo
+                    exerciseRows
                 )
             };
         } catch (error) {

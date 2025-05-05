@@ -24,14 +24,12 @@ function Form() {
     } = useForm<MeasurementDataForm>({
         defaultValues: {
             idClient: idClient || undefined,
-            idUser: '',
             isDeleted: 0
         }
     });
 
     const { 
-        measurements, 
-        selectedMeasurement, 
+        measurements,
         activeEditingId, 
         fetchMeasurements, 
         addMeasurement, 
@@ -91,28 +89,32 @@ function Form() {
     };
 
     useEffect(() => {
-        if (selectedMeasurement) {
-            setValue('idMeasurement', selectedMeasurement.idMeasurement);
-            setValue('idClient', selectedMeasurement.idClient || idClient);
-            setValue('isDeleted', selectedMeasurement.isDeleted);
-            setValue('measurementDate', selectedMeasurement.measurementDate);
-            setValue('weight', selectedMeasurement.weight);
-            setValue('height', selectedMeasurement.height);
-            setValue('muscleMass', selectedMeasurement.muscleMass);
-            setValue('bodyFatPercentage', selectedMeasurement.bodyFatPercentage);
-            setValue('visceralFatPercentage', selectedMeasurement.visceralFatPercentage);
-            setValue('chestSize', selectedMeasurement.chestSize);
-            setValue('waistSize', selectedMeasurement.waistSize);
-            setValue('leftLegSize', selectedMeasurement.leftLegSize);
-            setValue('rightLegSize', selectedMeasurement.rightLegSize);
-            setValue('leftCalfSize', selectedMeasurement.leftCalfSize);
-            setValue('rightCalfSize', selectedMeasurement.rightCalfSize);
-            setValue('leftForeArmSize', selectedMeasurement.leftForeArmSize);
-            setValue('rightForeArmSize', selectedMeasurement.rightForeArmSize);
-            setValue('leftArmSize', selectedMeasurement.leftArmSize);
-            setValue('rightArmSize', selectedMeasurement.rightArmSize);
+        if (activeEditingId) {
+            const selectedMeasurement = measurements.find(measurement => measurement.idMeasurement === activeEditingId);
+
+            if(selectedMeasurement){
+                setValue('idMeasurement', selectedMeasurement.idMeasurement);
+                setValue('idClient', selectedMeasurement.idClient || idClient);
+                setValue('isDeleted', selectedMeasurement.isDeleted);
+                setValue('measurementDate', selectedMeasurement.measurementDate);
+                setValue('weight', selectedMeasurement.weight);
+                setValue('height', selectedMeasurement.height);
+                setValue('muscleMass', selectedMeasurement.muscleMass);
+                setValue('bodyFatPercentage', selectedMeasurement.bodyFatPercentage);
+                setValue('visceralFatPercentage', selectedMeasurement.visceralFatPercentage);
+                setValue('chestSize', selectedMeasurement.chestSize);
+                setValue('waistSize', selectedMeasurement.waistSize);
+                setValue('leftLegSize', selectedMeasurement.leftLegSize);
+                setValue('rightLegSize', selectedMeasurement.rightLegSize);
+                setValue('leftCalfSize', selectedMeasurement.leftCalfSize);
+                setValue('rightCalfSize', selectedMeasurement.rightCalfSize);
+                setValue('leftForeArmSize', selectedMeasurement.leftForeArmSize);
+                setValue('rightForeArmSize', selectedMeasurement.rightForeArmSize);
+                setValue('leftArmSize', selectedMeasurement.leftArmSize);
+                setValue('rightArmSize', selectedMeasurement.rightArmSize);
+            }
         }
-    }, [selectedMeasurement]);
+    }, [activeEditingId]);
 
     return (
         <form 
@@ -125,11 +127,6 @@ function Form() {
             </legend>
 
             {/* inputs ocultos para la funcionalidad de actualizar */}
-            <input  
-                id="idUser" 
-                type="hidden" 
-                {...register('idUser')}
-            />
             <input  
                 id="idClient" 
                 type="hidden"

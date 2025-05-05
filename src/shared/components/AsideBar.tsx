@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { IoMdMenu } from 'react-icons/io';
 import { FaRegUser, FaSignOutAlt, FaBalanceScale, FaSlidersH } from 'react-icons/fa';
 import { FaRegCircleUser } from "react-icons/fa6";
-import { GiWeightLiftingUp, GiGymBag } from "react-icons/gi";
+import { GiWeightLiftingUp } from "react-icons/gi";
 import { MdOutlineInventory, MdOutlineTrendingUp, MdTrendingDown, MdOutlineGroups, MdOutlineCategory } from 'react-icons/md';
 import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";

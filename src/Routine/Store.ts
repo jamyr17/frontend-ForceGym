@@ -30,43 +30,6 @@ type RoutineStore = {
     closeModalFileType: () => void;
 };
 
-const convertRoutineToDTO = (routine: Routine): RoutineWithExercisesDTO => {
-    if (!routine) {
-        return {
-            name: '',
-            date: new Date().toISOString(),
-            idUser: 0,
-            difficultyRoutine: { idDifficultyRoutine: 0 },
-            exercises: [],
-            assignments: [],
-            isDeleted: 0
-        };
-    }
-
-    return {
-        idRoutine: routine.idRoutine,
-        name: routine.name,
-        date: routine.date instanceof Date ? routine.date.toISOString() : new Date(routine.date).toISOString(),
-        idUser: routine.user?.idUser || routine.idUser || 0,
-        difficultyRoutine: {
-            idDifficultyRoutine: routine.difficultyRoutine?.idDifficultyRoutine || 0
-        },
-        exercises: routine.routineExercises?.map(ex => ({
-            idExercise: ex.exercise?.idExercise || 0,
-            series: ex.series || 0,
-            repetitions: ex.repetitions || 0
-        })) || [],
-        assignments: routine.routineAssignments?.map(assignment => ({
-            idClient: assignment.client?.idClient || 0,
-            assignmentDate: assignment.assignmentDate instanceof Date 
-                ? assignment.assignmentDate.toISOString() 
-                : new Date(assignment.assignmentDate).toISOString()
-        })) || [],
-        isDeleted: routine.isDeleted || 0,
-        paramLoggedIdUser: routine.user?.idUser || routine.idUser || 0
-    };
-};
-
 export const useRoutineStore = create<RoutineStore>()(
     devtools((set, get) => ({
         routines: [],

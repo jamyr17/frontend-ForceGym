@@ -3,18 +3,20 @@ import { Dialog, Transition } from "@headlessui/react";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { NotificationTemplateModal } from "./NotificationTemplateModal";
 
-type Client = {
-  id: string;
+export type ClientNotification = {
+  idClient: string;
   name: string;
+  firstLastName: string;
+  secondLastName: string;
   email: string;
   phoneNumber: string;
   additionalInfo?: string;
 };
 
 type NotificationsData = {
-  mensualidades: Client[];
-  cumpleanos: Client[];
-  aniversarios: Client[];
+  mensualidades: ClientNotification[];
+  cumpleanos: ClientNotification[];
+  aniversarios: ClientNotification[];
 };
 
 type NotificationsModalProps = {
@@ -31,7 +33,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
-  const [selectedClients, setSelectedClients] = useState<Client[]>([]);
+  const [selectedClients, setSelectedClients] = useState<ClientNotification[]>([]);
   const [notificationType, setNotificationType] = useState<"mensualidades" | "cumpleanos" | "aniversarios">("mensualidades");
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   }, [isOpen]);
 
-  const sendEmail = async (clients: Client[], subject: string, message: string) => {
+  const sendEmail = async (clients: ClientNotification[], subject: string, message: string) => {
     const controller = new AbortController();
   
     try {
@@ -115,7 +117,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     }
   };
 
-  const handleActionClick = (type: "mensualidades" | "cumpleanos" | "aniversarios", clients: Client[]) => {
+  const handleActionClick = (type: "mensualidades" | "cumpleanos" | "aniversarios", clients: ClientNotification[]) => {
     setSelectedClients(clients);
     setNotificationType(type);
     onClose()
@@ -123,9 +125,8 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   };
 
   const handleSendNotification = async (
-    templateId: number,
     message: string,
-    client: Client
+    client: ClientNotification
   ) => {
     try {
       console.log("Enviando notificación a:", client.email);
@@ -154,7 +155,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   const renderNotificationSection = (
     title: string,
     type: "mensualidades" | "cumpleanos" | "aniversarios",
-    clients: Client[],
+    clients: ClientNotification[],
     actionText: string
   ) => {
     if (clients.length === 0) return null;

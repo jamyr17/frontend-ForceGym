@@ -27,7 +27,7 @@ export const useActivityType = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteActivityType(idActivityType, loggedUser?.idUser)
+                const response = await deleteActivityType(idActivityType, loggedUser?.idUser as number)
                 if(response.ok){
                     Swal.fire({
                         title: 'Tipo de actividad eliminada',

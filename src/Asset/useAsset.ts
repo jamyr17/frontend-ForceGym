@@ -25,7 +25,7 @@ export const useAsset = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteAsset(idAsset, loggedUser?.idUser)
+                const response = await deleteAsset(idAsset, loggedUser?.idUser as number)
 
                 if(response.ok){
                     Swal.fire({

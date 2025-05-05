@@ -24,7 +24,7 @@ export const useNotificationTemplate = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser()
-                const response = await deleteNotificationTemplate(idNotificationTemplate, loggedUser?.idUser)
+                const response = await deleteNotificationTemplate(idNotificationTemplate, loggedUser?.idUser as number)
 
                 if(response.ok){
                     Swal.fire({

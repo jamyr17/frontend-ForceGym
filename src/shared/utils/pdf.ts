@@ -10,8 +10,7 @@ import { getAuthUser } from "./authentication";
 export const exportToPDF = (
   title: string,
   tableColumn: string[],
-  tableRows: any[][],
-  includeReferenceTable: boolean = false
+  tableRows: any[][]
 ) => {
   const doc = new jsPDF({ putOnlyUsedFonts: true });
 
