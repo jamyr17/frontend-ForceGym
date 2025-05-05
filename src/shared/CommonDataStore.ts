@@ -100,7 +100,7 @@ export const useCommonDataStore = create<CommonDataStore>()(
         },
 
         fetchExerciseCategories: async() => {
-            const result = await getData(`${import.meta.env.VITE_URL_API}exercisecategory/list`);
+            const result = await getData(`${import.meta.env.VITE_URL_API}exerciseCategory/listAll`);
             set(() => ({ exerciseCategories: result.data }));
             return result;
         },

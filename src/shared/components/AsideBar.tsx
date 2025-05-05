@@ -8,6 +8,8 @@ import { PiHouseSimpleFill } from "react-icons/pi";
 import { TbBellCog } from "react-icons/tb";
 import { CgGym } from "react-icons/cg";
 import { FaRegCalendarAlt } from 'react-icons/fa';
+import { TfiWrite } from "react-icons/tfi";
+import { BiBody } from "react-icons/bi";
 import { getAuthUser } from '../utils/authentication';
 import { LogoutModal } from './LogoutModal';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -108,6 +110,7 @@ function AsideBar() {
           <NavItem to="/gestion/gastos" icon={<MdTrendingDown />} title="Gastos" text="Gastos" allowedRoles={['Administrador']}/>
           <NavItem to="/gestion/balance" icon={<FaBalanceScale />} title="Balance Económico" text="Balance" />
           <NavItem to="/gestion/activos" icon={<MdOutlineInventory />} title="Activos" text="Activos"/>
+          <NavItem to="/gestion/rutinas" icon={<TfiWrite  />} title="Rutinas" text="Rutinas" />
           <NavItem to="/gestion/ejercicios" icon={<CgGym />} title="Ejercicios" text="Ejercicios" />
 
           {/* Botón más opciones */}
@@ -158,7 +161,7 @@ function AsideBar() {
         <NavItem to="/gestion/tipos-cliente" icon={<MdOutlineGroups />} title="Tipos de Cliente" text="Tipos de Cliente" />
         <NavItem to="/gestion/tipos-actividad" icon={<FaRegCalendarAlt />} title="Tipos de Actividad" text="Tipos de Actividad"/>
         <NavItem to="/gestion/plantillas-notificacion" icon={<TbBellCog />} title="Plantillas de Notificación" text="Plantillas de Notificación" />
-        <NavItem to="/gestion/rutinas" icon={<GiGymBag  />} title="Rutinas" text="Rutinas" />
+        <NavItem to="/gestion/categorias-ejercicios" icon={<BiBody />} title="Categorías de Ejercicios" text="Categorías de Ejercicios" />
       </div>
     )}
 
