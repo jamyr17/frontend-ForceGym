@@ -9,7 +9,9 @@ import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authent
 import { useCommonDataStore } from "../shared/CommonDataStore";
 
 const MAXLENGTH_NAME = 100;
+const MINLENGTH_NAME = 3;
 const MAXLENGTH_DESCRIPTION = 255;
+const MINLENGTH_DESCRIPTION = 5;
 
 function FormExercise() {
   const navigate = useNavigate();
@@ -48,9 +50,6 @@ function FormExercise() {
       ? await updateExercise(reqData)
       : await addExercise(reqData);
 
-    closeModalForm();
-    reset();
-
     if (result.ok) {
       const result2 = await fetchExercises();
 
@@ -58,8 +57,11 @@ function FormExercise() {
         setAuthHeader(null);
         setAuthUser(null);
         navigate('/login');
-        return;
+        return; 
       }
+
+      closeModalForm();
+      reset();
 
       Swal.fire({
         title: `Ejercicio ${actionText}`,
@@ -120,9 +122,13 @@ function FormExercise() {
           placeholder="Ingrese el nombre"
           {...register("name", {
             required: "El nombre es obligatorio",
+            minLength: {
+              value: MINLENGTH_NAME,
+              message: `Debe ingresar un nombre de mínimo ${MINLENGTH_NAME} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_NAME,
-              message: `Máximo ${MAXLENGTH_NAME} caracteres`
+              message: `Debe ingresar un nombre de máximo ${MAXLENGTH_NAME} caracteres`
             }
           })}
         />
@@ -141,9 +147,13 @@ function FormExercise() {
           placeholder="Ingrese la descripción"
           {...register("description", {
             required: "La descripción es obligatoria",
+            minLength: {
+              value: MINLENGTH_DESCRIPTION,
+              message: `Debe ingresar una descripción de mínimo ${MINLENGTH_DESCRIPTION} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_DESCRIPTION,
-              message: `Máximo ${MAXLENGTH_DESCRIPTION} caracteres`
+              message: `Debe ingresar una descripción de máximo ${MAXLENGTH_DESCRIPTION} caracteres`
             }
           })}
         />

@@ -7,6 +7,8 @@ const MAXLENGTH_NAME = 50;
 const MAXLENGTH_FIRSTLASTNAME = 50;
 const MAXLENGTH_SECONDLASTNAME = 50;
 const MAXDATE_BIRTHDAY = new Date().toUTCString();
+const MINLENGTH_IDENTIFICATIONUMBER = 7;
+const MINLENGTH_NAME = 2;
 
 export const StepClientInfo = ({ genders, typesClient }: { genders: any[], typesClient: any[] }) => {
   const { register, formState: { errors } } = useFormContext();
@@ -46,9 +48,17 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
           placeholder="Ingrese la cédula" 
           {...register('identificationNumber', {
             required: 'La cédula es obligatoria',
+            minLength: {
+              value: MINLENGTH_IDENTIFICATIONUMBER,
+              message: `Debe ingresar una cédula de mínimo ${MINLENGTH_IDENTIFICATIONUMBER} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_IDENTIFICATIONUMBER,
               message: `Debe ingresar una cédula de máximo ${MAXLENGTH_IDENTIFICATIONUMBER} carácteres`
+            },
+            pattern: {
+              value: /^[0-9]+$/,
+              message: 'La cédula sólo puede contener números, ejemplo: 401240987'
             }
           })}
         />
@@ -68,9 +78,17 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
           placeholder="Ingrese el nombre" 
           {...register('name', {
             required: 'El nombre es obligatorio',
+            minLength: {
+              value: MINLENGTH_NAME,
+              message: `Debe ingresar un nombre de mínimo ${MINLENGTH_NAME} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_NAME,
               message: `Debe ingresar un nombre de máximo ${MAXLENGTH_NAME} carácteres`
+            },
+            pattern: {
+              value: /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s'-]*$/,
+              message: 'El nombre no puede contener números ni símbolos especiales'
             }
           })}
         />
@@ -88,9 +106,17 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
           placeholder="Ingrese el primer apellido" 
           {...register('firstLastName', {
             required: 'El primer apellido es obligatorio',
+            minLength: {
+              value: MINLENGTH_NAME,
+              message: `Debe ingresar un primer apellido de mínimo ${MINLENGTH_NAME} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_FIRSTLASTNAME,
               message: `Debe ingresar un primer apellido de máximo ${MAXLENGTH_FIRSTLASTNAME} carácteres`
+            },
+            pattern: {
+              value: /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s'-]*$/,
+              message: 'El primer apellido no puede contener números ni símbolos especiales'
             }
           })}
         />
@@ -108,9 +134,17 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
           placeholder="Ingrese el segundo apellido" 
           {...register('secondLastName', {
             required: 'El segundo apellido es obligatorio',
+            minLength: {
+              value: MINLENGTH_NAME,
+              message: `Debe ingresar un segundo apellido de mínimo ${MINLENGTH_NAME} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_SECONDLASTNAME,
               message: `Debe ingresar un segundo apellido de máximo ${MAXLENGTH_SECONDLASTNAME} carácteres`
+            },
+            pattern: {
+              value: /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s'-]*$/,
+              message: 'El segundo apellido no puede contener números ni símbolos especiales'
             }
           })}
         />

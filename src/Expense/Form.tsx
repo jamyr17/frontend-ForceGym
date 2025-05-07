@@ -11,7 +11,7 @@ import { formatDate } from "../shared/utils/format";
 
 const MAXLENGTH_VOUCHER = 100;
 const MAXLENGTH_DETAIL = 100;
-//const MAXDATE = new Date().toLocaleDateString('sv-SE');
+const MINLENGTH_DETAIL = 5;
 const CASH_PAYMENT_ID = 2; 
 const MAXDATE = new Date().toUTCString();
 
@@ -80,9 +80,6 @@ function Form() {
             result = await updateEconomicExpense(reqUser as EconomicExpenseDataForm);
             action = 'editado';
         }
-
-        closeModalForm();
-        reset();
         
         if (result.ok) {
             const result2 = await fetchEconomicExpenses();
@@ -91,7 +88,11 @@ function Form() {
                 setAuthHeader(null);
                 setAuthUser(null);
                 navigate('/login', {replace: true});
+
             } else {
+                closeModalForm();
+                reset();
+
                 await Swal.fire({
                     title: `Gasto económico ${action}`,
                     text: `Se ha ${action} el gasto`,
@@ -212,6 +213,31 @@ function Form() {
                 {errors.registrationDate && <ErrorForm>{errors.registrationDate.message?.toString()}</ErrorForm>}
             </div>
 
+            <div className="my-5">
+                <label htmlFor="idMeanOfPayment" className="text-sm uppercase font-bold">
+                    Medio de Pago 
+                </label>
+                <select
+                    id="idMeanOfPayment"
+                    className="w-full p-3 border border-gray-100" 
+                    {...register("idMeanOfPayment", {
+                        required: 'El medio de pago es obligatorio'
+                    })}  
+                >
+                    <option value="">Seleccione un medio de pago</option>
+                    {meansOfPayment.map((meanOfPayment) => (
+                        <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
+                            {meanOfPayment.name}
+                        </option>
+                    ))}
+                </select>
+                {errors.idMeanOfPayment && 
+                    <ErrorForm>
+                        {errors.idMeanOfPayment.message}
+                    </ErrorForm>
+                }
+            </div>
+
             <div className="mb-5">
                 <label htmlFor="voucherNumber" className="text-sm uppercase font-bold">
                     Voucher
@@ -254,6 +280,10 @@ function Form() {
                     placeholder="Ingrese el detalle" 
                     {...register('detail', {
                         required: 'El detalle es obligatorio',
+                        minLength: {
+                            value: MINLENGTH_DETAIL,
+                            message: `Debe ingresar un voucher de mínimo ${MINLENGTH_DETAIL} carácteres`
+                        },
                         maxLength: {
                             value: MAXLENGTH_DETAIL,
                             message: `Debe ingresar un detalle de máximo ${MAXLENGTH_DETAIL} carácteres`
@@ -263,31 +293,6 @@ function Form() {
                 {errors.detail && 
                     <ErrorForm>
                         {errors.detail.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="my-5">
-                <label htmlFor="idMeanOfPayment" className="text-sm uppercase font-bold">
-                    Medio de Pago 
-                </label>
-                <select
-                    id="idMeanOfPayment"
-                    className="w-full p-3 border border-gray-100" 
-                    {...register("idMeanOfPayment", {
-                        required: 'El medio de pago es obligatorio'
-                    })}  
-                >
-                    <option value="">Seleccione un medio de pago</option>
-                    {meansOfPayment.map((meanOfPayment) => (
-                        <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
-                            {meanOfPayment.name}
-                        </option>
-                    ))}
-                </select>
-                {errors.idMeanOfPayment && 
-                    <ErrorForm>
-                        {errors.idMeanOfPayment.message}
                     </ErrorForm>
                 }
             </div>
