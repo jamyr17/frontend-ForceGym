@@ -58,7 +58,7 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
             validate: value => value !== '0' || 'Debe seleccionar un rol'
           })}  
         >
-          <option value="">Seleccione un rol</option>
+          <option value="0">Seleccione un rol</option>
           {roles.map((role) => (
             <option key={role.idRole} value={role.idRole}>
               {role.name}

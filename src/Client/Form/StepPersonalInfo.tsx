@@ -25,7 +25,7 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
             required: "El tipo de cliente es obligatorio"
           })}  
         >
-          <option value="">Seleccione un tipo de cliente</option>
+          <option value="0">Seleccione un tipo de cliente</option>
           {typesClient.map((type) => (
             <option key={type.idTypeClient} value={type.idTypeClient}>
               {type.name}
@@ -148,6 +148,7 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
             validate: value => value !== '0' || 'Debe seleccionar un género'
           })}   
         >
+          <option value= "0" >Seleccione un género</option>
           {genders.map((gender) => (
             <option key={gender.idGender} value={gender.idGender}>
               {gender.name}
