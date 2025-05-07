@@ -123,7 +123,7 @@ export const PersonalInfoStep = ({ genders }: { genders: any[] }) => {
           className="w-full p-3 border border-gray-100" 
           {...register("idGender", {
             required: 'El género es obligatorio',
-            validate: value => value !== 0 || 'Debe seleccionar un género'
+            validate: value =>  Number(value) !== 0 || 'Debe seleccionar un género'
           })}   
         >
           <option value = {0} >Seleccione un género</option>
