@@ -22,10 +22,11 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
           className="w-full p-3 border border-gray-100" 
           defaultValue=""
           {...register("idTypeClient", {
-            required: "El tipo de cliente es obligatorio"
+            required: "El tipo de cliente es obligatorio",
+            validate: value => value !== 0 || 'Debe seleccionar un tipo de cliente'
           })}  
         >
-          <option value="0">Seleccione un tipo de cliente</option>
+          <option value={0}>Seleccione un tipo de cliente</option>
           {typesClient.map((type) => (
             <option key={type.idTypeClient} value={type.idTypeClient}>
               {type.name}
@@ -145,10 +146,10 @@ export const StepClientInfo = ({ genders, typesClient }: { genders: any[], types
           className="w-full p-3 border border-gray-100" 
           {...register("idGender", {
             required: 'El género es obligatorio',
-            validate: value => value !== '0' || 'Debe seleccionar un género'
+            validate: value => value !== 0 || 'Debe seleccionar un género'
           })}   
         >
-          <option value= "0" >Seleccione un género</option>
+          <option value = {0} >Seleccione un género</option>
           {genders.map((gender) => (
             <option key={gender.idGender} value={gender.idGender}>
               {gender.name}
