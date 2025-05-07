@@ -59,8 +59,6 @@ function Form() {
             action = 'editado';
         }
 
-        closeModalForm();
-        reset();
         
         if (result.ok) {
             const result2 = await fetchAssets();
@@ -69,7 +67,11 @@ function Form() {
                 setAuthHeader(null);
                 setAuthUser(null);
                 navigate('/login');
+
             } else {
+                closeModalForm();
+                reset();
+
                 await Swal.fire({
                     title: `Activo ${action}`,
                     text: `Se ha ${action} el activo ${reqData.name}`,
