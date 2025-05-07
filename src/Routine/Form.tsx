@@ -171,6 +171,35 @@ function Form() {
       });
       return;
     }
+      
+    const invalidExercises = validExercises.filter(ex => 
+      ex.series <= 0 || ex.repetitions <= 0
+    );
+    
+    if (invalidExercises.length > 0) {
+      const htmlList = invalidExercises.map(ex => {
+        const errors = [];
+        if (ex.series <= 0) errors.push('Series');
+        if (ex.repetitions <= 0) errors.push('Repeticiones');
+        return `<strong>${ex.name}</strong>: ${errors.join(' y ')}`;
+      }).join('<br>');
+    
+      await Swal.fire({
+        title: 'Error en ejercicios',
+        html: `Los siguientes ejercicios tienen valores inválidos:<br><br>${htmlList}`,
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#CFAD04'
+      });
+    
+      setSelectedExercises(prev => prev.map(ex => ({
+        ...ex,
+        hasError: invalidExercises.some(ie => ie.idExercise === ex.idExercise)
+      })));
+    
+      return;
+    }
+    
     const hasInvalidValues = selectedExercises.some(ex => 
       ex.idExercise > 0 && (ex.series <= 0 || ex.repetitions <= 0)
     );
@@ -476,74 +505,83 @@ function Form() {
                 
                 return (
                   <div key={index} className="mb-4">
+                   <div className="flex items-end gap-4">
+                    {/* Selector de ejercicio */}
+                    <div className="flex-1 min-w-[450px]"> 
+                      <select
+                        className="w-full p-2 border border-gray-300 rounded text-sm"
+                        value={ex.idExercise}
+                        onChange={(e) => handleExerciseChange(index, Number(e.target.value))}
+                        disabled={loading}
+                      >
+                        <option value="0">Escoja un ejercicio</option>
+                        {exercisesForSelect.map(opt => (
+                          <option 
+                            key={opt.idExercise} 
+                            value={opt.idExercise} 
+                            className="text-yellow-800"
+                          >
+                            {opt.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Contenedor de series y repeticiones (más estrecho) */}
                     <div className="flex items-end gap-3">
-                      <div className="flex-1">
-                        <select
-                          className="w-full p-2 border border-gray-300 rounded text-sm"
-                          value={ex.idExercise}
-                          onChange={(e) => handleExerciseChange(index, Number(e.target.value))}
+                      {/* Input Series */}
+                      <div className="flex flex-col w-[70px]">  {/* Ancho fijo */}
+                        <label className="text-xs text-gray-500 mb-1">Series</label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="1"
+                            className="w-full p-2 border border-gray-300 rounded text-center h-[38px]"  /* Misma altura */
+                            value={ex.series || "0"}
+                            onChange={(e) => updateExerciseField(index, 'series', Math.max(1, Number(e.target.value)))}
+                            disabled={loading}
+                          />
+                          {ex.idExercise > 0 && ex.series <= 0 && (
+                            <span className="absolute -bottom-5 left-0 right-0 text-xs text-red-500 text-center whitespace-nowrap">
+                              Mínimo 1
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Input Repeticiones */}
+                      <div className="flex flex-col w-[70px]">  {/* Ancho fijo */}
+                        <label className="text-xs text-gray-500 mb-1">Repeticiones</label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="1"
+                            className="w-full p-2 border border-gray-300 rounded text-center h-[38px]"  /* Misma altura */
+                            value={ex.repetitions || "0"}
+                            onChange={(e) => updateExerciseField(index, 'repetitions', Math.max(1, Number(e.target.value)))}
+                            disabled={loading}
+                          />
+                          {ex.idExercise > 0 && ex.repetitions <= 0 && (
+                            <span className="absolute -bottom-5 left-0 right-0 text-xs text-red-500 text-center whitespace-nowrap">
+                              Mínimo 1
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Botón Eliminar */}
+                      {categoryExercises.length > 1 && (
+                        <button
+                          type="button"
+                          className="text-red-500 hover:text-red-700 mb-1 ml-2"
+                          onClick={() => removeExercise(index)}
                           disabled={loading}
                         >
-                          <option value="0">Escoja un ejercicio</option>
-                          {exercisesForSelect.map(opt => (
-                            <option 
-                              key={opt.idExercise} 
-                              value={opt.idExercise} 
-                              className="text-yellow-800"
-                            >
-                              {opt.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col">
-                          <label className="text-xs text-gray-500 mb-1">Series</label>
-                          <input
-                            type="number"
-                            min="0"
-                            className={`w-16 p-1 border ${
-                              ex.idExercise > 0 && ex.series === 0 ? 'border-red-500' : 'border-gray-300'
-                            } rounded text-center`}
-                            value={ex.series}
-                            onChange={(e) => updateExerciseField(index, 'series', Number(e.target.value))}
-                            disabled={loading}
-                          />
-                          {ex.idExercise > 0 && ex.series === 0 && (
-                            <ErrorForm>Series requeridas</ErrorForm>
-                          )}
-                        </div>
-                        
-                        <div className="flex flex-col">
-                          <label className="text-xs text-gray-500 mb-1">Repeticiones</label>
-                          <input
-                            type="number"
-                            min="0"
-                            className={`w-16 p-1 border ${
-                              ex.idExercise > 0 && ex.repetitions === 0 ? 'border-red-500' : 'border-gray-300'
-                            } rounded text-center`}
-                            value={ex.repetitions}
-                            onChange={(e) => updateExerciseField(index, 'repetitions', Number(e.target.value))}
-                            disabled={loading}
-                          />
-                          {ex.idExercise > 0 && ex.repetitions === 0 && (
-                            <ErrorForm>Repeticiones requeridas</ErrorForm>
-                          )}
-                        </div>
-
-                        {categoryExercises.length > 1 && (
-                          <button
-                            type="button"
-                            className="text-red-500 hover:text-red-700 mb-1"
-                            onClick={() => removeExercise(index)}
-                            disabled={loading}
-                          >
-                            ✖
-                          </button>
-                        )}
-                      </div>
+                          ✖
+                        </button>
+                      )}
                     </div>
+                  </div>
                   </div>
                 );
               })}
