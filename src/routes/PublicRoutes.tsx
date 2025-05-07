@@ -6,7 +6,7 @@ import ChangePasswordForm from '../Login/ChangePasswordForm';
 import LandingPage from '../LandingPage/page'; // Importa tu Landing Page
 
 function PublicRoutes() {
-    const { credencialUser, setCredencialUser, handleLoginSubmit } = useLogin();
+    const { credencialUser, setCredencialUser, handleLoginSubmit, isSubmitting } = useLogin();
     
     return (
         <Routes>
@@ -22,7 +22,7 @@ function PublicRoutes() {
                         credencialUser={credencialUser}
                         setCredencialUser={setCredencialUser}
                         handleLoginSubmit={handleLoginSubmit}
-                        isSubmitting={true}
+                        isSubmitting={isSubmitting}
                     />
                 } 
             />
