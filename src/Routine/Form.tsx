@@ -171,7 +171,9 @@ function Form() {
       });
       return;
     }
-
+    const hasInvalidValues = selectedExercises.some(ex => 
+      ex.idExercise > 0 && (ex.series <= 0 || ex.repetitions <= 0)
+    );
     // Preparar datos para enviar
     const reqRoutine: RoutineWithExercisesDTO = {
       name: data.name,
@@ -180,7 +182,9 @@ function Form() {
       difficultyRoutine: {
         idDifficultyRoutine: data.idDifficultyRoutine
       },
-      exercises: validExercises.map(ex => ({
+      exercises: selectedExercises
+      .filter(ex => ex.idExercise > 0)
+      .map(ex => ({
         idExercise: ex.idExercise,
         series: ex.series,
         repetitions: ex.repetitions
@@ -315,7 +319,26 @@ function Form() {
     const category = exerciseCategories.find(c => c.idExerciseCategory === categoryId);
     if (!category) return;
 
+    // Obtener ejercicios disponibles para esta categoría
     const availableExercises = getAvailableExercises(categoryId);
+    
+    // Obtener ejercicios actualmente seleccionados para esta categoría
+    const currentExercisesInCategory = selectedExercises.filter(
+      ex => ex.categoryId === categoryId && ex.idExercise === 0
+    );
+    
+    // Verificar si hay ejercicios disponibles y si no hemos alcanzado el límite
+    if (availableExercises.length <= currentExercisesInCategory.length) {
+      Swal.fire({
+        title: 'Límite alcanzado',
+        text: 'No puedes agregar más ejercicios de esta categoría que los disponibles',
+        icon: 'info',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#CFAD04'
+      });
+      return;
+    }
+      
     if (availableExercises.length === 0) {
       Swal.fire({
         title: 'No hay ejercicios disponibles',
@@ -480,11 +503,16 @@ function Form() {
                           <input
                             type="number"
                             min="0"
-                            className="w-16 p-1 border border-gray-300 rounded text-center"
+                            className={`w-16 p-1 border ${
+                              ex.idExercise > 0 && ex.series === 0 ? 'border-red-500' : 'border-gray-300'
+                            } rounded text-center`}
                             value={ex.series}
                             onChange={(e) => updateExerciseField(index, 'series', Number(e.target.value))}
                             disabled={loading}
                           />
+                          {ex.idExercise > 0 && ex.series === 0 && (
+                            <ErrorForm>Series requeridas</ErrorForm>
+                          )}
                         </div>
                         
                         <div className="flex flex-col">
@@ -492,11 +520,16 @@ function Form() {
                           <input
                             type="number"
                             min="0"
-                            className="w-16 p-1 border border-gray-300 rounded text-center"
+                            className={`w-16 p-1 border ${
+                              ex.idExercise > 0 && ex.repetitions === 0 ? 'border-red-500' : 'border-gray-300'
+                            } rounded text-center`}
                             value={ex.repetitions}
                             onChange={(e) => updateExerciseField(index, 'repetitions', Number(e.target.value))}
                             disabled={loading}
                           />
+                          {ex.idExercise > 0 && ex.repetitions === 0 && (
+                            <ErrorForm>Repeticiones requeridas</ErrorForm>
+                          )}
                         </div>
 
                         {categoryExercises.length > 1 && (
@@ -514,18 +547,19 @@ function Form() {
                   </div>
                 );
               })}
-
-              {getAvailableExercises(category.idExerciseCategory).length > 0 && (
-                <div className="flex justify-start mt-2">
-                  <button
-                    type="button"
-                    className="text-gray-500 hover:text-yellow-600 text-sm flex items-center"
-                    onClick={() => addNewExercise(category.idExerciseCategory)}
-                    disabled={loading}
-                  >
-                    <span className="mr-1 text-lg">+</span> Agregar ejercicio
-                  </button>
-                </div>
+                {getAvailableExercises(category.idExerciseCategory).length > 0 && 
+                  getAvailableExercises(category.idExerciseCategory).length > 
+                    selectedExercises.filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise === 0).length && (
+                  <div className="flex justify-start mt-2">
+                    <button
+                      type="button"
+                      className="text-gray-500 hover:text-yellow-600 text-sm flex items-center"
+                      onClick={() => addNewExercise(category.idExerciseCategory)}
+                      disabled={loading}
+                    >
+                      <span className="mr-1 text-lg">+</span> Agregar ejercicio
+                    </button>
+                  </div>
               )}
             </div>
           );
