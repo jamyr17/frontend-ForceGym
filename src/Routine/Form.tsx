@@ -14,6 +14,7 @@ type SelectedExercise = {
   name: string;
   series: number;
   repetitions: number;
+  note: string;
   category: string;
   categoryId: number;
 };
@@ -83,6 +84,7 @@ function Form() {
         name: "",
         series: 0,
         repetitions: 0,
+        note: "",
         category: category.name,
         categoryId: category.idExerciseCategory
       }));
@@ -120,6 +122,7 @@ function Form() {
             name: exerciseData?.name || `Ejercicio ${ex.idExercise}`,
             series: ex.series || 0,
             repetitions: ex.repetitions || 0,
+            note: ex.note || "Sin nota",
             category: category?.name || "Sin categoría",
             categoryId: category?.idExerciseCategory || 0
           };
@@ -134,6 +137,7 @@ function Form() {
             name: "",
             series: 0,
             repetitions: 0,
+            note: "",
             category: cat.name,
             categoryId: cat.idExerciseCategory
           }));
@@ -183,7 +187,8 @@ function Form() {
       exercises: validExercises.map(ex => ({
         idExercise: ex.idExercise,
         series: ex.series,
-        repetitions: ex.repetitions
+        repetitions: ex.repetitions,
+        note: ex.note
       })),
       assignments: selectedClients.map(client => ({
         idClient: client.value,
@@ -256,6 +261,7 @@ function Form() {
           name: "",
           series: 0,
           repetitions: 0,
+          note: "",
           category: category.name,
           categoryId: category.idExerciseCategory
         }))
@@ -294,7 +300,8 @@ function Form() {
             idExercise: selectedExercise.idExercise,
             name: selectedExercise.name,
             series: newExercises[index].series || 0,
-            repetitions: newExercises[index].repetitions || 0
+            repetitions: newExercises[index].repetitions || 0,
+            note: newExercises[index].note,
           };
         }
       } else {
@@ -303,7 +310,8 @@ function Form() {
           idExercise: 0,
           name: "",
           series: 0,
-          repetitions: 0
+          repetitions: 0,
+          note: "",
         };
       }
       
@@ -334,13 +342,14 @@ function Form() {
         name: "",
         series: 0,
         repetitions: 0,
+        note: "",
         category: category.name,
         categoryId: category.idExerciseCategory
       }
     ]);
   };
 
-  const updateExerciseField = (index: number, field: 'series' | 'repetitions', value: number) => {
+  const updateExerciseField = (index: number, field: 'series' | 'repetitions' | 'note', value: number | string) => {
     setSelectedExercises(prev => {
       const newExercises = [...prev];
       newExercises[index] = {
@@ -495,6 +504,17 @@ function Form() {
                             className="w-16 p-1 border border-gray-300 rounded text-center"
                             value={ex.repetitions}
                             onChange={(e) => updateExerciseField(index, 'repetitions', Number(e.target.value))}
+                            disabled={loading}
+                          />
+                        </div>
+
+                        <div className="flex flex-col">
+                          <label className="text-xs text-gray-500 mb-1">Notas</label>
+                          <input
+                            type="text"
+                            className="w-24 p-1 border border-gray-300 rounded text-center"
+                            value={ex.note}
+                            onChange={(e) => updateExerciseField(index, 'note', e.target.value)}
                             disabled={loading}
                           />
                         </div>
