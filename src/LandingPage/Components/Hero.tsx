@@ -16,23 +16,19 @@ const Hero = () => {
 
   return (
     <section className="relative h-screen flex items-center justify-center bg-black overflow-hidden">
-      {/* Capa de video */}
+      {/* Capa de video desde YouTube (solo desktop) */}
       {isDesktop && (
-        <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-          >
-            <source src="/LandingPage/heroVideoGymcomp.mp4" type="video/mp4" />
-            Tu navegador no soporta el elemento de video.
-          </video>
-        </div>
-      )}
-
+  <div className="absolute inset-0 z-0 overflow-hidden">
+    <iframe
+      className="w-full h-full object-cover"
+      src="https://www.youtube.com/embed/xVQZaeBqI5A?autoplay=1&loop=1&playlist=xVQZaeBqI5A&mute=1&controls=0&modestbranding=1&rel=0&vq=hd1080"
+      title="YouTube video player"
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    ></iframe>
+  </div>
+)}
       {/* Capa de imagen para móviles */}
       <div className="md:hidden absolute inset-0 z-0">
         <div
@@ -45,7 +41,7 @@ const Hero = () => {
         />
       </div>
 
-      {/* Overlay oscuro (ajusta la opacidad según necesites) */}
+      {/* Overlay oscuro */}
       <div className="absolute inset-0 bg-black/50 z-1"></div>
 
       {/* Contenido */}
