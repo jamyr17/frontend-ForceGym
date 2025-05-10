@@ -124,6 +124,7 @@ export const useRoutine = () => {
             name: globalExercise?.name || `Ejercicio #${ex.idExercise}`,
             series: ex.series || 0,
             repetitions: ex.repetitions || 0,
+            note: ex.note || "Sin nota",
             category: globalExercise?.exerciseCategory?.name || "Sin categoría",
         };
     };
@@ -136,7 +137,7 @@ export const useRoutine = () => {
                 throw new Error('Rutina no encontrada');
             }
 
-            const exerciseHeaders = ["#", "Ejercicio", "Categoría", "Series", "Repeticiones"];
+            const exerciseHeaders = ["#", "Ejercicio", "Categoría", "Series", "Repeticiones", "Nota"];
             const exerciseRows = currentRoutine.exercises?.map((ex, index) => {
                 const details = getExerciseDetails(ex);
                 return [
@@ -144,7 +145,8 @@ export const useRoutine = () => {
                     details.name,
                     details.category,
                     details.series.toString(),
-                    details.repetitions.toString()
+                    details.repetitions.toString(),
+                    details.note
                 ];
             }) || [];
 
@@ -171,20 +173,22 @@ export const useRoutine = () => {
         }
     };
 
-    const pdfTableHeaders = ["#", "Nombre", "Ejercicios", "Series", "Reps"];
+    const pdfTableHeaders = ["#", "Nombre", "Ejercicios", "Series", "Reps", "Nota"];
     
     const pdfTableRows = routines.map((routine) => {
         const totals = routine.routineExercises?.reduce((acc, ex) => ({
             series: acc.series + (ex.series || 0),
-            reps: acc.reps + (ex.repetitions || 0)
-        }), { series: 0, reps: 0 }) || { series: 0, reps: 0 };
+            reps: acc.reps + (ex.repetitions || 0),
+            nots: acc.nots + (ex.note || "")
+        }), { series: 0, reps: 0, nots: "" }) || { series: 0, reps: 0, nots: "" };
 
         return [
             routine.idRoutine.toString(),
             routine.name,
             routine.routineExercises?.length.toString() || "0",
             totals.series.toString(),
-            totals.reps.toString()
+            totals.reps.toString(),
+            totals.nots
         ];
     });
 
