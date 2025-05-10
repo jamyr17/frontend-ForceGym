@@ -96,6 +96,7 @@ export function FilterSelect() {
                     className={'border rounded-md p-2 w-78 text-center' + filteredMeanOfPaymentStyles}
                     onChange={(e) => {changeFilterByMeanOfPayment(+e.target.value)}}
                 >
+                    <option value={0}>Todos</option>
                     {meansOfPayment.map((meanOfPayment)=> (
                         <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
                             {meanOfPayment.name}

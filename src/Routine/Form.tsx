@@ -447,10 +447,13 @@ function Form() {
         <select
           id="idDifficultyRoutine"
           className="w-full p-3 border border-gray-100"
-          {...register('idDifficultyRoutine', { required: 'Debe seleccionar una dificultad' })}
+          {...register('idDifficultyRoutine', {
+            required: 'Debe seleccionar una dificultad',
+            validate: value => Number(value) !== 0 || 'Debe seleccionar una dificultad'
+          })}
           disabled={loading}
         >
-          <option value="">--Seleccione--</option>
+          <option value={0}>Seleccione una dificultad</option>
           {difficultyRoutines.map(difficulty => (
             <option
               key={difficulty.idDifficultyRoutine}
