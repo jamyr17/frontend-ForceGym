@@ -99,6 +99,7 @@ export function FilterSelect() {
                     className={'border rounded-md p-2 w-78 text-center' + filteredMeanOfPaymentStyles}
                     onChange={(e) => {changeFilterByMeanOfPayment(+e.target.value)}}
                 >
+                    <option value={0}>Todos</option>
                     {meansOfPayment.map((meanOfPayment)=> (
                         <option key={meanOfPayment.idMeanOfPayment} value={meanOfPayment.idMeanOfPayment}>
                             {meanOfPayment.name}
@@ -126,6 +127,7 @@ export function FilterSelect() {
                     className={'border rounded-md p-2 w-78 text-center' + filteredCategoryStyles}
                     onChange={(e) => {changeFilterByCategory(+e.target.value)}}
                 >
+                    <option value={-1}>Todos</option>
                     {categories.map((category)=> (
                         <option key={category.idCategory} value={category.idCategory}>
                             {category.name}

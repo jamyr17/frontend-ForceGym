@@ -128,15 +128,23 @@ function Form() {
                 </label>
                 <select
                     id="idNotificationType"
-                    className="w-full p-3 border border-gray-100"
-                    {...register("idNotificationType")}
+                    className="w-full p-3 border border-gray-300 rounded"
+                    {...register("idNotificationType", {
+                        required: 'El tipo de notificación es obligatorio'
+                    })}
+                    aria-invalid={errors.idNotificationType ? "true" : "false"}
                 >
+                    <option value="">Seleccione un tipo de notificación</option>
                     {notificationTypes.map((noti) => (
                         <option key={noti.idNotificationType} value={noti.idNotificationType}>
                             {noti.name}
                         </option>
                     ))}
                 </select>
+                {errors.idNotificationType && (
+                    <p className="text-red-500 text-xs mt-1">{errors.idNotificationType.message}</p>
+                )}
+
             </div>
 
             <div className="mb-5">
