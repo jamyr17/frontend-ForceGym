@@ -11,6 +11,8 @@ import { formatDate } from "../shared/utils/format";
 const MAXLENGTH_NAME = 100;
 const MAXLENGTH_CODE = 10;
 const MAXDATE = new Date().toUTCString();
+const MIN_UNIT_VALUE = 115000; // Valor mínimo por unidad
+
 
 function Form() {
     const navigate = useNavigate();
@@ -32,6 +34,17 @@ function Form() {
             });
             return;
         }
+         // Validación clave: costo unitario ≥ 115,000
+         if (data.initialCost < MIN_UNIT_VALUE) {
+            Swal.fire({
+                title: 'Error',
+                text: `Cada activo debe valer ${MIN_UNIT_VALUE.toLocaleString()} o más (valor unitario insuficiente)`,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
 
         if (data.initialCost <= 0) {
             Swal.fire({
@@ -252,41 +265,31 @@ function Form() {
 
             <div className="mb-5">
                 <label htmlFor="cost" className="text-sm uppercase font-bold">
-                    Costo unitario
+                    Costo unitario (Mínimo: ${MIN_UNIT_VALUE.toLocaleString()})
                 </label>
                 <input  
                     id="cost"
                     className="w-full p-3 border border-gray-100"  
                     type="number" 
-                    min="0"
-                    step="0"
-                    placeholder="Ingrese el costo" 
-                    onWheel={(e) => {
-                        e.preventDefault();
-                        e.currentTarget.blur();
-                    }}
+                    min={MIN_UNIT_VALUE}
+                    step="0.01"
+                    placeholder={`Mínimo ${MIN_UNIT_VALUE.toLocaleString()}`} 
                     {...register('initialCost', {
-                        required: 'El costo es obligatorio', 
+                        required: 'El costo unitario es obligatorio', 
                         min: {
-                            value: 0,
-                            message: 'El costo no puede ser negativo'
+                            value: MIN_UNIT_VALUE,
+                            message: `El valor por unidad debe ser ≥ ${MIN_UNIT_VALUE.toLocaleString()}`
                         },
                         valueAsNumber: true
                     })}
-                    onKeyDown={(e) => {
-                        // Prevenir la entrada de caracteres negativos
-                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                            e.preventDefault();
-                        }
-                    }}
                 />
                 {errors.initialCost && 
                     <ErrorForm>
-                        {errors.initialCost.message}
+                        {errors.initialCost.message?.toString().replace("initialCost", "valor unitario")}
                     </ErrorForm>
                 }
             </div>
-
+            
             <div className="mb-5">
                 <label htmlFor="serviceLifeYears" className="text-sm uppercase font-bold">
                     Años de vida útil
