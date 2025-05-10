@@ -80,142 +80,71 @@ function EconomicBalanceDashboard() {
     };
 
     return (
-        <div className="bg-black min-h-screen">
+        <div className="bg-black min-h-screen text-gray-800 pl-0 md:pl-12 transition-all duration-300">
             <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
                 <h1 className="text-4xl uppercase">BALANCE</h1>
                 <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
 
-            {/* Contenedor principal */}
             <div className="grid grid-cols-1 gap-6 p-6">
-                {/* Balance Mensual - Solo cambios en el gráfico */}
+                {/* Gráfico Principal: Balance */}
                 <div className="bg-white p-6 rounded-lg shadow-md mx-auto w-full max-w-4xl">
-                    <h2 className="text-lg font-semibold text-center mb-4">Balance Mensual</h2>
-                    <div className="h-62">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis 
-                                    dataKey="name" 
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#666', fontSize: 12 }}
-                                />
-                                <YAxis 
-                                    tickFormatter={formatYAxis}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#666', fontSize: 12 }}
-                                    width={90}
-                                />
-                                <Tooltip 
-                                    formatter={(value: number) => [`₡${value.toLocaleString('es-CR')}`, 'Monto']}
-                                    labelFormatter={(label) => `Mes: ${label}`}
-                                    contentStyle={{
-                                        backgroundColor: '#fff',
-                                        border: '1px solid #eee',
-                                        borderRadius: '6px',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                        fontSize: '14px'
-                                    }}
-                                />
-                                <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                <Bar 
-                                    dataKey="balance" 
-                                    name="Balance" 
-                                    fill="#8a2be2"
-                                    radius={[4, 4, 0, 0]}
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+                <h2 className="text-lg font-semibold text-center mb-4">Balance Mensual</h2>
+                <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                        <XAxis dataKey="name" tick={{ fill: "#444", fontSize: 12 }} />
+                        <YAxis tickFormatter={formatYAxis} tick={{ fill: "#444", fontSize: 12 }} width={90} />
+                        <Tooltip
+                        formatter={(value: number) => [`₡${value.toLocaleString("es-CR")}`, "Monto"]}
+                        labelFormatter={(label) => `Mes: ${label}`}
+                        />
+                        <Legend wrapperStyle={{ paddingTop: "10px" }} />
+                        <Bar dataKey="balance" name="Balance" fill="#6B46C1" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                    </ResponsiveContainer>
+                </div>
                 </div>
 
-                {/* Ingresos y Gastos - Solo cambios en los gráficos */}
+                {/* Gráficos de Ingresos y Gastos */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-auto w-full max-w-6xl">
-                    {/* Ingresos */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-lg font-semibold text-center mb-4">Ingresos</h2>
-                        <div className="h-56">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis 
-                                        dataKey="name" 
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#666', fontSize: 11 }}
-                                    />
-                                    <YAxis 
-                                        tickFormatter={formatYAxis}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#666', fontSize: 11 }}
-                                        width={80}
-                                    />
-                                    <Tooltip 
-                                        formatter={(value: number) => [`₡${value.toLocaleString('es-CR')}`, 'Monto']}
-                                        labelFormatter={(label) => `Mes: ${label}`}
-                                        contentStyle={{
-                                            backgroundColor: '#fff',
-                                            border: '1px solid #eee',
-                                            borderRadius: '6px',
-                                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                            fontSize: '13px'
-                                        }}
-                                    />
-                                    <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                                    <Bar 
-                                        dataKey="income" 
-                                        name="Ingresos" 
-                                        fill="#4CAF50"
-                                        radius={[4, 4, 0, 0]}
-                                    />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
+                {/* Ingresos */}
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-lg font-semibold text-center mb-4">Ingresos</h2>
+                    <div className="h-56">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                        <XAxis dataKey="name" tick={{ fill: "#444", fontSize: 11 }} />
+                        <YAxis tickFormatter={formatYAxis} tick={{ fill: "#444", fontSize: 11 }} width={80} />
+                        <Tooltip
+                            formatter={(value: number) => [`₡${value.toLocaleString("es-CR")}`, "Monto"]}
+                            labelFormatter={(label) => `Mes: ${label}`}
+                        />
+                        <Legend wrapperStyle={{ paddingTop: "10px" }} />
+                        <Bar dataKey="income" name="Ingresos" fill="#48BB78" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
                     </div>
-
+                </div>
                     {/* Gastos */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-lg font-semibold text-center mb-4">Gastos</h2>
                         <div className="h-56">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis 
-                                        dataKey="name" 
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#666', fontSize: 11 }}
-                                    />
-                                    <YAxis 
-                                        tickFormatter={formatYAxis}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#666', fontSize: 11 }}
-                                        width={80}
-                                    />
-                                    <Tooltip 
-                                        formatter={(value: number) => [`₡${value.toLocaleString('es-CR')}`, 'Monto']}
-                                        labelFormatter={(label) => `Mes: ${label}`}
-                                        contentStyle={{
-                                            backgroundColor: '#fff',
-                                            border: '1px solid #eee',
-                                            borderRadius: '6px',
-                                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                            fontSize: '13px'
-                                        }}
-                                    />
-                                    <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                                    <Bar 
-                                        dataKey="expense" 
-                                        name="Gastos" 
-                                        fill="#FFD700"
-                                        radius={[4, 4, 0, 0]}
-                                    />
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                            <XAxis dataKey="name" tick={{ fill: "#444", fontSize: 11 }} />
+                            <YAxis tickFormatter={formatYAxis} tick={{ fill: "#444", fontSize: 11 }} width={80} />
+                            <Tooltip
+                                formatter={(value: number) => [`₡${value.toLocaleString("es-CR")}`, "Monto"]}
+                                labelFormatter={(label) => `Mes: ${label}`}
+                            />
+                            <Legend wrapperStyle={{ paddingTop: "10px" }} />
+                            <Bar dataKey="expense" name="Gastos" fill="#F6AD55" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
                         </div>
                     </div>
                 </div>

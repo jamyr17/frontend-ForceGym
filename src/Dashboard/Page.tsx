@@ -33,7 +33,6 @@ function DashboardManagement() {
     fetchData();
   }, []);
 
-  // Procesamiento de datos mensuales para el gráfico
   const processChartData = () => {
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const monthlyData = months.map(month => ({
@@ -59,34 +58,30 @@ function DashboardManagement() {
   };
 
   const chartData = processChartData();
-
-  // Formato del eje Y (colón costarricense)
   const formatYAxis = (value: number) => `₡${value.toLocaleString('es-CR')}`;
 
   return (
-    <div className="bg-black min-h-screen p-4">
-      {/* Header con logo y botón de notificación */}
-      <header className="relative flex justify-center items-center py-4 mb-6">
+    <div className="bg-black min-h-screen text-gray-800 pl-0 md:pl-12 transition-all duration-300">
+      {/* Header */}
+      <header className="relative flex justify-center items-center py-4 mb-6 border-b border-gray-700 bg-black px-4 sm:px-6">
         <img 
           src="/LogoBlack.jpg" 
           alt="Logo de Force GYM" 
-          className="w-40 h-auto" // Tamaño del logo
+          className="w-40 h-auto" 
         />
         <button 
           className="p-2 rounded-full hover:bg-gray-800 absolute right-4"
           onClick={() => setIsNotificationsOpen(true)}
         >
-          <IoIosNotificationsOutline className="text-white text-2xl" /> {/* Tamaño del ícono */}
+          <IoIosNotificationsOutline className="text-white text-2xl" />
         </button>
       </header>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-6">
-        {/* Gráfico Balance Mensual */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-center text-gray-800 mb-4">
-            Balance Mensual
-          </h2>
-          <div className="h-64"> {/* Altura del gráfico principal */}
+      <main className="max-w-7xl mx-auto grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-8">
+        {/* Balance Mensual */}
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-md overflow-x-auto">
+          <h2 className="text-xl font-semibold text-center mb-4">Balance Mensual</h2>
+          <div className="h-52 md:h-60 min-w-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 30, right: 20, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -94,14 +89,14 @@ function DashboardManagement() {
                   dataKey="name" 
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#666', fontSize: 12 }} // Tamaño fuente eje X
+                  tick={{ fill: '#666', fontSize: 12 }}
                 />
                 <YAxis 
                   tickFormatter={formatYAxis}
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#666', fontSize: 12 }} // Tamaño fuente eje Y
-                  width={90} // Ancho del eje Y
+                  tick={{ fill: '#666', fontSize: 12 }}
+                  width={90}
                 />
                 <Tooltip 
                   formatter={(value: number) => [`₡${value.toLocaleString('es-CR')}`, 'Monto']}
@@ -111,29 +106,27 @@ function DashboardManagement() {
                     border: '1px solid #eee',
                     borderRadius: '6px',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    fontSize: '14px' // Tamaño del tooltip
+                    fontSize: '20px'
                   }}
                 />
-                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                <Legend wrapperStyle={{ paddingTop: '0px' }} />
                 <Bar 
                   dataKey="balance" 
                   name="Balance" 
                   fill="#8a2be2"
-                  radius={[4, 4, 0, 0]} // Bordes redondeados arriba
+                  radius={[4, 4, 0, 0]} 
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Ingresos y Gastos en dos columnas */}
+        {/* Ingresos y Gastos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Ingresos */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-center text-gray-800 mb-4">
-              Ingresos Mensuales
-            </h2>
-            <div className="h-48"> {/* Altura del gráfico de ingresos */}
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-md overflow-x-auto">
+            <h2 className="text-lg font-semibold text-center mb-4">Ingresos Mensuales</h2>
+            <div className="h-40 md:h-48 min-w-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -141,21 +134,21 @@ function DashboardManagement() {
                     dataKey="name" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#666', fontSize: 11 }} // Fuente eje X
+                    tick={{ fill: '#666', fontSize: 11 }}
                   />
                   <YAxis 
                     tickFormatter={formatYAxis}
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#666', fontSize: 11 }} // Fuente eje Y
+                    tick={{ fill: '#666', fontSize: 11 }}
                     width={80}
                   />
                   <Tooltip 
                     formatter={(value: number) => [`₡${value.toLocaleString('es-CR')}`, 'Monto']}
                     labelFormatter={(label) => `Mes: ${label}`}
-                    contentStyle={{ fontSize: '13px' }}
+                    contentStyle={{ fontSize: '40px' }}
                   />
-                  <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                  <Legend wrapperStyle={{ paddingTop: '-10px' }} />
                   <Bar 
                     dataKey="income" 
                     name="Ingresos" 
@@ -168,11 +161,9 @@ function DashboardManagement() {
           </div>
 
           {/* Gastos */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-center text-gray-800 mb-4">
-              Gastos Mensuales
-            </h2>
-            <div className="h-48"> {/* Altura del gráfico de gastos */}
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-md overflow-x-auto">
+            <h2 className="text-lg font-semibold text-center mb-4">Gastos Mensuales</h2>
+            <div className="h-40 md:h-48 min-w-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -192,9 +183,9 @@ function DashboardManagement() {
                   <Tooltip 
                     formatter={(value: number) => [`₡${value.toLocaleString('es-CR')}`, 'Monto']}
                     labelFormatter={(label) => `Mes: ${label}`}
-                    contentStyle={{ fontSize: '13px' }}
+                    contentStyle={{ fontSize: '25px' }}
                   />
-                  <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                  <Legend wrapperStyle={{ paddingTop: '-10px' }} />
                   <Bar 
                     dataKey="expense" 
                     name="Gastos" 
@@ -206,7 +197,7 @@ function DashboardManagement() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Modal de notificaciones */}
       <NotificationsModal 
