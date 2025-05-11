@@ -19,6 +19,7 @@ import ExerciseManagement from "../Exercise/Page";
 import ActivityTypeManagement from "../ActivityType/Page";
 import RoutineManagement from "../Routine/Page";
 import ExerciseCategoryManagement from "../ExerciseCategory/Page";
+import CollaboratorModule from "../Collaborator";
 
 function PrivateRoutes () {
     const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty, fetchDifficultyRoutines, fetchExercise } = useCommonDataStore()
@@ -73,6 +74,14 @@ function PrivateRoutes () {
                 element={
                 <ProtectedRoute allowedRoles={['Administrador']}>
                 <UserManagement/>
+                </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="usuariocolaborador" 
+                element={
+                <ProtectedRoute allowedRoles={['Colaborador']}>
+                <CollaboratorModule/>
                 </ProtectedRoute>
                 }
             />
