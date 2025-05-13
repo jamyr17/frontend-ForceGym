@@ -99,13 +99,15 @@ function Form() {
       setValue('idDifficultyRoutine', routineToEdit.difficultyRoutine?.idDifficultyRoutine || 0);
 
       if (routineToEdit.assignments?.length > 0) {
-        const clientOptions = routineToEdit.assignments.map(assignment => ({
-          value: assignment.idClient,
-          label: assignment.idClient.toString()
-        }));
+        const clientOptions = routineToEdit.assignments.map(assignment => {
+          const client = allClients.find(c => c.value === assignment.idClient);
+          return {
+            value: assignment.idClient,
+            label: client ? `${client.label}` : `Cliente ${assignment.idClient}`
+          };
+        });
         setSelectedClients(clientOptions);
       }
-
       if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
         const loadedExercises = routineToEdit.exercises.map(ex => {
           const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
