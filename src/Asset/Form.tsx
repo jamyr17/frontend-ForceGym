@@ -34,17 +34,16 @@ function Form() {
             });
             return;
         }
-         // Validación clave: costo unitario ≥ 115,000
-         if (data.initialCost < MIN_UNIT_VALUE) {
+        // Validación clave: costo unitario ≥ 115,000
+        if (data.initialCost < MIN_UNIT_VALUE) {
             Swal.fire({
                 title: 'Error',
-                text: `Cada activo debe valer ${MIN_UNIT_VALUE.toLocaleString()} o más (valor unitario insuficiente)`,
+                text: `Cada activo debe valer ₡${MIN_UNIT_VALUE.toLocaleString()} o más (valor unitario insuficiente)`,
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
             return;
         }
-
 
         if (data.initialCost <= 0) {
             Swal.fire({
@@ -63,7 +62,7 @@ function Form() {
             idUser: loggedUser?.idUser,
             paramLoggedIdUser: loggedUser?.idUser
         };
-        
+
         if (activeEditingId === 0) {
             result = await addAsset(reqData as AssetDataForm);
             action = 'agregado';
@@ -74,11 +73,11 @@ function Form() {
 
         closeModalForm();
         reset();
-        
+
         if (result.ok) {
             const result2 = await fetchAssets();
-            
-            if(result2.logout){
+
+            if (result2.logout) {
                 setAuthHeader(null);
                 setAuthUser(null);
                 navigate('/login');
@@ -94,7 +93,7 @@ function Form() {
                     confirmButtonColor: '#CFAD04'
                 });
             }
-        } else if(result.logout) {
+        } else if (result.logout) {
             setAuthHeader(null);
             setAuthUser(null);
             navigate('/login');
@@ -133,7 +132,7 @@ function Form() {
     }, [cost]);
 
     return (
-        <form 
+        <form
             className="bg-white rounded-lg px-5 mb-10 overflow-scroll"
             noValidate
             onSubmit={handleSubmit(submitForm)}
@@ -143,19 +142,19 @@ function Form() {
             </legend>
 
             {/* inputs ocultos para la funcionalidad de actualizar */}
-            <input  
-                id="idUser" 
-                type="hidden" 
+            <input
+                id="idUser"
+                type="hidden"
                 {...register('idUser')}
             />
-            <input  
-                id="idAsset" 
-                type="hidden" 
+            <input
+                id="idAsset"
+                type="hidden"
                 {...register('idAsset')}
             />
-            <input  
-                id="isDeleted" 
-                type="hidden" 
+            <input
+                id="isDeleted"
+                type="hidden"
                 {...register('isDeleted')}
             />
 
@@ -163,18 +162,18 @@ function Form() {
                 <label htmlFor="boughtDate" className="text-sm uppercase font-bold">
                     Fecha de compra
                 </label>
-                <input  
+                <input
                     id="registrationDate"
-                    className="w-full p-3 border border-gray-100"  
-                    type="date" 
+                    className="w-full p-3 border border-gray-100"
+                    type="date"
                     {...register('boughtDate', {
                         required: 'La fecha de compra es obligatoria',
                         max: {
-                        value: MAXDATE,
-                        message: `Debe ingresar una fecha de compra de máximo ${formatDate(new Date())}`
+                            value: MAXDATE,
+                            message: `Debe ingresar una fecha de compra de máximo ${formatDate(new Date())}`
                         }
                     })}
-                    />
+                />
                 {errors.boughtDate && <ErrorForm>{errors.boughtDate.message?.toString()}</ErrorForm>}
             </div>
 
@@ -182,11 +181,11 @@ function Form() {
                 <label htmlFor="code" className="text-sm uppercase font-bold">
                     Código
                 </label>
-                <input  
+                <input
                     id="code"
-                    className="w-full p-3 border border-gray-100"  
-                    type="text" 
-                    placeholder="Ingrese el código" 
+                    className="w-full p-3 border border-gray-100"
+                    type="text"
+                    placeholder="Ingrese el código"
                     {...register('code', {
                         required: 'El código es obligatorio',
                         maxLength: {
@@ -195,7 +194,7 @@ function Form() {
                         }
                     })}
                 />
-                {errors.code && 
+                {errors.code &&
                     <ErrorForm>
                         {errors.code.message}
                     </ErrorForm>
@@ -206,11 +205,11 @@ function Form() {
                 <label htmlFor="name" className="text-sm uppercase font-bold">
                     Nombre
                 </label>
-                <input  
+                <input
                     id="name"
-                    className="w-full p-3 border border-gray-100"  
-                    type="text" 
-                    placeholder="Ingrese el nombre" 
+                    className="w-full p-3 border border-gray-100"
+                    type="text"
+                    placeholder="Ingrese el nombre"
                     {...register('name', {
                         required: 'El nombre es obligatorio',
                         maxLength: {
@@ -219,7 +218,7 @@ function Form() {
                         }
                     })}
                 />
-                {errors.name && 
+                {errors.name &&
                     <ErrorForm>
                         {errors.name.message}
                     </ErrorForm>
@@ -230,19 +229,19 @@ function Form() {
                 <label htmlFor="quantity" className="text-sm uppercase font-bold">
                     Cantidad
                 </label>
-                <input  
+                <input
                     id="quantity"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
+                    className="w-full p-3 border border-gray-100"
+                    type="number"
                     min="0"
                     step="1"
-                    placeholder="Ingrese la cantidad" 
+                    placeholder="Ingrese la cantidad"
                     onWheel={(e) => {
                         e.preventDefault();
                         e.currentTarget.blur();
                     }}
                     {...register('quantity', {
-                        required: 'La cantidad es obligatoria', 
+                        required: 'La cantidad es obligatoria',
                         min: {
                             value: 0,
                             message: 'La cantidad no puede ser negativa'
@@ -256,7 +255,7 @@ function Form() {
                         }
                     }}
                 />
-                {errors.quantity && 
+                {errors.quantity &&
                     <ErrorForm>
                         {errors.quantity.message}
                     </ErrorForm>
@@ -265,48 +264,52 @@ function Form() {
 
             <div className="mb-5">
                 <label htmlFor="cost" className="text-sm uppercase font-bold">
-                    Costo unitario (Mínimo: ${MIN_UNIT_VALUE.toLocaleString()})
+                    Costo unitario (Mínimo: ₡{MIN_UNIT_VALUE.toLocaleString()})
                 </label>
-                <input  
+                <input
                     id="cost"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
+                    className="w-full p-3 border border-gray-100"
+                    type="number"
                     min={MIN_UNIT_VALUE}
                     step="0.01"
-                    placeholder={`Mínimo ${MIN_UNIT_VALUE.toLocaleString()}`} 
+                    placeholder={`Mínimo ₡${MIN_UNIT_VALUE.toLocaleString()}`}
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                    }}
                     {...register('initialCost', {
-                        required: 'El costo unitario es obligatorio', 
+                        required: 'El costo unitario es obligatorio',
                         min: {
                             value: MIN_UNIT_VALUE,
-                            message: `El valor por unidad debe ser ≥ ${MIN_UNIT_VALUE.toLocaleString()}`
+                            message: `El valor por unidad debe ser ≥ ₡${MIN_UNIT_VALUE.toLocaleString()}`
                         },
                         valueAsNumber: true
                     })}
                 />
-                {errors.initialCost && 
+                {errors.initialCost &&
                     <ErrorForm>
                         {errors.initialCost.message?.toString().replace("initialCost", "valor unitario")}
                     </ErrorForm>
                 }
             </div>
-            
+
             <div className="mb-5">
                 <label htmlFor="serviceLifeYears" className="text-sm uppercase font-bold">
                     Años de vida útil
                 </label>
-                <input  
+                <input
                     id="serviceLifeYears"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
+                    className="w-full p-3 border border-gray-100"
+                    type="number"
                     min="0"
                     step="1"
-                    placeholder="Ingrese los años de vida útil" 
+                    placeholder="Ingrese los años de vida útil"
                     onWheel={(e) => {
                         e.preventDefault();
                         e.currentTarget.blur();
                     }}
                     {...register('serviceLifeYears', {
-                        required: 'Los años de vida útil son obligatorios', 
+                        required: 'Los años de vida útil son obligatorios',
                         min: {
                             value: 0,
                             message: 'Los ños de vida útil no pueden ser negativos'
@@ -320,19 +323,19 @@ function Form() {
                         }
                     }}
                 />
-                {errors.serviceLifeYears && 
+                {errors.serviceLifeYears &&
                     <ErrorForm>
                         {errors.serviceLifeYears.message}
                     </ErrorForm>
                 }
             </div>
 
-            <input 
-                type="submit" 
-                className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors" 
-                value={activeEditingId ? 'Actualizar' : 'Registrar'} 
+            <input
+                type="submit"
+                className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors"
+                value={activeEditingId ? 'Actualizar' : 'Registrar'}
             />
-        </form> 
+        </form>
     );
 }
 
