@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 type FeatureOption = {
   img: string;
@@ -18,7 +19,10 @@ type FeatureCardProps = {
   coach: CoachOption;
   onPrev?: () => void;
   onNext?: () => void;
+  onHoverStart?: () => void;
+  onHoverEnd?: () => void;
 };
+
 
 const FeatureCard = ({
   item,
@@ -26,25 +30,44 @@ const FeatureCard = ({
   coach,
   onPrev,
   onNext,
+  onHoverStart,
+  onHoverEnd,
 }: FeatureCardProps) => {
+  const [showText, setShowText] = useState(true);
+
   return (
-    <div className="group relative">
+    <div 
+      className="group relative"
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+    >
       <div className="relative h-72 sm:h-80 overflow-hidden rounded-lg transform transition-transform duration-300 group-hover:scale-105 hover:shadow-yellow-500/30 hover:shadow-lg">
         <img
           src={isCoach ? coach?.img : item.img}
           alt={isCoach ? coach?.name : item.title}
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover brightness-[0.75] transition-opacity duration-500 group-hover:opacity-90"
+          className="absolute inset-0 w-full h-full object-cover brightness-[0.85] transition-opacity duration-500 group-hover:opacity-90"
         />
 
-        <div className="absolute inset-0 flex flex-col justify-between p-2 text-center z-10">
+        <div className="w-full absolute inset-0 flex flex-col justify-between p-2 text-center z-10">
           <h3 className="text-xl sm:text-2xl font-extrabold mb-2 text-yellow-400">
             {isCoach ? coach?.name : item.title}
           </h3>
-          <p className="w-full text-white text-center text-sm sm:text-base font-semibold transition-opacity duration-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:w-2/3 sm:mx-auto">
-            {isCoach ? coach?.text : item.desc}
-          </p>
+
+          {showText && (
+            <p className="w-full bg-black/60 py-1 px-6 rounded-sm text-white text-center text-sm sm:text-base font-semibold transition-opacity duration-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:w-4/5 sm:mx-auto">
+              {isCoach ? coach?.text : item.desc}
+            </p>
+          )}
+
+          <button
+            onClick={() => setShowText(!showText)}
+            className="absolute bottom-2 right-2 bg-white text-black p-1 rounded-full hover:bg-yellow hover:cursor-pointer transition"
+            aria-label={showText ? 'Ocultar texto' : 'Mostrar texto'}
+          >
+            {showText ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
         </div>
 
         {isCoach && onPrev && onNext && (
@@ -54,7 +77,7 @@ const FeatureCard = ({
               aria-label="Anterior entrenador"
               className="absolute left-2 top-1/2 -translate-y-1/2 text-2xl bg-black/50 text-white p-1 rounded-full 
                 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 
-                hover:bg-gray-200 hover:text-black z-20"
+                hover:bg-gray-200 hover:cursor-pointer hover:text-black z-20"
             >
               ‹
             </button>
@@ -63,7 +86,7 @@ const FeatureCard = ({
               aria-label="Siguiente entrenador"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-2xl bg-black/50 text-white p-1 rounded-full 
                 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 
-                hover:bg-gray-200 hover:text-black z-20"
+                hover:bg-gray-200 hover:cursor-pointer hover:text-black z-20"
             >
               ›
             </button>
@@ -107,12 +130,12 @@ const WhyUs = () => {
       },
       {
         img: '/LandingPage/coach-1.webp',
-        name: 'Kimberly',
+        name: 'Genesis',
         text: 'Entrenadora especializada en fuerza funcional y acondicionamiento físico.',
       },
       {
         img: '/LandingPage/coach-2.webp',
-        name: 'Génesis',
+        name: 'Kimberly',
         text: 'Nutricionista deportiva con enfoque integral en rendimiento.',
       },
       {
@@ -159,6 +182,8 @@ const WhyUs = () => {
                 coach={coach}
                 onPrev={isCoach ? prevCoach : undefined}
                 onNext={isCoach ? nextCoach : undefined}
+                onHoverStart={undefined}
+                onHoverEnd={isCoach ? () => setCurrentCoachIndex(0) : undefined}
               />
             );
           })}
