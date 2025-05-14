@@ -86,11 +86,12 @@ function EconomicBalanceDashboard() {
                 <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
             </header>
 
+      <main className="max-w-7xl mx-auto grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-20">
             <div className="grid grid-cols-1 gap-6 p-6">
                 {/* Gráfico Principal: Balance */}
                 <div className="bg-white p-6 rounded-lg shadow-md mx-auto w-full max-w-4xl">
                 <h2 className="text-lg font-semibold text-center mb-4">Balance Mensual</h2>
-                <div className="h-64">
+                <div className="w-full h-40 sm:h-48 lg:h-52">
                     <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -112,7 +113,7 @@ function EconomicBalanceDashboard() {
                 {/* Ingresos */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-lg font-semibold text-center mb-4">Ingresos</h2>
-                    <div className="h-56">
+                    <div className="w-full h-32 sm:h-45">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -131,24 +132,25 @@ function EconomicBalanceDashboard() {
                     {/* Gastos */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-lg font-semibold text-center mb-4">Gastos</h2>
-                        <div className="h-56">
+                        <div className="w-full h-32 sm:h-45">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis dataKey="name" tick={{ fill: "#444", fontSize: 11 }} />
-                            <YAxis tickFormatter={formatYAxis} tick={{ fill: "#444", fontSize: 11 }} width={80} />
+                            <YAxis tickFormatter={formatYAxis} tick={{ fill: "#666", fontSize: 11 }} width={80} />
                             <Tooltip
                                 formatter={(value: number) => [`₡${value.toLocaleString("es-CR")}`, "Monto"]}
                                 labelFormatter={(label) => `Mes: ${label}`}
                             />
                             <Legend wrapperStyle={{ paddingTop: "10px" }} />
-                            <Bar dataKey="expense" name="Gastos" fill="#F6AD55" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="expense" name="Gastos" fill="#FFD700" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
             </div>
+      </main>
         </div>
     );
 }
