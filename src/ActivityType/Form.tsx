@@ -307,19 +307,23 @@ function Form() {
                     );
                 })}
 
-                <div className="mb-5">
-                    <button
-                        type="button"
-                        onClick={addNewLine}
-                        disabled={getAvailableClientTypes(0).length === 0}
-                        className={`px-4 py-2 text-sm rounded outline-2 hover:opacity-50 ${
-                            getAvailableClientTypes(0).length === 0 ? 
-                            'cursor-not-allowed' : ' hover:cursor-pointer'
-                        }`}
-                    >
-                        + Añadir otra línea
-                    </button>
-                </div>
+                {/* Solo se pueden añadir tantas tarifas como tipos de clientes */}
+                {feeLines.length < clientTypesOptions.length && (
+                    <div className="mb-5">
+                        <button
+                            type="button"
+                            onClick={addNewLine}
+                            disabled={getAvailableClientTypes(0).length === 0}
+                            className={`px-4 py-2 text-sm rounded outline-2 hover:opacity-50 ${
+                                getAvailableClientTypes(0).length === 0 ? 
+                                'cursor-not-allowed' : ' hover:cursor-pointer'
+                            }`}
+                        >
+                            + Añadir otra línea
+                        </button>
+                    </div>
+                )}
+                
             </div>
 
             <input 
