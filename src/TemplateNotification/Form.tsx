@@ -83,6 +83,18 @@ function Form() {
         }
     }, [activeEditingId]);
 
+    useEffect(() => {
+        register("message", {
+            validate: value => {
+                if (!value || value.trim().split(/\s+/).length <= 3) {
+                    return "El mensaje debe contener más de 3 palabras";
+                }
+                return true;
+            }
+        });
+    }, [register]);
+
+
     const handleEmojiClick = (emojiData: any) => {
         const emoji = emojiData.emoji;
 
@@ -141,9 +153,11 @@ function Form() {
                         </option>
                     ))}
                 </select>
-                {errors.idNotificationType && (
-                    <p className="text-red-500 text-xs mt-1">{errors.idNotificationType.message}</p>
-                )}
+                {errors.idNotificationType &&
+                    <ErrorForm>
+                        {errors.idNotificationType.message}
+                    </ErrorForm>
+                }
 
             </div>
 
