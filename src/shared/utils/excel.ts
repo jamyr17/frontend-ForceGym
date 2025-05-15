@@ -16,12 +16,6 @@ export const exportToExcel = async (
 ) => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet(`Reporte de ${title}`);
-  if (clientData) {
-    worksheet.addRow([`Nombre del cliente: ${clientData.name}`]);
-    worksheet.addRow([`Edad: ${clientData.age}`]);
-    worksheet.addRow([`Estatura: ${clientData.height} cm`]);
-    worksheet.addRow([]);
-  }
 
   const formattedCurrentDate = formatCurrentDateWithHourForTitle();
   const formattedCurrentDateDoc = formatCurrentDateForDocument();

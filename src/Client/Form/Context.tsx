@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback } from "react";
-
 interface ClientFormContextProps {
   step: number;
   nextStep: () => void;
@@ -13,9 +12,9 @@ const ClientFormContext = createContext<ClientFormContextProps | undefined>(unde
 export const ClientFormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [step, setStep] = useState(1);
 
-  const nextStep = useCallback(() => setStep(prev => Math.min(prev + 1, 4)), []);
+  const nextStep = useCallback(() => setStep(prev => Math.min(prev + 1, 5)), []);
   const prevStep = useCallback(() => setStep(prev => Math.max(prev - 1, 1)), []);
-  const setCustomStep = useCallback((newStep: number) => setStep(Math.max(1, Math.min(newStep, 4))), []);
+  const setCustomStep = useCallback((newStep: number) => setStep(Math.max(1, Math.min(newStep, 5))), []);
   const resetForm = useCallback(() => setStep(1), []);
 
   return (
