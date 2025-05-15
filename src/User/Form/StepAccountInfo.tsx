@@ -117,8 +117,9 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
         type="password" 
         placeholder="Confirme la contraseña" 
         {...register('confirmPassword', {
-          validate: value => {
-            if (activeEditingId === 0 && value !== watch('password')) {
+          validate: (value) => {
+            const password = watch('password');
+            if ((activeEditingId === 0 || password) && value !== password) {
               return 'Las contraseñas no coinciden';
             }
             return true;
