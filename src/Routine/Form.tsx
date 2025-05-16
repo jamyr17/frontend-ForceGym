@@ -55,6 +55,49 @@ function Form() {
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([]);
   const [selectedClients, setSelectedClients] = useState<ClientOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [draggedCategoryId, setDraggedCategoryId] = useState<number | null>(null);
+  const [dragOverCategoryId, setDragOverCategoryId] = useState<number | null>(null);
+  const [orderedCategories, setOrderedCategories] = useState(exerciseCategories);
+  const handleDragStart = (categoryId: number) => {
+    setDraggedCategoryId(categoryId);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, categoryId: number) => {
+    e.preventDefault();
+    if (categoryId !== dragOverCategoryId) {
+      setDragOverCategoryId(categoryId);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverCategoryId(null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number) => {
+    e.preventDefault();
+    
+    if (!draggedCategoryId || draggedCategoryId === targetCategoryId) {
+      setDragOverCategoryId(null);
+      setDraggedCategoryId(null);
+      return;
+    }
+
+    setOrderedCategories(prev => {
+      const draggedIndex = prev.findIndex(c => c.idExerciseCategory === draggedCategoryId);
+      const targetIndex = prev.findIndex(c => c.idExerciseCategory === targetCategoryId);
+      
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      
+      const newCategories = [...prev];
+      const [removed] = newCategories.splice(draggedIndex, 1);
+      newCategories.splice(targetIndex, 0, removed);
+      
+      return newCategories;
+    });
+
+    setDragOverCategoryId(null);
+    setDraggedCategoryId(null);
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -89,6 +132,10 @@ function Form() {
       setSelectedExercises(initialExercises);
     }
   }, [exerciseCategories]);
+  
+  useEffect(() => {
+    setOrderedCategories(exerciseCategories);
+  }, [exerciseCategories]);
 
   useEffect(() => {
     if (activeEditingId && !loading && routineToEdit) {
@@ -108,21 +155,27 @@ function Form() {
         });
         setSelectedClients(clientOptions);
       }
-      if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
-        const loadedExercises = routineToEdit.exercises.map(ex => {
-          const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
-          const category = exerciseData?.exerciseCategory;
+      
+    if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
+      // Ordena los ejercicios según el categoryOrder si existe
+      const sortedExercises = [...routineToEdit.exercises].sort((a, b) => {
+        return (a.categoryOrder || 0) - (b.categoryOrder || 0);
+      });
 
-          return {
-            idExercise: ex.idExercise,
-            name: exerciseData?.name || `Ejercicio ${ex.idExercise}`,
-            series: ex.series || 0,
-            repetitions: ex.repetitions || 0,
-            note: ex.note || "Sin nota",
-            category: category?.name || "Sin categoría",
-            categoryId: category?.idExerciseCategory || 0
-          };
-        });
+      const loadedExercises = sortedExercises.map(ex => {
+        const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
+        const category = exerciseData?.exerciseCategory;
+
+        return {
+          idExercise: ex.idExercise,
+          name: exerciseData?.name || `Ejercicio ${ex.idExercise}`,
+          series: ex.series || 0,
+          repetitions: ex.repetitions || 0,
+          note: ex.note || "Sin nota",
+          category: category?.name || "Sin categoría",
+          categoryId: category?.idExerciseCategory || 0
+        };
+      });
 
         const categoriesWithExercises = loadedExercises.map(ex => ex.categoryId);
         const emptyCategories = exerciseCategories
@@ -205,14 +258,18 @@ function Form() {
       difficultyRoutine: {
         idDifficultyRoutine: data.idDifficultyRoutine
       },
-      exercises: selectedExercises
-        .filter(ex => ex.idExercise > 0)
-        .map(ex => ({
-          idExercise: ex.idExercise,
-          series: ex.series,
-          repetitions: ex.repetitions,
-          note: ex.note
-        })),
+      exercises: orderedCategories.flatMap(category => {
+        return selectedExercises
+          .filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise > 0)
+          .map(ex => ({
+            idExercise: ex.idExercise,
+            series: ex.series,
+            repetitions: ex.repetitions,
+            note: ex.note,
+            // Añade el orden de la categoría
+            categoryOrder: orderedCategories.findIndex(c => c.idExerciseCategory === category.idExerciseCategory)
+          }));
+      }),
       assignments: selectedClients.map(client => ({
         idClient: client.value,
         assignmentDate: new Date().toISOString()
@@ -220,7 +277,7 @@ function Form() {
       isDeleted: 0,
       paramLoggedIdUser: loggedUser?.idUser
     };
-
+    
     try {
       let result;
       let action = '';
@@ -489,12 +546,31 @@ function Form() {
 
       <div className="mb-5">
         <h2 className="text-lg font-bold mb-4 text-yellow">Ejercicios</h2>
-        {exerciseCategories.map(category => {
+        {orderedCategories.map((category) => {
           const categoryExercises = getExercisesForCategory(category.idExerciseCategory);
+          const isDragged = draggedCategoryId === category.idExerciseCategory;
+          const isDragOver = dragOverCategoryId === category.idExerciseCategory;
 
           return (
-            <div key={category.idExerciseCategory} className="mb-8">
-              <h3 className="text-md font-bold text-gray-700 mb-3">{category.name}</h3>
+            <div
+              key={category.idExerciseCategory}
+              className={`mb-8 border rounded-lg p-4 transition-all duration-200 ${
+                isDragged ? 'opacity-50 bg-gray-100' : 
+                isDragOver ? 'border-yellow-500 border-2 bg-yellow-50' : 
+                'border-gray-200 bg-gray-50'
+              }`}
+              draggable
+              onDragStart={() => handleDragStart(category.idExerciseCategory)}
+              onDragOver={(e) => handleDragOver(e, category.idExerciseCategory)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, category.idExerciseCategory)}
+            >
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-md font-bold text-gray-700 flex items-center">
+                  <span className="mr-2 cursor-move">↕</span>
+                  {category.name}
+                </h3>
+              </div>
 
               {categoryExercises.map(({ index, ...ex }) => {
                 const exercisesForSelect = getAvailableExercises(category.idExerciseCategory, ex.idExercise);

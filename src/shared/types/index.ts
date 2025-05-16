@@ -292,6 +292,7 @@ export type RoutineExerciseDTO = {
     series: number;
     repetitions: number;
     note: string;
+    categoryOrder: number;
 };
 
 export type RoutineAssignmentDTO = {
