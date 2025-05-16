@@ -1,185 +1,55 @@
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
-import { useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useEffect } from "react";
 import { UserDataForm } from "../../shared/types";
-import { getAuthUser, setAuthHeader, setAuthUser } from "../../shared/utils/authentication";
-import useUserStore from "../Store";
 import { useCommonDataStore } from "../../shared/CommonDataStore";
-import { useUserForm } from "./Context";
 
-export const useMultiStepForm = () => {
-  const navigate = useNavigate();
+interface UseMultiStepFormProps {
+    initialData: UserDataForm;
+    onSubmit: (data: UserDataForm) => Promise<void>;
+    isUpdate: boolean;
+}
+
+export const useMultiStepForm = ({ initialData, onSubmit, isUpdate }: UseMultiStepFormProps) => {
   const { roles, genders } = useCommonDataStore();
-  const { users, activeEditingId, fetchUsers, addUser, updateUser, closeModalForm } = useUserStore();
-  const { step, nextStep, prevStep, setCustomStep, resetForm } = useUserForm();
-
-  const getDefaultValues = (): UserDataForm => ({
-    idUser: 0,
-    idRole: 0,
-    idGender: 0,
-    idPerson: 0,
-    identificationNumber: '',
-    name: '',
-    firstLastName: '',
-    secondLastName: '',
-    phoneNumber: '',
-    birthday: new Date(),
-    email: '',
-    username: '',
-    password: '',
-    isDeleted: 0,
-    confirmPassword: ''
-  });
-
-  const getEditingValues = (): UserDataForm => {
-    if (!activeEditingId) return getDefaultValues();
-    
-    const activeEditingUser = users.find(user => user.idUser === activeEditingId);
-    if (!activeEditingUser) return getDefaultValues();
-
-    return {
-      idUser: activeEditingUser.idUser,
-      idRole: activeEditingUser.role.idRole,
-      idGender: activeEditingUser.person.gender.idGender,
-      idPerson: activeEditingUser.person.idPerson,
-      identificationNumber: activeEditingUser.person.identificationNumber,
-      name: activeEditingUser.person.name,
-      firstLastName: activeEditingUser.person.firstLastName,
-      secondLastName: activeEditingUser.person.secondLastName,
-      phoneNumber: activeEditingUser.person.phoneNumber,
-      birthday: activeEditingUser.person.birthday,
-      email: activeEditingUser.person.email,
-      username: activeEditingUser.username,
-      password: '',
-      isDeleted: Number(activeEditingUser.isDeleted),
-      confirmPassword: ''
-    };
-  };
-
-  const defaultValues = useMemo(getEditingValues, [activeEditingId, users]);
+  
   const methods = useForm<UserDataForm>({ 
-    defaultValues,
+    defaultValues: initialData,
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true,
     shouldUnregister: false
   });
 
-  const submitForm = async (data: UserDataForm) => {
-    let action = '', result;
-    const loggedUser = getAuthUser();
-    
-    const isSelfEditing = loggedUser?.idUser === data.idUser;
-    const reqUser: UserDataForm & { paramLoggedIdUser?: number } = {
-      ...data,
-      password: isSelfEditing ? data.password : '', 
-      paramLoggedIdUser: loggedUser?.idUser
-    };
+  // Reset form when initialData changes
+  useEffect(() => {
+    methods.reset(initialData);
+  }, [initialData]);
 
-    delete (reqUser as any).confirmPassword;
-
-    if (activeEditingId === 0) {
-      result = await addUser(reqUser);
-      action = 'agregado';
-    } else {
-      result = await updateUser(reqUser);
-      action = 'editado';
-    }
-
-    handleClose();
-    
-    if (result.ok) {
-      const result2 = await fetchUsers();
-      if (result2.logout) {
-        setAuthHeader(null);
-        setAuthUser(null);
-        navigate('/login', { replace: true });
-      } else {
-        await Swal.fire({
-          title: `Usuario ${action}`,
-          text: `Ha ${action} al usuario ${reqUser.username}`,
-          icon: 'success',
-          confirmButtonText: 'OK',
-          timer: 3000,
-          timerProgressBar: true,
-          width: 500,
-          confirmButtonColor: '#CFAD04'
-        });
-      }
-    } else if (result.logout) {
-      setAuthHeader(null);
-      setAuthUser(null);
-      navigate('/login');
-    }
-  };
-
-  const handleClose = () => {
-    methods.reset();
-    resetForm();
-    closeModalForm();
-  };
-
-  type FormField = 
-    | "idUser" | "username" | "isDeleted" | "idRole" | "idPerson" 
-    | "name" | "firstLastName" | "secondLastName" | "birthday" 
-    | "identificationNumber" | "email" | "phoneNumber" 
-    | "confirmPassword" | "idGender" | "password";
-
-  interface StepFields {
-    step: number;
-    fields: FormField[];
-  }
-
-  const inputsByStep: StepFields[] = [
-    {step: 1, fields: ['identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender']},
-    {step: 2, fields: ['phoneNumber', 'email']},
-    {step: 3, fields: ['idRole', 'username', 'password', 'confirmPassword']}
-  ];
-
-  const validateStepChange = async () => {
+    const submitForm = async (data: UserDataForm) => {
     try {
-      const matchingItem = inputsByStep.find(item => item.step === step);
-      if (!matchingItem) {
-        return false; 
-      }
-      
-      if (methods.formState.isValid) return true;
-      
-      return await methods.trigger(matchingItem.fields);
+        // Si es actualización y no hay cambios en la contraseña
+        if (isUpdate && data.password === '') {
+            data.password = undefined;
+        }
+        data.confirmPassword = undefined; // Siempre eliminamos esto
+
+        await onSubmit(data);
     } catch (error) {
-      console.error('Validation failed:', error);
-      return false;
-    }
-  };
-
-  const handleStepChangeByMenu = async (toStep: number) => {
-    if (toStep > step) {
-      if (await validateStepChange()) {
-        setCustomStep(toStep);
-      }
-    } else {
-      setCustomStep(toStep);
-    }
-  };
-
-  const handleStepChangeByButton = async (stepChange: () => void) => {
-    if (await validateStepChange()) {
-      stepChange();
+      console.error('Submission error:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Ocurrió un error al guardar los datos',
+        icon: 'error',
+        confirmButtonColor: '#CFAD04'
+      });
     }
   };
 
   return {
     methods,
-    step,
     roles,
     genders,
-    activeEditingId,
-    submitForm,
-    handleClose,
-    prevStep,
-    nextStep,
-    handleStepChangeByMenu,
-    handleStepChangeByButton
+    submitForm
   };
 };

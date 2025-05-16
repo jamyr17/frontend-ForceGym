@@ -7,10 +7,9 @@ import { useEffect } from "react";
 
 const MAXLENGTH_USERNAME = 50;
 
-export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: number, roles: Role[] }) => {
+export const AccountInfoStep = ({ roles, isUpdate }: { roles: Role[], isUpdate: boolean }) => {
   const { register, formState: { errors }, watch, setValue } = useFormContext();
   const loggedUser = getAuthUser();
-  const isSelfEditing = loggedUser?.idUser === activeEditingId;
 
   // Establecer el valor por defecto del rol como 2
   useEffect(() => {
@@ -18,8 +17,8 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
   }, [setValue]);
 
   const validatePassword = (password: string): true | string => {
-    if (activeEditingId !== 0 && !password) {
-      return true;
+    if (!password && isUpdate) {
+      return true; 
     }
     
     const num = /\d/;
@@ -29,7 +28,7 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
     const charLength = /^.{8,20}$/;
 
     if (!charLength.test(password)) {
-      return "La contraseña debe tener al menos 8 y 20 caracteres.";
+      return "La contraseña debe tener entre 8 y 20 caracteres.";
     }
     if (!lowercase.test(password)) {
       return "La contraseña debe contener al menos una letra minúscula.";
@@ -46,8 +45,6 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
 
     return true;
   };
-
-  console.log("Editing ID ", activeEditingId)
 
   return (
     <div className="space-y-5">
@@ -67,54 +64,56 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
             required: 'El nombre de usuario es obligatorio',
             maxLength: {
               value: MAXLENGTH_USERNAME,
-              message: `Debe ingresar un nombre de usuario de máximo ${MAXLENGTH_USERNAME} carácteres`
+              message: `Máximo ${MAXLENGTH_USERNAME} caracteres`
             }
           })}
         />
         {errors.username && <ErrorForm>{errors.username.message?.toString()}</ErrorForm>}
       </div>
 
-      {(activeEditingId === 0 || isSelfEditing) && (
-        <>
-          <div>
-            <label htmlFor="password" className="text-sm uppercase font-bold">
-              Contraseña
-            </label>
-            <PasswordInput     
-              id="password"
-              className="w-full p-3 border border-gray-100"  
-              type="password" 
-              placeholder="Ingrese la contraseña" 
-              {...register('password', {
-                required: activeEditingId === 0 ? 'La contraseña es obligatoria' : false,
-                validate: validatePassword
-              })}
-            />
-            {errors.password && <ErrorForm>{errors.password.message?.toString()}</ErrorForm>}
-          </div>
+      <div>
+        <label htmlFor="password" className="text-sm uppercase font-bold">
+          {isUpdate ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña'}
+        </label>
+        <PasswordInput     
+          id="password"
+          className="w-full p-3 border border-gray-100"  
+          type="password" 
+          placeholder={isUpdate ? 'Dejar vacío para no cambiar' : 'Ingrese la contraseña'} 
+          {...register('password', {
+            required: !isUpdate ? 'La contraseña es obligatoria' : false,
+            validate: validatePassword
+          })}
+        />
+        {errors.password && <ErrorForm>{errors.password.message?.toString()}</ErrorForm>}
+        {isUpdate && (
+          <p className="text-sm text-gray-500 mt-1">
+            Solo complete si desea cambiar la contraseña
+          </p>
+        )}
+      </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="text-sm uppercase font-bold">
-              Confirmar Contraseña
-            </label>
-            <PasswordInput     
-              id="confirmPassword"
-              className="w-full p-3 border border-gray-100"  
-              type="password" 
-              placeholder="Confirme la contraseña" 
-              {...register('confirmPassword', {
-                validate: value => {
-                  if (activeEditingId === 0 && value !== watch('password')) {
-                    return 'Las contraseñas no coinciden';
-                  }
-                  return true;
-                }
-              })}
-            />
-            {errors.confirmPassword && <ErrorForm>{errors.confirmPassword.message?.toString()}</ErrorForm>}
-          </div>
-        </>
-      )}
+      <div>
+        <label htmlFor="confirmPassword" className="text-sm uppercase font-bold">
+          Confirmar {isUpdate ? 'Nueva ' : ''}Contraseña
+        </label>
+        <PasswordInput     
+          id="confirmPassword"
+          className="w-full p-3 border border-gray-100"  
+          type="password" 
+          placeholder={isUpdate ? 'Confirmar nueva contraseña' : 'Confirme la contraseña'} 
+          {...register('confirmPassword', {
+            validate: value => {
+              const password = watch('password');
+              if (password && value !== password) {
+                return 'Las contraseñas no coinciden';
+              }
+              return true;
+            }
+          })}
+        />
+        {errors.confirmPassword && <ErrorForm>{errors.confirmPassword.message?.toString()}</ErrorForm>}
+      </div>
     </div>
   );
 };
