@@ -72,15 +72,14 @@ function Form() {
   const handleDragLeave = () => {
     setDragOverCategoryId(null);
   };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number) => {
-    e.preventDefault();
-    
-    if (!draggedCategoryId || draggedCategoryId === targetCategoryId) {
-      setDragOverCategoryId(null);
-      setDraggedCategoryId(null);
-      return;
-    }
+const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number) => {
+  e.preventDefault();
+  
+  if (!draggedCategoryId || draggedCategoryId === targetCategoryId) {
+    setDragOverCategoryId(null);
+    setDraggedCategoryId(null);
+    return;
+  }
 
     setOrderedCategories(prev => {
       const draggedIndex = prev.findIndex(c => c.idExerciseCategory === draggedCategoryId);
@@ -91,6 +90,16 @@ function Form() {
       const newCategories = [...prev];
       const [removed] = newCategories.splice(draggedIndex, 1);
       newCategories.splice(targetIndex, 0, removed);
+      
+      // Actualiza el categoryOrder de los ejercicios en tiempo real (opcional)
+      setSelectedExercises(currentExercises => 
+        currentExercises.map(ex => {
+          const newCategoryOrder = newCategories.findIndex(
+            cat => cat.idExerciseCategory === ex.categoryId
+          );
+          return newCategoryOrder >= 0 ? { ...ex, categoryOrder: newCategoryOrder } : ex;
+        })
+      );
       
       return newCategories;
     });
@@ -136,15 +145,13 @@ function Form() {
   useEffect(() => {
     setOrderedCategories(exerciseCategories);
   }, [exerciseCategories]);
-
   useEffect(() => {
     if (activeEditingId && !loading && routineToEdit) {
-      console.log('Precargando datos para edición:', routineToEdit);
-
       setValue('idRoutine', routineToEdit.idRoutine);
       setValue('name', routineToEdit.name);
       setValue('idDifficultyRoutine', routineToEdit.difficultyRoutine?.idDifficultyRoutine || 0);
 
+      // Cargar clientes asignados (código existente)
       if (routineToEdit.assignments?.length > 0) {
         const clientOptions = routineToEdit.assignments.map(assignment => {
           const client = allClients.find(c => c.value === assignment.idClient);
@@ -156,39 +163,73 @@ function Form() {
         setSelectedClients(clientOptions);
       }
       
-    if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
-      // Ordena los ejercicios según el categoryOrder si existe
-      const sortedExercises = [...routineToEdit.exercises].sort((a, b) => {
-        return (a.categoryOrder || 0) - (b.categoryOrder || 0);
-      });
+      if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
+        // 1. Obtener categorías USADAS en los ejercicios
+        const usedCategories = routineToEdit.exercises.reduce((acc, ex) => {
+          const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
+          const category = exerciseData?.exerciseCategory;
+          if (category && !acc.some(c => c.idExerciseCategory === category.idExerciseCategory)) {
+            acc.push(category);
+          }
+          return acc;
+        }, [] as ExerciseCategory[]);
 
-      const loadedExercises = sortedExercises.map(ex => {
-        const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
-        const category = exerciseData?.exerciseCategory;
+        // 2. Ordenar categorías usadas según su MIN categoryOrder
+        const sortedUsedCategories = [...usedCategories].sort((a, b) => {
+          const minOrderA = Math.min(
+            ...routineToEdit.exercises
+              .filter(ex => {
+                const exData = exercise.find(e => e.idExercise === ex.idExercise);
+                return exData?.exerciseCategory?.idExerciseCategory === a.idExerciseCategory;
+              })
+              .map(ex => ex.categoryOrder)
+          );
+          
+          const minOrderB = Math.min(
+            ...routineToEdit.exercises
+              .filter(ex => {
+                const exData = exercise.find(e => e.idExercise === ex.idExercise);
+                return exData?.exerciseCategory?.idExerciseCategory === b.idExerciseCategory;
+              })
+              .map(ex => ex.categoryOrder)
+          );
 
-        return {
-          idExercise: ex.idExercise,
-          name: exerciseData?.name || `Ejercicio ${ex.idExercise}`,
-          series: ex.series || 0,
-          repetitions: ex.repetitions || 0,
-          note: ex.note || "Sin nota",
-          category: category?.name || "Sin categoría",
-          categoryId: category?.idExerciseCategory || 0
-        };
-      });
+          return minOrderA - minOrderB;
+        });
 
-        const categoriesWithExercises = loadedExercises.map(ex => ex.categoryId);
-        const emptyCategories = exerciseCategories
-          .filter(cat => !categoriesWithExercises.includes(cat.idExerciseCategory))
-          .map(cat => ({
-            idExercise: 0,
-            name: "",
-            series: 0,
-            repetitions: 0,
-            note: "",
-            category: cat.name,
-            categoryId: cat.idExerciseCategory
-          }));
+        // 3. Añadir categorías NO USADAS al final
+        const unusedCategories = exerciseCategories.filter(
+          cat => !usedCategories.some(used => used.idExerciseCategory === cat.idExerciseCategory)
+        );
+
+        setOrderedCategories([...sortedUsedCategories, ...unusedCategories]);
+
+        // 4. Cargar ejercicios
+        const loadedExercises = routineToEdit.exercises.map(ex => {
+          const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
+          const category = exerciseData?.exerciseCategory;
+
+          return {
+            idExercise: ex.idExercise,
+            name: exerciseData?.name || `Ejercicio ${ex.idExercise}`,
+            series: ex.series || 0,
+            repetitions: ex.repetitions || 0,
+            note: ex.note || "Sin nota",
+            category: category?.name || "Sin categoría",
+            categoryId: category?.idExerciseCategory || 0
+          };
+        });
+
+        // 5. Añadir placeholders para categorías vacías
+        const emptyCategories = unusedCategories.map(cat => ({
+          idExercise: 0,
+          name: "",
+          series: 0,
+          repetitions: 0,
+          note: "",
+          category: cat.name,
+          categoryId: cat.idExerciseCategory
+        }));
 
         setSelectedExercises([...loadedExercises, ...emptyCategories]);
       }
@@ -258,18 +299,17 @@ function Form() {
       difficultyRoutine: {
         idDifficultyRoutine: data.idDifficultyRoutine
       },
-      exercises: orderedCategories.flatMap(category => {
-        return selectedExercises
-          .filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise > 0)
-          .map(ex => ({
-            idExercise: ex.idExercise,
-            series: ex.series,
-            repetitions: ex.repetitions,
-            note: ex.note,
-            // Añade el orden de la categoría
-            categoryOrder: orderedCategories.findIndex(c => c.idExerciseCategory === category.idExerciseCategory)
-          }));
-      }),
+      exercises: orderedCategories.flatMap((category, index) => { // Usa 'index' en lugar de currentCategoryIndex
+          return selectedExercises
+            .filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise > 0)
+            .map(ex => ({
+              idExercise: ex.idExercise,
+              series: ex.series,
+              repetitions: ex.repetitions,
+              note: ex.note,
+              categoryOrder: index // Usamos el índice actual del flatMap
+            }));
+        }),
       assignments: selectedClients.map(client => ({
         idClient: client.value,
         assignmentDate: new Date().toISOString()
@@ -333,8 +373,10 @@ function Form() {
       isDeleted: 0
     });
     setSelectedClients([]);
-
+    
+    // Resetear al orden original pero manteniendo cualquier orden previo
     if (exerciseCategories.length > 0) {
+      setOrderedCategories([...exerciseCategories]); // Copia para evitar mutaciones
       setSelectedExercises(
         exerciseCategories.map(category => ({
           idExercise: 0,

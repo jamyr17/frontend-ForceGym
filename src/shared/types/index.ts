@@ -264,6 +264,7 @@ export type RoutineExercise = {
     series: number;
     repetitions: number;
     note: string;
+    categoryOrder: number;
 };
 
 export type RoutineAssignment = {
@@ -326,6 +327,7 @@ export type RoutineDataForm = {
         series: number;
         repetitions: number;
         note: string;
+        categoryOrder: number;
     }[];
     assignments: {
         idClient: number;
