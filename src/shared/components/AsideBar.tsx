@@ -104,6 +104,7 @@ function AsideBar() {
 
         <div className={`flex flex-col items-center gap-1 w-full mt-4 ${isOpen && "border-y-2 py-4 border-gray-500"}`}>
           <NavItem to="/gestion/dashboard" icon={<PiHouseSimpleFill />} title="Dashboard" text="Dashboard" />
+          <NavItem to="/gestion/usuariocolaborador" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Colaborador']} />
           <NavItem to="/gestion/usuarios" icon={<FaRegUser />} title="Usuarios" text="Usuarios" allowedRoles={['Administrador']} />
           <NavItem to="/gestion/clientes" icon={<GiWeightLiftingUp />} title="Clientes" text="Clientes" />
           <NavItem to="/gestion/ingresos" icon={<MdOutlineTrendingUp />} title="Ingresos" text="Ingresos"  />

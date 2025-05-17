@@ -104,8 +104,8 @@ export type User = {
 
 export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Omit<Person, 'gender'> & {
     idGender: number
-    password: string
-    confirmPassword: string
+    password?: string
+    confirmPassword?: string
 }
 
 // -----------------------------------------------------
