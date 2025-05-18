@@ -25,7 +25,7 @@ export const exportToPDF = (
   });
 
   const logo = "/Logo.webp";
-  doc.addImage(logo, 'WEBP', 13, 8, 35, 15);
+  doc.addImage(logo, "WEBP", 13, 8, 35, 15);
 
   doc.setFont("helvetica", "bold");
   doc.text(`Reporte de ${title}`, 105, 18, { align: "center" });
@@ -42,31 +42,9 @@ export const exportToPDF = (
 
   doc.line(13, 50, 195, 50);
 
-  autoTable(doc, {
-    theme: "striped",
-    head: [tableColumn],
-    body: tableRows,
-    startY: 55,
-    styles: {
-      font: "helvetica",
-      fontSize: 10,
-      textColor: [0, 0, 0],
-    },
-    headStyles: {
-      fillColor: [207, 173, 4],
-      textColor: [0, 0, 0],
-    },
-  });
+  let nextStartY = 55;
 
-  const finalY = (doc as any).lastAutoTable.finalY || 60;
-
-  // Solo si es reporte de medidas, se incluye la tabla de referencia
   if (title.toLowerCase() === "medidas") {
-    // Línea separadora antes de la tabla
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(200, 200, 200);
-    doc.line(13, finalY + 5, 195, finalY + 5);
-
     const referenceHeaders = ["", "BAJO", "NORMAL", "ELEVADO", "MUY ELEVADO"];
     const referenceData = [
       ["IMC", "<18.5", "18.5 a 25", "25 a 30", "30 o +"],
@@ -82,13 +60,13 @@ export const exportToPDF = (
     ];
 
     autoTable(doc, {
-      startY: finalY + 10,
+      startY: nextStartY,
       head: [referenceHeaders],
       body: referenceData,
       theme: "grid",
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
+        fontSize: 7,
+        cellPadding: 0.8,
         halign: "center",
         valign: "middle",
       },
@@ -101,7 +79,28 @@ export const exportToPDF = (
         0: { fillColor: [242, 242, 242], fontStyle: "bold" },
       },
     });
+
+    nextStartY = (doc as any).lastAutoTable.finalY + 6;
+    doc.line(13, nextStartY - 3, 195, nextStartY - 3);
   }
+
+  autoTable(doc, {
+    startY: nextStartY,
+    head: [tableColumn],
+    body: tableRows,
+    theme: "striped",
+    styles: {
+      font: "helvetica",
+      fontSize: 9,
+      cellPadding: 1.5,
+      textColor: [0, 0, 0],
+    },
+    headStyles: {
+      fillColor: [207, 173, 4],
+      textColor: [0, 0, 0],
+      fontSize: 9,
+    },
+  });
 
   doc.save(`Reporte de ${title} - ${formattedCurrentDate}.pdf`);
 };
