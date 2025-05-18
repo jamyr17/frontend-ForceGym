@@ -10,11 +10,27 @@ function ForgotPasswordForm () {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-    
+
         const form = e.currentTarget;
         const emailInput = form.elements[0] as HTMLInputElement;
         const email = emailInput.value;
-    
+
+        // Validación de correo
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            await Swal.fire({
+                title: 'Correo inválido',
+                text: 'Por favor, ingresá un correo electrónico válido',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                timerProgressBar: true,
+                width: 300,
+                confirmButtonColor: '#CFAD04'
+            });
+            return;
+        }
+
         const captchaValue = recaptcha.current?.getValue();
         if (!captchaValue) {
             await Swal.fire({
@@ -29,11 +45,11 @@ function ForgotPasswordForm () {
             });
             return;
         }
-    
+
         try {
             const res = await postData(`${import.meta.env.VITE_URL_API}recoveryPassword?email=${encodeURIComponent(email)}`, {});
             console.log(res)
-    
+
             if (res.ok) {
                 await Swal.fire({
                     title: 'Correo enviado',
@@ -51,7 +67,7 @@ function ForgotPasswordForm () {
         } catch (error) {
             await Swal.fire({
                 title: 'Error',
-                text: 'Ocurrió un error al procesar su solicitud',
+                text: 'El correo usado no está registrado',
                 icon: 'error',
                 confirmButtonText: 'OK',
                 timer: 3000,
