@@ -125,7 +125,7 @@ export const useMeasurement = () => {
         name: `${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}`,
         age: calculateAge(measurements[0].client.person.birthday),
         height: measurements[0].height
-    } : null;
+    } : undefined;
     
     const tableColumn = [
         "Fecha",
