@@ -46,9 +46,21 @@ function ForgotPasswordForm () {
             return;
         }
 
+        // Mostrar loader
+        Swal.fire({
+            title: 'Enviando correo...',
+            html: 'Por favor espera mientras procesamos tu solicitud',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         try {
             const res = await postData(`${import.meta.env.VITE_URL_API}recoveryPassword?email=${encodeURIComponent(email)}`, {});
-            console.log(res)
+            
+            // Cerrar el loader
+            Swal.close();
 
             if (res.ok) {
                 await Swal.fire({
@@ -65,6 +77,9 @@ function ForgotPasswordForm () {
                 throw new Error('Error al enviar el correo de recuperación');
             }
         } catch (error) {
+            // Cerrar el loader si hay error
+            Swal.close();
+            
             await Swal.fire({
                 title: 'Error',
                 text: 'El correo usado no está registrado',
