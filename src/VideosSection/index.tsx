@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import Fuse from 'fuse.js';
-import { YouTubeVideoCard } from './components/YoutubeVideoCard';
 import { CategoryFilter } from './components/CategoryFilter';
 import { SearchBar } from './components/SearchBar';
 import { videos } from './data/videos';
 import { VideoCategory } from './types/video';
+import { YouTubeVideoCard } from './components/YouTubeVideoCard';
 
 const allCategories: VideoCategory[] = [
   'gluteos', 'femoral', 'cuadriceps', 'pecho', 
