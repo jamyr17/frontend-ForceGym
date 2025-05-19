@@ -22,7 +22,7 @@ import ExerciseCategoryManagement from "../ExerciseCategory/Page";
 import UserColabManagement from "../UserColab/Page";
 
 function PrivateRoutes () {
-    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchTypesClient, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty, fetchDifficultyRoutines, fetchExercise } = useCommonDataStore()
+    const { fetchRoles, fetchMeansOfPayment, fetchActivityTypes, fetchGenders, fetchClientTypes, fetchCategories, fetchNotificationTypes, fetchExerciseDifficulty, fetchDifficultyRoutines, fetchExercise } = useCommonDataStore()
 
     const navigate = useNavigate()
 
@@ -34,7 +34,7 @@ function PrivateRoutes () {
                 fetchMeansOfPayment,
                 fetchActivityTypes,
                 fetchGenders,
-                fetchTypesClient,
+                fetchClientTypes,
                 fetchCategories,
                 fetchNotificationTypes,
                 fetchDifficultyRoutines,

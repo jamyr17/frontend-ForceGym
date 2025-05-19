@@ -21,7 +21,7 @@ type ClientTypeOption = {
 
 function Form() {
     const navigate = useNavigate();
-    const { typesClient } = useCommonDataStore();
+    const { clientTypes } = useCommonDataStore();
     const [feeLines, setFeeLines] = useState<{id: number, fee: Fee}[]>([{ 
         id: 1, 
         fee: { idClientType: [], amount: 0 } 
@@ -134,15 +134,15 @@ function Form() {
     // Mapear tipos de cliente para opciones
     useEffect(() => {
         const getMappedClientTypes = () => {
-            const mappedClientTypesOptions = typesClient?.map((type) => ({
-                value: type.idTypeClient,
+            const mappedClientTypesOptions = clientTypes?.map((type) => ({
+                value: type.idClientType,
                 label: type.name
             })) || [];
             setClientTypesOptions(mappedClientTypesOptions);
         };
 
         getMappedClientTypes();
-    }, [typesClient]);
+    }, [clientTypes]);
 
     // Obtener los tipos de clientes ya seleccionados en otras líneas
     const getAvailableClientTypes = (currentLineId: number): ClientTypeOption[] => {
