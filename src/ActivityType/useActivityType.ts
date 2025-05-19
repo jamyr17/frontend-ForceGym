@@ -12,8 +12,8 @@ export const useActivityType = () => {
         updateActivityType, 
     } = useActivityTypeStore()
 
-    const handleDelete = async ({ idActivityType, name } : ActivityType) => {
-        await Swal.fire({
+    const handleDelete = async ({ idActivityType, name }: ActivityType) => {
+        const result = await Swal.fire({
             title: '¿Desea eliminar el tipo de actividad?',
             text: `Estaría eliminando "${name}"`,
             icon: 'question',
@@ -24,12 +24,26 @@ export const useActivityType = () => {
             confirmButtonColor: '#CFAD04',
             width: 500,
             reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const loggedUser = getAuthUser()
-                const response = await deleteActivityType(idActivityType, loggedUser?.idUser as number)
-                if(response.ok){
-                    Swal.fire({
+        });
+
+        if (result.isConfirmed) {
+            const loggedUser = getAuthUser();
+            if (!loggedUser?.idUser) {
+                console.error("No user ID available");
+                return;
+            }
+
+            try {
+                const response = await deleteActivityType(
+                    idActivityType, 
+                    loggedUser.idUser
+                );
+
+                if (response?.ok) {
+                    // Espera a que se complete la recarga
+                    await fetchActivityTypes();
+                    
+                    await Swal.fire({
                         title: 'Tipo de actividad eliminada',
                         text: `Ha eliminado "${name}"`,
                         icon: 'success',
@@ -38,19 +52,18 @@ export const useActivityType = () => {
                         timerProgressBar: true,
                         width: 500,
                         confirmButtonColor: '#CFAD04'
-                    })
-
-                    fetchActivityTypes()
+                    });
                 }
-
-                if(response.logout){
-                    setAuthHeader(null)
-                    setAuthUser(null)
-                    navigate('/login', {replace: true})
-                }
-            } 
-        })
-    }
+            } catch (error) {
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo eliminar el tipo de actividad',
+                    icon: 'error',
+                    confirmButtonColor: '#CFAD04'
+                });
+            }
+        }
+    };
 
     const handleRestore = async (activityType: ActivityType) => {
         const loggedUser = getAuthUser()

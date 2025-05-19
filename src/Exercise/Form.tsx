@@ -88,7 +88,7 @@ function FormExercise() {
         setValue("name", exercise.name);
         setValue("description", exercise.description);
         // Cambios realizados aquí:
-        setValue("idExerciseDifficulty", 1); // ANTES ESTABA: exercise.idExerciseDifficulty || exercise.exerciseDifficulty?.idDifficulty, SE DEBE CORREGIR
+        setValue("idExerciseDifficulty", exercise.exerciseDifficulty?.idExerciseDifficulty); // ANTES ESTABA: exercise.idExerciseDifficulty || exercise.exerciseDifficulty?.idDifficulty, SE DEBE CORREGIR
         setValue("idExerciseCategory", exercise.exerciseCategory?.idExerciseCategory);
         setValue("isDeleted", exercise.isDeleted);
       }

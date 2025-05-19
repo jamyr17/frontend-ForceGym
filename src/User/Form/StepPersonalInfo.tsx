@@ -154,13 +154,13 @@ export const PersonalInfoStep = ({ genders }: { genders: any[] }) => {
         </label>
         <select
           id="idGender"
-          defaultValue=""
-          className="w-full p-3 border border-gray-100"
+          className="w-full p-3 border border-gray-100" 
           {...register("idGender", {
-            required: "El género es obligatorio",
-          })}
+            required: 'El género es obligatorio',
+            validate: value =>  Number(value) !== 0 || 'Debe seleccionar un género'
+          })}   
         >
-          <option value="">Seleccione un género</option>
+          <option value = {0} >Seleccione un género</option>
           {genders.map((gender) => (
             <option key={gender.idGender} value={gender.idGender}>
               {gender.name}

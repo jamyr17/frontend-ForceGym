@@ -104,8 +104,8 @@ export type User = {
 
 export type UserDataForm = Pick<User, 'idUser' | 'username' | 'isDeleted'> & Pick<Role, 'idRole'> & Omit<Person, 'gender'> & {
     idGender: number
-    password: string
-    confirmPassword: string
+    password?: string
+    confirmPassword?: string
 }
 
 // -----------------------------------------------------
@@ -263,6 +263,8 @@ export type RoutineExercise = {
     exercise: Exercise;
     series: number;
     repetitions: number;
+    note: string;
+    categoryOrder: number;
 };
 
 export type RoutineAssignment = {
@@ -290,6 +292,8 @@ export type RoutineExerciseDTO = {
     idExercise: number; 
     series: number;
     repetitions: number;
+    note: string;
+    categoryOrder: number;
 };
 
 export type RoutineAssignmentDTO = {
@@ -322,6 +326,8 @@ export type RoutineDataForm = {
         idExercise: number;
         series: number;
         repetitions: number;
+        note: string;
+        categoryOrder: number;
     }[];
     assignments: {
         idClient: number;
