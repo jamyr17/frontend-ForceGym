@@ -55,6 +55,58 @@ function Form() {
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([]);
   const [selectedClients, setSelectedClients] = useState<ClientOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [draggedCategoryId, setDraggedCategoryId] = useState<number | null>(null);
+  const [dragOverCategoryId, setDragOverCategoryId] = useState<number | null>(null);
+  const [orderedCategories, setOrderedCategories] = useState(exerciseCategories);
+  const handleDragStart = (categoryId: number) => {
+    setDraggedCategoryId(categoryId);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, categoryId: number) => {
+    e.preventDefault();
+    if (categoryId !== dragOverCategoryId) {
+      setDragOverCategoryId(categoryId);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverCategoryId(null);
+  };
+const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number) => {
+  e.preventDefault();
+  
+  if (!draggedCategoryId || draggedCategoryId === targetCategoryId) {
+    setDragOverCategoryId(null);
+    setDraggedCategoryId(null);
+    return;
+  }
+
+    setOrderedCategories(prev => {
+      const draggedIndex = prev.findIndex(c => c.idExerciseCategory === draggedCategoryId);
+      const targetIndex = prev.findIndex(c => c.idExerciseCategory === targetCategoryId);
+      
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      
+      const newCategories = [...prev];
+      const [removed] = newCategories.splice(draggedIndex, 1);
+      newCategories.splice(targetIndex, 0, removed);
+      
+      // Actualiza el categoryOrder de los ejercicios en tiempo real (opcional)
+      setSelectedExercises(currentExercises => 
+        currentExercises.map(ex => {
+          const newCategoryOrder = newCategories.findIndex(
+            cat => cat.idExerciseCategory === ex.categoryId
+          );
+          return newCategoryOrder >= 0 ? { ...ex, categoryOrder: newCategoryOrder } : ex;
+        })
+      );
+      
+      return newCategories;
+    });
+
+    setDragOverCategoryId(null);
+    setDraggedCategoryId(null);
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -89,15 +141,17 @@ function Form() {
       setSelectedExercises(initialExercises);
     }
   }, [exerciseCategories]);
-
+  
+  useEffect(() => {
+    setOrderedCategories(exerciseCategories);
+  }, [exerciseCategories]);
   useEffect(() => {
     if (activeEditingId && !loading && routineToEdit) {
-      console.log('Precargando datos para edición:', routineToEdit);
-
       setValue('idRoutine', routineToEdit.idRoutine);
       setValue('name', routineToEdit.name);
       setValue('idDifficultyRoutine', routineToEdit.difficultyRoutine?.idDifficultyRoutine || 0);
 
+      // Cargar clientes asignados (código existente)
       if (routineToEdit.assignments?.length > 0) {
         const clientOptions = routineToEdit.assignments.map(assignment => {
           const client = allClients.find(c => c.value === assignment.idClient);
@@ -108,7 +162,49 @@ function Form() {
         });
         setSelectedClients(clientOptions);
       }
+      
       if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
+        // 1. Obtener categorías USADAS en los ejercicios
+        const usedCategories = routineToEdit.exercises.reduce((acc, ex) => {
+          const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
+          const category = exerciseData?.exerciseCategory;
+          if (category && !acc.some(c => c.idExerciseCategory === category.idExerciseCategory)) {
+            acc.push(category);
+          }
+          return acc;
+        }, [] as ExerciseCategory[]);
+
+        // 2. Ordenar categorías usadas según su MIN categoryOrder
+        const sortedUsedCategories = [...usedCategories].sort((a, b) => {
+          const minOrderA = Math.min(
+            ...routineToEdit.exercises
+              .filter(ex => {
+                const exData = exercise.find(e => e.idExercise === ex.idExercise);
+                return exData?.exerciseCategory?.idExerciseCategory === a.idExerciseCategory;
+              })
+              .map(ex => ex.categoryOrder)
+          );
+          
+          const minOrderB = Math.min(
+            ...routineToEdit.exercises
+              .filter(ex => {
+                const exData = exercise.find(e => e.idExercise === ex.idExercise);
+                return exData?.exerciseCategory?.idExerciseCategory === b.idExerciseCategory;
+              })
+              .map(ex => ex.categoryOrder)
+          );
+
+          return minOrderA - minOrderB;
+        });
+
+        // 3. Añadir categorías NO USADAS al final
+        const unusedCategories = exerciseCategories.filter(
+          cat => !usedCategories.some(used => used.idExerciseCategory === cat.idExerciseCategory)
+        );
+
+        setOrderedCategories([...sortedUsedCategories, ...unusedCategories]);
+
+        // 4. Cargar ejercicios
         const loadedExercises = routineToEdit.exercises.map(ex => {
           const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
           const category = exerciseData?.exerciseCategory;
@@ -124,18 +220,16 @@ function Form() {
           };
         });
 
-        const categoriesWithExercises = loadedExercises.map(ex => ex.categoryId);
-        const emptyCategories = exerciseCategories
-          .filter(cat => !categoriesWithExercises.includes(cat.idExerciseCategory))
-          .map(cat => ({
-            idExercise: 0,
-            name: "",
-            series: 0,
-            repetitions: 0,
-            note: "",
-            category: cat.name,
-            categoryId: cat.idExerciseCategory
-          }));
+        // 5. Añadir placeholders para categorías vacías
+        const emptyCategories = unusedCategories.map(cat => ({
+          idExercise: 0,
+          name: "",
+          series: 0,
+          repetitions: 0,
+          note: "",
+          category: cat.name,
+          categoryId: cat.idExerciseCategory
+        }));
 
         setSelectedExercises([...loadedExercises, ...emptyCategories]);
       }
@@ -205,14 +299,17 @@ function Form() {
       difficultyRoutine: {
         idDifficultyRoutine: data.idDifficultyRoutine
       },
-      exercises: selectedExercises
-        .filter(ex => ex.idExercise > 0)
-        .map(ex => ({
-          idExercise: ex.idExercise,
-          series: ex.series,
-          repetitions: ex.repetitions,
-          note: ex.note
-        })),
+      exercises: orderedCategories.flatMap((category, index) => { // Usa 'index' en lugar de currentCategoryIndex
+          return selectedExercises
+            .filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise > 0)
+            .map(ex => ({
+              idExercise: ex.idExercise,
+              series: ex.series,
+              repetitions: ex.repetitions,
+              note: ex.note,
+              categoryOrder: index // Usamos el índice actual del flatMap
+            }));
+        }),
       assignments: selectedClients.map(client => ({
         idClient: client.value,
         assignmentDate: new Date().toISOString()
@@ -220,7 +317,7 @@ function Form() {
       isDeleted: 0,
       paramLoggedIdUser: loggedUser?.idUser
     };
-
+    
     try {
       let result;
       let action = '';
@@ -276,8 +373,10 @@ function Form() {
       isDeleted: 0
     });
     setSelectedClients([]);
-
+    
+    // Resetear al orden original pero manteniendo cualquier orden previo
     if (exerciseCategories.length > 0) {
+      setOrderedCategories([...exerciseCategories]); // Copia para evitar mutaciones
       setSelectedExercises(
         exerciseCategories.map(category => ({
           idExercise: 0,
@@ -489,12 +588,31 @@ function Form() {
 
       <div className="mb-5">
         <h2 className="text-lg font-bold mb-4 text-yellow">Ejercicios</h2>
-        {exerciseCategories.map(category => {
+        {orderedCategories.map((category) => {
           const categoryExercises = getExercisesForCategory(category.idExerciseCategory);
+          const isDragged = draggedCategoryId === category.idExerciseCategory;
+          const isDragOver = dragOverCategoryId === category.idExerciseCategory;
 
           return (
-            <div key={category.idExerciseCategory} className="mb-8">
-              <h3 className="text-md font-bold text-gray-700 mb-3">{category.name}</h3>
+            <div
+              key={category.idExerciseCategory}
+              className={`mb-8 border rounded-lg p-4 transition-all duration-200 ${
+                isDragged ? 'opacity-50 bg-gray-100' : 
+                isDragOver ? 'border-yellow-500 border-2 bg-yellow-50' : 
+                'border-gray-200 bg-gray-50'
+              }`}
+              draggable
+              onDragStart={() => handleDragStart(category.idExerciseCategory)}
+              onDragOver={(e) => handleDragOver(e, category.idExerciseCategory)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, category.idExerciseCategory)}
+            >
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-md font-bold text-gray-700 flex items-center">
+                  <span className="mr-2 cursor-move">↕</span>
+                  {category.name}
+                </h3>
+              </div>
 
               {categoryExercises.map(({ index, ...ex }) => {
                 const exercisesForSelect = getAvailableExercises(category.idExerciseCategory, ex.idExercise);

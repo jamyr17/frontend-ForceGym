@@ -59,6 +59,14 @@ const Navbar = () => {
                 Contacto
               </a>
             </li>
+            <li>
+            <Link 
+              to="/videos-ejercicios" 
+              className="text-white hover:text-yellow-400 transition-colors font-medium uppercase text-sm tracking-wider"
+            >
+              Videos de Ejercicios
+            </Link>
+            </li>
           </ul>
 
           {/* Botón Mobile */}
@@ -117,6 +125,15 @@ const Navbar = () => {
               >
                 Contacto
               </a>
+            </li>
+            <li>
+              <Link 
+                to="/videos-ejercicios" 
+                className="block text-white hover:text-yellow-400 transition-colors font-medium uppercase text-sm tracking-wider py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Videos de ejercicios
+              </Link>
             </li>
           </ul>
         </div>

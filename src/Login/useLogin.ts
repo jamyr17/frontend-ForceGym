@@ -49,7 +49,7 @@ export const useLogin = () => {
             if (response.data?.loggedUser) {
                 setAuthHeader(response.data.loggedUser.token);
                 setAuthUser(response.data.loggedUser);
-                navigate('/gestion/usuarios', { replace: true });
+                navigate('/gestion/dashboard', { replace: true });
             } else {
                 throw new Error('Credenciales incorrectas');
             }

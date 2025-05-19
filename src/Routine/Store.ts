@@ -151,7 +151,10 @@ export const useRoutineStore = create<RoutineStore>()(
                 );
                 
                 if (result?.logout) return { logout: true };
-                if (result?.ok) await get().fetchRoutines();
+                if (result?.ok) {
+                    await get().fetchRoutines();
+                    return result;
+                }
                 
                 return result;
             } catch (error) {
@@ -161,7 +164,7 @@ export const useRoutineStore = create<RoutineStore>()(
                 set({ isLoading: false });
             }
         },
-
+        
         restoreRoutine: async (id) => {
             set({ isLoading: true });
             try {

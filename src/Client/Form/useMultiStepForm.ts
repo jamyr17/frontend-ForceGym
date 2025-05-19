@@ -117,15 +117,16 @@ export const useMultiStepForm = () => {
       action = 'editado';
     }
 
-    handleClose();
-
     if (result.ok) {
       const result2 = await fetchClients();
       if (result2.logout) {
         setAuthHeader(null);
         setAuthUser(null);
         navigate('/login', { replace: true });
+
       } else {
+        handleClose();
+        
         await Swal.fire({
           title: `Cliente ${action}`,
           text: `Se ha ${action} el cliente`,
@@ -141,7 +142,18 @@ export const useMultiStepForm = () => {
       setAuthHeader(null);
       setAuthUser(null);
       navigate('/login');
-    }
+    } else {
+    await Swal.fire({
+      title: 'Error al guardar',
+      text: result.error || 'Ocurrió un error inesperado al guardar el cliente.',
+      icon: 'error',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#CFAD04',
+      timer: 3000,
+      timerProgressBar: true,
+      width: 500
+    });
+  }
   };
 
   const handleClose = () => {

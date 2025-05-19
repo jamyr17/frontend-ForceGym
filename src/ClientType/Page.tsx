@@ -10,7 +10,6 @@ import ModalFilter from "../shared/components/ModalFilter"
 import { FilterButton, FilterSelect } from "./Filter"
 import Modal from "../shared/components/Modal"
 import Form from "./Form"
-import DataInfo from "./DataInfo";
 import { mapClientTypeToDataForm } from "../shared/types/mapper";
 import { useNavigate } from "react-router";
 import NoData from "../shared/components/NoData";
@@ -128,24 +127,6 @@ function ClientTypeManagement() {
                                             </td>
                                         )}
                                         <td className="flex gap-4 justify-center py-2">
-                                            <Modal
-                                                Button={() => (
-                                                    <button
-                                                        onClick={() => {
-                                                            getClientTypeById(clientType.idClientType);
-                                                            showModalInfo();
-                                                        }}
-                                                        className="p-2 bg-black rounded-sm hover:bg-gray-700 hover:cursor-pointer"
-                                                        title="Ver detalles"
-                                                    >
-                                                        <IoIosMore className="text-white" />
-                                                    </button>
-                                                )}
-                                                modal={modalInfo}
-                                                getDataById={getClientTypeById}
-                                                closeModal={closeModalInfo}
-                                                Content={DataInfo}
-                                            />
                                             <button
                                                 onClick={() => {
                                                     getClientTypeById(clientType.idClientType);

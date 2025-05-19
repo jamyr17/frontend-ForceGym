@@ -11,8 +11,9 @@ import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authent
 import { useCommonDataStore } from "../shared/CommonDataStore";
 
 const MAXLENGTH_VOUCHER = 100;
+const MINLENGTH_VOUCHER = 5;
 const MAXLENGTH_DETAIL = 100;
-//const MAXDATE = new Date().toLocaleDateString('sv-SE');
+const MINLENGTH_DETAIL = 5;
 const CASH_PAYMENT_ID = 2; // Asumiendo que 2 es el ID para Efectivo
 const MAXDATE = new Date().toUTCString();
 
@@ -81,9 +82,6 @@ function Form() {
             result = await updateEconomicIncome(reqUser);
             action = 'editado';
         }
-
-        closeModalForm();
-        reset();
         
         if (result.ok) {
             const result2 = await fetchEconomicIncomes();
@@ -92,7 +90,11 @@ function Form() {
                 setAuthHeader(null);
                 setAuthUser(null);
                 navigate('/login', {replace: true});
+
             } else {
+                closeModalForm();
+                reset();    
+
                 await Swal.fire({
                     title: `Ingreso económico ${action}`,
                     text: `Se ha ${action} el ingreso`,
@@ -346,6 +348,10 @@ function Form() {
                     disabled={isCashPayment}
                     {...register('voucherNumber', {
                         required: idMeanOfPayment === 1 ? 'El voucher es obligatorio' : false,
+                        minLength: {
+                            value: MINLENGTH_VOUCHER,
+                            message: `Debe ingresar un voucher de mínimo ${MINLENGTH_VOUCHER} carácteres`
+                        },
                         maxLength: {
                             value: MAXLENGTH_VOUCHER,
                             message: `Debe ingresar un voucher de máximo ${MAXLENGTH_VOUCHER} carácteres`
@@ -376,6 +382,10 @@ function Form() {
                     placeholder="Ingrese el detalle" 
                     {...register('detail', {
                         required: 'El detalle es obligatorio',
+                        minLength: {
+                            value: MINLENGTH_DETAIL,
+                            message: `Debe ingresar un voucher de mínimo ${MINLENGTH_DETAIL} carácteres`
+                        },
                         maxLength: {
                             value: MAXLENGTH_DETAIL,
                             message: `Debe ingresar un detalle de máximo ${MAXLENGTH_DETAIL} carácteres`

@@ -20,6 +20,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^12.9.2",
     "frontend": "file:",
+    "fuse.js": "^7.1.0",
     "jspdf": "^3.0.0",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.485.0",

@@ -84,6 +84,7 @@ export const useMeasurementStore = create<MeasurementStore>()(
 
         fetchMeasurements: async () => {
             const state = useMeasurementStore.getState();
+            let newPage = state.page;
             let filters = `&searchType=${state.searchType}`;
             if (state.searchTerm !== '') {
                 filters += `&searchTerm=${state.searchTerm}`;
@@ -106,7 +107,12 @@ export const useMeasurementStore = create<MeasurementStore>()(
                 `${import.meta.env.VITE_URL_API}measurement/list?idClient=${state.idClient}&size=${state.size}&page=${state.page}${filters}`
             );
 
-            set({ measurements: result.data?.measurements ?? [], totalRecords: result.data?.totalRecords ?? 0 });
+            const totalPages = Math.max(1, Math.ceil(result.data.totalRecords / state.size));
+            if (state.page > totalPages) {
+                newPage = state.page-1; 
+            }
+
+            set({ measurements: result.data?.measurements ?? [], totalRecords: result.data?.totalRecords ?? 0, page: newPage});
             return result;
         },
 

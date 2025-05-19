@@ -73,6 +73,7 @@ export const useMultiStepForm = () => {
     const isSelfEditing = loggedUser?.idUser === data.idUser;
     const reqUser: UserDataForm & { paramLoggedIdUser?: number } = {
       ...data,
+      username: isSelfEditing ? data.username : defaultValues.username,
       password: isSelfEditing ? data.password : '', 
       paramLoggedIdUser: loggedUser?.idUser
     };
@@ -86,8 +87,6 @@ export const useMultiStepForm = () => {
       result = await updateUser(reqUser);
       action = 'editado';
     }
-
-    handleClose();
     
     if (result.ok) {
       const result2 = await fetchUsers();
@@ -95,7 +94,10 @@ export const useMultiStepForm = () => {
         setAuthHeader(null);
         setAuthUser(null);
         navigate('/login', { replace: true });
+        
       } else {
+        handleClose();
+
         await Swal.fire({
           title: `Usuario ${action}`,
           text: `Ha ${action} al usuario ${reqUser.username}`,
