@@ -63,8 +63,25 @@ const useActivityTypeStore = create<ActivityTypeStore>()(
         },
 
         deleteActivityType: async (id, loggedIdUser) => {
-            const result = await deleteData(`${import.meta.env.VITE_URL_API}activityType/delete/${id}`, loggedIdUser)
-            return result
+            try {
+                const result = await deleteData(
+                    `${import.meta.env.VITE_URL_API}activityType/delete/${id}`, 
+                    { userId: loggedIdUser } // Asegúrate de que el backend espere este formato
+                );
+                
+                if (result?.ok) {
+                    // Actualiza el estado local eliminando el item (opcional)
+                    set((state) => ({
+                        activityTypes: state.activityTypes.filter(
+                            (activity) => activity.idActivityType !== id
+                        ),
+                    }));
+                }
+                return result;
+            } catch (error) {
+                console.error("Error deleting activity type:", error);
+                return { ok: false };
+            }
         },
 
         showModalForm: () => {
