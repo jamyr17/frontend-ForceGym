@@ -163,8 +163,9 @@ export const useClientStore = create<ClientStore>()(
                 `${import.meta.env.VITE_URL_API}client/list?size=${state.size}&page=${state.page}${filters}`
             );
 
-            if (state.page > (Math.trunc(result.data.totalRecords / state.size) + 1)) {
-                newPage = 1;
+            const totalPages = Math.max(1, Math.ceil(result.data.totalRecords / state.size));
+            if (state.page > totalPages) {
+                newPage = state.page-1; 
             }
 
             const expenses = result.data?.clients ?? []
