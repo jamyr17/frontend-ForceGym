@@ -94,9 +94,9 @@ const useUserStore = create<UserStore>()(
                 `${import.meta.env.VITE_URL_API}user/list?size=${state.size}&page=${state.page}${filters}`
             )
     
-            // si la página en la que estoy es mayor que la cantidad nueva de páginas posibles me tengo que devolver a la pag 1
-            if (state.page > (Math.trunc(result.data.totalRecords / state.size) + 1)) {
-                newPage = 1
+            const totalPages = Math.max(1, Math.ceil(result.data.totalRecords / state.size));
+            if (state.page > totalPages) {
+                newPage = state.page-1; 
             }
 
             const users = result.data?.users ?? []

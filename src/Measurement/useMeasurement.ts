@@ -10,10 +10,10 @@ export const useMeasurement = () => {
     const navigate = useNavigate();
     const { measurements, fetchMeasurements, deleteMeasurement, updateMeasurement, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useMeasurementStore();
 
-    const handleDelete = async ({ idMeasurement }: Measurement) => {
+    const handleDelete = async (measurement : Measurement) => {
         await Swal.fire({
             title: '¿Desea eliminar esta medición?',
-            text: `Está eliminando la medición con ID ${idMeasurement}`,
+            text: `Está eliminando la medición del ${formatDate(new Date(measurement.measurementDate))}`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -25,12 +25,12 @@ export const useMeasurement = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser();
-                const response = await deleteMeasurement(idMeasurement, loggedUser?.idUser as number);
+                const response = await deleteMeasurement(measurement.idMeasurement, loggedUser?.idUser as number);
 
                 if(response.ok){
                     Swal.fire({
                         title: 'Medición eliminada',
-                        text: `Se ha eliminado la medición con ID ${idMeasurement}`,
+                        text: `Se ha eliminado la medición del ${formatDate(new Date(measurement.measurementDate))}`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -72,7 +72,7 @@ export const useMeasurement = () => {
         
         await Swal.fire({
             title: '¿Desea restaurar esta medición?',
-            text: `Está restaurando la medición con ID ${measurement.idMeasurement}`,
+            text: `Está restaurando la medición del ${formatDate(new Date(measurement.measurementDate))}`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -88,7 +88,7 @@ export const useMeasurement = () => {
                 if(response.ok){
                     Swal.fire({
                         title: 'Medición restaurada',
-                        text: `Se ha restaurado la medición con ID ${measurement.idMeasurement}`,
+                        text: `Se ha restaurado la medición del ${formatDate(new Date(measurement.measurementDate))}`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
