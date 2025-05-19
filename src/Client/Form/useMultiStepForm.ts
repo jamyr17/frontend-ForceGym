@@ -117,15 +117,16 @@ export const useMultiStepForm = () => {
       action = 'editado';
     }
 
-    handleClose();
-
     if (result.ok) {
       const result2 = await fetchClients();
       if (result2.logout) {
         setAuthHeader(null);
         setAuthUser(null);
         navigate('/login', { replace: true });
+
       } else {
+        handleClose();
+        
         await Swal.fire({
           title: `Cliente ${action}`,
           text: `Se ha ${action} el cliente`,

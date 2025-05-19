@@ -45,9 +45,6 @@ function FormCategory() {
       ? await updateCategory(reqData)
       : await addCategory(reqData);
 
-    closeModalForm();
-    reset();
-
     if (result.ok) {
       const result2 = await fetchCategories();
 
@@ -57,6 +54,9 @@ function FormCategory() {
         navigate('/login');
         return;
       }
+
+      closeModalForm();
+      reset();
 
       Swal.fire({
         title: `Categoría ${actionText}`,

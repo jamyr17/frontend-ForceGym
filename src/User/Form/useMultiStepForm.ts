@@ -87,8 +87,6 @@ export const useMultiStepForm = () => {
       result = await updateUser(reqUser);
       action = 'editado';
     }
-
-    handleClose();
     
     if (result.ok) {
       const result2 = await fetchUsers();
@@ -96,7 +94,10 @@ export const useMultiStepForm = () => {
         setAuthHeader(null);
         setAuthUser(null);
         navigate('/login', { replace: true });
+        
       } else {
+        handleClose();
+
         await Swal.fire({
           title: `Usuario ${action}`,
           text: `Ha ${action} al usuario ${reqUser.username}`,
