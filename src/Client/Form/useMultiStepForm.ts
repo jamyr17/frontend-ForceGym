@@ -176,9 +176,10 @@ export const useMultiStepForm = () => {
   }
 
   const inputsByStep: StepFields[] = [
-    { step: 1, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
-    { step: 2, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency'] },
-    { step: 3, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues'] }
+    { step: 1, fields: ['signatureImage']},
+    { step: 2, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
+    { step: 3, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency'] },
+    { step: 4, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues'] }
   ];
 
   const validateStepChange = async () => {

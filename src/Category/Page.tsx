@@ -14,7 +14,6 @@ import ModalFilter from "../shared/components/ModalFilter";
 import { FilterButton, FilterSelect } from "./Filter";
 import Modal from "../shared/components/Modal";
 import Form from "./Form";
-import DataInfo from "./DataInfo";
 import Pagination from "../shared/components/Pagination";
 import NoData from "../shared/components/NoData";
 
@@ -148,24 +147,6 @@ function CategoryManagement() {
                                             </td>
                                         )}
                                         <td className="flex gap-4 justify-center py-2">
-                                            <Modal
-                                                Button={() => (
-                                                    <button
-                                                        onClick={() => {
-                                                            getCategoryById(category.idCategory);
-                                                            showModalInfo();
-                                                        }}
-                                                        className="p-2 bg-black rounded-sm hover:bg-gray-700"
-                                                        title="Ver detalles"
-                                                    >
-                                                        <IoIosMore className="text-white" />
-                                                    </button>
-                                                )}
-                                                modal={modalInfo}
-                                                getDataById={getCategoryById}
-                                                closeModal={closeModalInfo}
-                                                Content={DataInfo}
-                                            />
                                             <button
                                                 onClick={() => {
                                                     getCategoryById(category.idCategory);
