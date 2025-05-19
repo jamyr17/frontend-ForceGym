@@ -1,14 +1,68 @@
+import { useCallback } from "react";
 import { formatAmountToCRC, formatDate, formatNullable } from "../shared/utils/format";
 import useClientStore from "./Store";
 import { CiCircleCheck } from "react-icons/ci";
 import { MdOutlineCancel } from "react-icons/md";
 
 function DataInfo() {
-    const { clients, activeEditingId } = useClientStore()
-    if (!activeEditingId) return <></>;
+    const { clients, activeEditingId } = useClientStore();
+    if (!activeEditingId) return null;
 
-    const client = clients.find(client => client.idClient === activeEditingId)
-    if (!client) return <></>
+    const client = clients.find(client => client.idClient === activeEditingId);
+    if (!client) return null;
+
+    // Función para validar y normalizar la firma
+    const getValidSignature = useCallback(() => {
+        if (!client.signatureImage) return null;
+
+        try {
+            // Caso 1: Ya es una data URI válida
+            if (client.signatureImage.startsWith('data:image/png;base64,')) {
+                return client.signatureImage;
+            }
+
+            // Caso 2: Es base64 sin prefijo
+            if (/^[A-Za-z0-9+/=]+$/.test(client.signatureImage)) {
+                return `data:image/png;base64,${client.signatureImage}`;
+            }
+
+            // Caso 3: Contiene caracteres especiales (URL encoded)
+            const decoded = decodeURIComponent(client.signatureImage);
+            if (decoded.startsWith('data:image')) {
+                return decoded;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Error al procesar firma:', error);
+            return null;
+        }
+    }, [client]);
+
+    const validSignature = getValidSignature();
+
+    // Función para descargar la firma
+    const handleDownload = useCallback(() => {
+        if (!validSignature) return;
+
+        try {
+            const link = document.createElement('a');
+            link.href = validSignature;
+            link.download = `firma-${client.person.identificationNumber}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error al descargar firma:', error);
+        }
+    }, [validSignature, client]);
+
+    // Renderizado de la firma
+    const renderSignature = () => {
+        if (!validSignature) {
+            return <p className="text-gray-500">No hay firma registrada</p>;
+        }
+    }
 
     return (
         <div className="grid grid-cols-4 gap-16">
@@ -170,7 +224,21 @@ function DataInfo() {
                     <p><strong>PRECIO POR MES</strong></p>
                     <p>{formatAmountToCRC(client.typeClient.monthlyCharge)}</p>
                 </div>
-                
+
+                <div className="flex flex-col gap-2 text-lg">
+                <p><strong>FIRMA DEL CLIENTE</strong></p>
+                {client.signatureImage ? (
+                    <div className="border border-gray-300 p-2 rounded-md">
+                    <img 
+                        src={client.signatureImage} 
+                        alt="Firma del cliente"
+                        className="max-w-full h-auto"
+                    />
+                    </div>
+                ) : (
+                    <p className="text-gray-500">No hay firma registrada</p>
+                )}
+                </div>
             </div>
         </div>
     );
