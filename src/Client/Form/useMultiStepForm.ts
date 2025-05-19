@@ -10,7 +10,7 @@ import { useClientForm } from "./Context";
 
 export const useMultiStepForm = () => {
   const navigate = useNavigate();
-  const { genders, typesClient } = useCommonDataStore();
+  const { genders, clientTypes } = useCommonDataStore();
   const { clients, activeEditingId, fetchClients, addClient, updateClient, closeModalForm } = useClientStore();
   const { step, nextStep, prevStep, setCustomStep, resetForm } = useClientForm();
 
@@ -209,7 +209,7 @@ export const useMultiStepForm = () => {
     methods,
     step,
     genders,
-    typesClient,
+    clientTypes,
     activeEditingId,
     submitForm,
     handleClose,
