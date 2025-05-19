@@ -147,9 +147,6 @@ export const useClientStore = create<ClientStore>()(
             if(state.filterByBreathingIssues!=null){
                 filters += `&filterByBreathingIssues=${state.filterByBreathingIssues}`;
             }
-            if (state.filterByBirthDateRangeMax !== null && state.filterByBirthDateRangeMin !== null) {
-                filters += `&filterByDateBirthStart=${formatDateForParam(state.filterByBirthDateRangeMin)}&filterByDateBirthEnd=${formatDateForParam(state.filterByBirthDateRangeMax)}`;
-            }
             if (
                 isCompleteDate(state.filterByBirthDateRangeMax) &&
                 isCompleteDate(state.filterByBirthDateRangeMin)

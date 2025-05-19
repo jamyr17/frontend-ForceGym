@@ -14,14 +14,17 @@ export const exportToExcel = async (
   includeReferenceTable: boolean = false,
   clientData?: { name: string; age: number; height: number }
 ) => {
+  // Determine if we're talking about body measurements
+  const isBodyMeasurements = title.toLowerCase().includes("medidas") || 
+                           title.toLowerCase().includes("corporales");
+  
+  // Create workbook and worksheet with appropriate title
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet(`Reporte de ${title}`);
-  if (clientData) {
-    worksheet.addRow([`Nombre del cliente: ${clientData.name}`]);
-    worksheet.addRow([`Edad: ${clientData.age}`]);
-    worksheet.addRow([`Estatura: ${clientData.height} cm`]);
-    worksheet.addRow([]);
-  }
+  const worksheet = workbook.addWorksheet(
+    isBodyMeasurements && clientData 
+      ? `Reporte de ${title} - ${clientData.name}`
+      : `Reporte de ${title}`
+  );
 
   const formattedCurrentDate = formatCurrentDateWithHourForTitle();
   const formattedCurrentDateDoc = formatCurrentDateForDocument();
@@ -49,7 +52,9 @@ export const exportToExcel = async (
 
   worksheet.mergeCells("D1:H1");
   const titleCell = worksheet.getCell("D1");
-  titleCell.value = `Reporte de ${title}`;
+  titleCell.value = isBodyMeasurements && clientData 
+    ? `Reporte de ${title} - ${clientData.name}`
+    : `Reporte de ${title}`;
   titleCell.font = { 
     size: 16, 
     bold: true,
@@ -84,7 +89,9 @@ export const exportToExcel = async (
     name: 'Arial'
   };
 
+  // Add client data if available (modified to put age and height in row 2 columns F and G)
   if (clientData) {
+    // Add client name in row 6 as before
     const clientRow1 = worksheet.getRow(6);
     clientRow1.getCell(1).value = `Cliente: ${clientData.name}`;
     clientRow1.getCell(1).font = { 
@@ -93,12 +100,23 @@ export const exportToExcel = async (
       name: 'Arial'
     };
 
-    const clientRow2 = worksheet.getRow(7);
-    clientRow2.getCell(1).value = `Edad: ${clientData.age} años | Estatura: ${clientData.height} cm`;
-    clientRow2.getCell(1).font = { 
-      size: 11,
-      name: 'Arial'
-    };
+    // Add age and height in row 2 columns F and G
+    const infoRow = worksheet.getRow(2);
+    infoRow.getCell(6).value = `Edad: ${clientData.age} años`;
+    infoRow.getCell(7).value = `Estatura: ${clientData.height} cm`;
+    
+    // Style the age and height cells
+    [6, 7].forEach(col => {
+      const cell = infoRow.getCell(col);
+      cell.font = {
+        size: 11,
+        name: 'Arial'
+      };
+      cell.alignment = {
+        horizontal: "left",
+        vertical: "middle"
+      };
+    });
 
     worksheet.mergeCells("A8:H8");
     const separatorCell = worksheet.getCell("A8");
@@ -172,7 +190,7 @@ export const exportToExcel = async (
     });
   });
 
-  if (includeReferenceTable && title.toLowerCase() === "medidas") {
+  if (includeReferenceTable && isBodyMeasurements) {
     const startRow = worksheet.rowCount + 3;
     
     const headerLabels = ["", "BAJO", "NORMAL", "ELEVADO", "MUY ELEVADO"];
@@ -189,7 +207,7 @@ export const exportToExcel = async (
       cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FFE6E6E6" }, // Fondo gris claro
+        fgColor: { argb: "FFE6E6E6" },
       };
       cell.border = {
         top: { style: "thin", color: { argb: "FF000000" } },
@@ -239,7 +257,6 @@ export const exportToExcel = async (
           wrapText: true
         };
 
-        // Resaltar primera columna
         if (colIndex === 0) {
           cell.font = { ...cell.font, bold: true };
           cell.fill = {
@@ -251,13 +268,12 @@ export const exportToExcel = async (
       });
     });
 
-    worksheet.getColumn(1).width = 12; // Primera columna más ancha
+    worksheet.getColumn(1).width = 12;
     for (let i = 2; i <= 5; i++) {
-      worksheet.getColumn(i).width = 15; // Columnas de valores
+      worksheet.getColumn(i).width = 15;
     }
   }
 
-  // Ajustar anchos de columnas para la tabla principal
   const columnWidths = [8, 15, 12, 15, 20, 20, 40]; 
   worksheet.columns.forEach((column, index) => {
     const customWidth = columnWidths[index];
@@ -278,6 +294,8 @@ export const exportToExcel = async (
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(
     new Blob([buffer]), 
-    `Reporte de ${title} - ${formattedCurrentDate}.xlsx`
+    isBodyMeasurements && clientData
+      ? `Reporte de ${title} - ${clientData.name} - ${formattedCurrentDate}.xlsx`
+      : `Reporte de ${title} - ${formattedCurrentDate}.xlsx`
   );
 };

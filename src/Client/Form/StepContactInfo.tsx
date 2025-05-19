@@ -3,9 +3,11 @@ import ErrorForm from "../../shared/components/ErrorForm";
 import { formatDate } from "../../shared/utils/format";
 
 const MAXLENGTH_PHONENUMBER = 15;
+const MINLENGTH_PHONENUMBER = 8;
 const MAXLENGTH_EMAIL = 100;
 const MAXDATE = new Date().toUTCString();
 const MAXLENGTH_NAME = 50;
+const MINLENGTH_NAME = 2;
 
 export const StepContactInfo = () => {
   const { register, formState: { errors } } = useFormContext();
@@ -22,9 +24,17 @@ export const StepContactInfo = () => {
           type="text" 
           placeholder="Ingrese el número de teléfono" 
           {...register("phoneNumber", {
+            minLength: {
+              value: MINLENGTH_PHONENUMBER,
+              message: `Debe ingresar un número de teléfono de mínimo ${MINLENGTH_PHONENUMBER} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_PHONENUMBER,
               message: `Debe ingresar número de teléfono de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
+            },
+            pattern: {
+              value: /^[0-9]+$/,
+              message: 'El número de teléfono sólo puede contener carácteres númericos'
             }
           })}
         />
@@ -64,9 +74,17 @@ export const StepContactInfo = () => {
           type="text" 
           placeholder="Ingrese el nombre del contacto de emergencia" 
           {...register("nameEmergencyContact", {
+            minLength: {
+              value: MINLENGTH_NAME,
+              message: `Debe ingresar un nombre de contacto de emergencia de mínimo ${MINLENGTH_NAME} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_NAME,
               message: `Debe ingresar un nombre de contacto de emergencia de máximo ${MAXLENGTH_NAME} carácteres`
+            },
+            pattern: {
+              value: /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s'-]*$/,
+              message: 'El nombre de contacto de emergencia no puede contener números ni símbolos especiales'
             }
           })}
         />
@@ -83,9 +101,17 @@ export const StepContactInfo = () => {
           type="text" 
           placeholder="Ingrese el número del contacto de emergencia" 
           {...register("phoneNumberContactEmergency", {
+            minLength: {
+              value: MINLENGTH_PHONENUMBER,
+              message: `Debe ingresar un número de contacto de emergencia de mínimo ${MINLENGTH_PHONENUMBER} carácteres`
+            },
             maxLength: {
               value: MAXLENGTH_PHONENUMBER,
               message: `Debe ingresar un número de contacto de emergencia de máximo ${MAXLENGTH_PHONENUMBER} carácteres`
+            },
+            pattern: {
+              value: /^[0-9]+$/,
+              message: 'El número de contacto de emergencia sólo puede contener carácteres númericos'
             }
           })}
         />

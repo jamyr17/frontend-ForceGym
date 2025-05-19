@@ -7,9 +7,11 @@ import { useNavigate } from "react-router";
 import { exportToPDF } from "../shared/utils/pdf";
 import { exportToExcel } from "../shared/utils/excel";
 import { mapRoutineToDTO } from '../shared/types/mapper';
+import { useState } from 'react';
 
 export const useRoutine = () => {
     const navigate = useNavigate();
+    const [refreshKey, setRefreshKey] = useState(0);
     const { 
         routines,
         currentRoutine,
@@ -22,7 +24,7 @@ export const useRoutine = () => {
     const { exercise: allExercises } = useCommonDataStore();
 
     const handleDelete = async ({ idRoutine, name }: Routine) => {
-        await Swal.fire({
+        const result = await Swal.fire({
             title: '¿Desea eliminar la rutina?',
             text: `Estaría eliminando "${name}"`,
             icon: 'question',
@@ -33,37 +35,37 @@ export const useRoutine = () => {
             confirmButtonColor: '#CFAD04',
             width: 500,
             reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const loggedUser = getAuthUser();
-                if (!loggedUser?.idUser) {
-                    console.error("No user ID available");
-                    return;
-                }
-                
-                const response = await deleteRoutine(idRoutine);
-                
-                if (response?.ok) {
-                    await Swal.fire({
-                        title: 'Rutina eliminada',
-                        text: `Ha eliminado "${name}"`,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        timer: 3000,
-                        timerProgressBar: true,
-                        width: 500,
-                        confirmButtonColor: '#CFAD04'
-                    });
-                    await fetchRoutines();
-                }
-
-                if (response?.logout) {
-                    setAuthHeader(null);
-                    setAuthUser(null);
-                    navigate('/login', {replace: true});
-                }
-            } 
         });
+
+        if (result.isConfirmed) {
+            const loggedUser = getAuthUser();
+            if (!loggedUser?.idUser) {
+                console.error("No user ID available");
+                return;
+            }
+            
+            const response = await deleteRoutine(idRoutine);
+            
+            if (response?.ok) {
+                await fetchRoutines(); // Asegura que las rutinas se actualicen
+                await Swal.fire({
+                    title: 'Rutina eliminada',
+                    text: `Ha eliminado "${name}"`,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    width: 500,
+                    confirmButtonColor: '#CFAD04'
+                });
+            }
+
+            if (response?.logout) {
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', {replace: true});
+            }
+        } 
     };
 
     const handleRestore = async (routine: Routine) => {
