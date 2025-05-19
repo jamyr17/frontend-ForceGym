@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useFormContext } from 'react-hook-form';
 import SignatureCanvas from 'react-signature-canvas';
-import { useClientForm } from './Context';
 import ErrorForm from '../../shared/components/ErrorForm';
 
 const CONTRACT_TEXT = `
@@ -18,34 +18,51 @@ Con la firma del presente contrato, se aceptan los términos y condiciones estip
 -El incumplimiento de estos términos y condiciones podrá dar lugar, según la gravedad, a la expulsión de las instalaciones.
 `;
 
+
 export const StepContract = () => {
-  const { nextStep } = useClientForm();
+  const { 
+    setValue, 
+    watch, 
+    formState: { errors }, 
+    trigger,
+    register 
+  } = useFormContext();
+  
   const sigCanvasRef = useRef<SignatureCanvas>(null);
-  const [error, setError] = useState('');
+  const signature = watch('signatureImage');
+
+  register('signatureImage', {
+    required: 'Debe proporcionar su firma para continuar',
+    validate: {
+      hasSignature: () => 
+        !sigCanvasRef.current?.isEmpty() || 'La firma es requerida'
+    }
+  });
+
+  useEffect(() => {
+    trigger('signatureImage');
+  }, [signature, trigger]);
 
   const handleClear = () => {
     sigCanvasRef.current?.clear();
-    setError('');
+    setValue('signatureImage', '', { shouldValidate: true });
   };
 
-  const handleAccept = () => {
-    if (sigCanvasRef.current?.isEmpty()) {
-      setError('Debe proporcionar su firma para continuar');
-      return;
-    }
-
-    const signature = sigCanvasRef.current?.getTrimmedCanvas().toDataURL('image/png');
-    if (signature) {
-      setError('');
-      // Aquí puedes manejar la firma como necesites
-      nextStep();
+  const handleSignatureEnd = () => {
+    if (!sigCanvasRef.current?.isEmpty()) {
+      const signatureData = sigCanvasRef.current
+        .getTrimmedCanvas()
+        .toDataURL('image/png');
+      setValue('signatureImage', signatureData, { shouldValidate: true });
+    } else {
+      setValue('signatureImage', '', { shouldValidate: true });
     }
   };
 
   return (
     <div className="space-y-5">
       <div className="contract-container bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Términos y condiciones </h2>
+        <h2 className="text-xl font-bold mb-4">Términos y condiciones</h2>
         <pre className="whitespace-pre-wrap font-sans">{CONTRACT_TEXT}</pre>
       </div>
 
@@ -60,10 +77,13 @@ export const StepContract = () => {
               height: 200,
               className: 'sig-canvas w-full bg-white'
             }}
+            onEnd={handleSignatureEnd}
           />
         </div>
         
-        {error && <ErrorForm>{error}</ErrorForm>}
+        {errors.signatureImage && (
+          <ErrorForm>{errors.signatureImage.message?.toString()}</ErrorForm>
+        )}
 
         <div className="flex gap-4 mt-4">
           <button
@@ -72,13 +92,6 @@ export const StepContract = () => {
             className="border-2 border-gray-600 text-gray-600 py-2 px-3 uppercase font-bold rounded-md hover:opacity-50 cursor-pointer transition-colors"
           >
             Limpiar Firma
-          </button>
-          <button
-            type="button"
-            onClick={handleAccept}
-            className="bg-yellow text-white py-2 px-3 uppercase font-bold rounded-md hover:bg-amber-600 cursor-pointer transition-colors"
-          >
-            Aceptar y Continuar
           </button>
         </div>
       </div>
