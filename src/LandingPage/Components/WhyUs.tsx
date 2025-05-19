@@ -130,18 +130,18 @@ const WhyUs = () => {
       },
       {
         img: '/LandingPage/coach-1.webp',
-        name: 'Genesis',
-        text: 'Entrenadora especializada en fuerza funcional y acondicionamiento físico.',
+        name: 'Andrea Chacón',
+        text: 'Encargada de las rutinas de entrenamiento y planificación física.',
       },
       {
         img: '/LandingPage/coach-2.webp',
-        name: 'Kimberly',
-        text: 'Nutricionista deportiva con enfoque integral en rendimiento.',
+        name: 'Kimberly Chacón',
+        text: 'Encargada administrativa y también atiende consultas personalizadas.',
       },
       {
         img: '/LandingPage/coach-3.webp',
-        name: 'Lucía',
-        text: 'Coach personal con certificaciones internacionales en HIIT y movilidad.',
+        name: 'Gipsy López',
+        text: 'Apoya en entrenamientos y responde dudas sobre nutrición y bienestar.',
       },
     ],
     []
