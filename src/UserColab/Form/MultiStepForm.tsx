@@ -3,10 +3,11 @@ import { PersonalInfoStep } from "./StepPersonalInfo";
 import { ContactInfoStep } from "./StepContactInfo";
 import { AccountInfoStep } from "./StepAccountInfo";
 import { useMultiStepForm } from "./useMultiStepForm";
+import { UserDataForm } from "../../shared/types";
 
 interface MultiStepFormProps {
     initialData: any;
-    onSubmit: (data: any) => void;
+    onSubmit: (data: UserDataForm) => Promise<void>; 
     isUpdate: boolean;
 }
 

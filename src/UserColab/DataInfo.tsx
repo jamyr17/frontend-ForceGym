@@ -2,10 +2,10 @@ import { formatDate } from "../shared/utils/format";
 import useUserStore from "./Store";
 
 function DataInfo() {
-    const { users, activeEditingId } = useUserStore()
-    if (!activeEditingId) return <></>
+    const { currentUser } = useUserStore()
+    if (!currentUser) return <></>
 
-    const activeEditingUser = users.find(user => user.idUser === activeEditingId)
+    const activeEditingUser = currentUser
     if (!activeEditingUser) return <></>
 
     return (

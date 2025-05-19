@@ -6,14 +6,14 @@ import { MdOutlineCancel } from "react-icons/md";
 
 function DataInfo() {
     const { clients, activeEditingId } = useClientStore();
-    if (!activeEditingId) return null;
+    if (!activeEditingId) return <></>;
 
     const client = clients.find(client => client.idClient === activeEditingId);
-    if (!client) return null;
+    if (!client) return <></>;
 
     // Función para validar y normalizar la firma
     const getValidSignature = useCallback(() => {
-        if (!client.signatureImage) return null;
+        if (!client.signatureImage) return <></>;
 
         try {
             // Caso 1: Ya es una data URI válida
@@ -47,7 +47,7 @@ function DataInfo() {
 
         try {
             const link = document.createElement('a');
-            link.href = validSignature;
+            link.href = validSignature as string;
             link.download = `firma-${client.person.identificationNumber}.png`;
             document.body.appendChild(link);
             link.click();

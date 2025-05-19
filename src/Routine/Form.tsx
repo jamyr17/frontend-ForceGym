@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import Select from 'react-select';
-import { RoutineDataForm, RoutineWithExercisesDTO } from "../shared/types";
+import { ExerciseCategory, RoutineDataForm, RoutineWithExercisesDTO } from "../shared/types";
 import ErrorForm from "../shared/components/ErrorForm";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import useRoutineStore from "./Store";

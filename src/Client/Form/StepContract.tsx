@@ -50,10 +50,12 @@ export const StepContract = () => {
 
   const handleSignatureEnd = () => {
     if (!sigCanvasRef.current?.isEmpty()) {
-      const signatureData = sigCanvasRef.current
-        .getTrimmedCanvas()
-        .toDataURL('image/png');
-      setValue('signatureImage', signatureData, { shouldValidate: true });
+      if (sigCanvasRef.current) {
+        const signatureData = sigCanvasRef.current
+          .getTrimmedCanvas()
+          .toDataURL('image/png');
+        setValue('signatureImage', signatureData, { shouldValidate: true });
+      }
     } else {
       setValue('signatureImage', '', { shouldValidate: true });
     }
