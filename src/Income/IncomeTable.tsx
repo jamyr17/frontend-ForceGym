@@ -159,7 +159,7 @@ function IncomeTable({
           <div className="mt-6 p-4 bg-gray-100 rounded-lg">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold">Total de Ingresos:
-                {formatAmountToCRC(economicIncomes.reduce((total, item) => total + item.amount, 0))}
+                {' ' + formatAmountToCRC(economicIncomes.reduce((total, item) => total + item.amount, 0))}
               </h3>
             </div>
           </div>

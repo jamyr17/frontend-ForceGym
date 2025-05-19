@@ -74,7 +74,7 @@ function EconomicIncomeManagement() {
                 <div className="flex gap-4">
                     <button 
                         onClick={() => setShowDashboard(!showDashboard)}
-                        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 hover:cursor-pointer"
                     >
                         {showDashboard ? 'Ver Tabla' : 'Ver Dashboard'}
                     </button>

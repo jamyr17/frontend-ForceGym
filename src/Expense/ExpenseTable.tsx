@@ -158,7 +158,7 @@ function ExpenseTable({
           <div className="mt-6 p-4 bg-gray-100 rounded-lg">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold">Total de Gastos:
-                {formatAmountToCRC(economicExpenses.reduce((total, item) => total + item.amount, 0))}
+                {' ' + formatAmountToCRC(economicExpenses.reduce((total, item) => total + item.amount, 0))}
               </h3>
             </div>
           </div>
