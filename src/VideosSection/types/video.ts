@@ -1,13 +1,11 @@
 export type VideoCategory = 
   'gluteos' | 'femoral' | 'cuadriceps' | 'pecho' | 
-  'tricep' | 'hombro' | 'espalda' | 'biceps' | 'pantorrilla';
+  'triceps' | 'hombro' | 'espalda' | 'biceps' | 'pantorrilla';
 
 export interface Video {
   id: string;
   title: string;
   description: string;
-  youtubeId: string; 
-  duration: string;
+  youTubeId: string; 
   category: VideoCategory;
-  uploadDate: string;
 }
