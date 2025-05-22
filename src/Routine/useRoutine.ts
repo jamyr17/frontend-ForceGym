@@ -131,9 +131,8 @@ export const useRoutine = () => {
         };
     };
 
-    const handleExportRoutine = async (routineId: number) => {
+    const handleExportRoutine = async () => {
         try {
-            await getRoutineById(routineId);
             
             if (!currentRoutine) {
                 throw new Error('Rutina no encontrada');
