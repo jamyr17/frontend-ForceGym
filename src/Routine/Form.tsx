@@ -8,6 +8,7 @@ import ErrorForm from "../shared/components/ErrorForm";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import useRoutineStore from "./Store";
 import { useCommonDataStore } from "../shared/CommonDataStore";
+import clsx from "clsx";
 
 type SelectedExercise = {
   idExercise: number;
@@ -509,11 +510,11 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
 
   return (
     <form
-      className="bg-white rounded-lg px-5 mb-10 overflow-scroll"
+      className="bg-white rounded-lg px-5 py-6 mb-10 max-w-[1200px] mx-auto w-full overflow-x-hidden"
       noValidate
       onSubmit={handleSubmit(submitForm)}
     >
-      <legend className="uppercase text-center text-yellow text-2xl font-black border-b-2 py-2 border-yellow">
+      <legend className="uppercase text-center text-yellow text-2xl font-black border-b-2 py-2 border-yellow mb-6">
         {activeEditingId ? 'Actualizar Rutina' : 'Crear Rutina'}
       </legend>
 
@@ -586,7 +587,9 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
         {errors.name && <ErrorForm>{errors.name.message}</ErrorForm>}
       </div>
 
-      <div className="mb-5">
+
+      {/* Ejercicios */}
+      <div className="mb-8">
         <h2 className="text-lg font-bold mb-4 text-yellow">Ejercicios</h2>
         {orderedCategories.map((category) => {
           const categoryExercises = getExercisesForCategory(category.idExerciseCategory);
@@ -596,10 +599,10 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
           return (
             <div
               key={category.idExerciseCategory}
-              className={`mb-8 border rounded-lg p-4 transition-all duration-200 ${
-                isDragged ? 'opacity-50 bg-gray-100' : 
-                isDragOver ? 'border-yellow-500 border-2 bg-yellow-50' : 
-                'border-gray-200 bg-gray-50'
+              className={`mb-8 border rounded-lg p-4 w-full max-w-[1000px] mx-auto transition-all duration-200 ${
+                isDragged ? 'opacity-10 bg-gray-300' :
+                isDragOver ? 'border-yellow-500 border-2 bg-yellow-50' :
+                'border-gray-300 bg-gray-50'
               }`}
               draggable
               onDragStart={() => handleDragStart(category.idExerciseCategory)}
@@ -619,10 +622,15 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                 
                 return (
                   <div key={index} className="mb-4">
-                    <div className="flex items-end gap-4">
-                      <div className="flex-1 min-w-[450px]"> 
+                    <div className="flex flex-wrap items-end gap-4">
+                      <div className="flex-1 min-w-[200px]">
                         <select
-                          className="w-full p-2 border border-gray-300 rounded text-sm"
+                          className={clsx(
+                            "w-full p-2 rounded text-sm h-[38px] transition-colors duration-150",
+                            ex.idExercise > 0
+                              ? "border border-yellow-400 bg-yellow-50"
+                              : "border border-gray-300 bg-white"
+                          )}
                           value={ex.idExercise}
                           onChange={(e) => handleExerciseChange(index, Number(e.target.value))}
                           disabled={loading}
@@ -678,11 +686,12 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                           </div>
                         </div>
 
-                        <div className="flex flex-col">
+
+                        <div className="flex flex-col w-[100px]">
                           <label className="text-xs text-gray-500 mb-1">Notas</label>
                           <input
                             type="text"
-                            className="w-24 p-1 border border-gray-300 rounded text-center"
+                            className="w-full p-2 border border-gray-300 rounded text-center h-[38px]"
                             value={ex.note}
                             onChange={(e) => updateExerciseField(index, 'note', e.target.value)}
                             disabled={loading}
@@ -692,11 +701,28 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                         {categoryExercises.length > 1 && (
                           <button
                             type="button"
-                            className="text-red-500 hover:text-red-700 mb-1"
+                            className={
+                              loading
+                                ? "h-[38px] w-[38px] flex items-center justify-center rounded-full -mt-2 cursor-not-allowed"
+                                : "h-[38px] w-[38px] flex items-center justify-center rounded-full -mt-2 hover:bg-gray-200 transition-colors duration-150"
+                            }
                             onClick={() => removeExercise(index)}
                             disabled={loading}
                           >
-                            ✖
+                            <span 
+                              className={
+                                loading 
+                                  ? "text-gray-400 text-xl" 
+                                  : "text-yellow-500 hover:text-yellow-700 text-xl font-bold"
+                              }
+                              style={{ 
+                                fontFamily: 'Arial, sans-serif',
+                                fontSize: '1.5rem',  // Tamaño personalizado
+                                lineHeight: '1'
+                              }}
+                            >
+                              ×
+                            </span>
                           </button>
                         )}
                       </div>

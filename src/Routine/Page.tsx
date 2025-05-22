@@ -163,11 +163,11 @@ function RoutineManagement() {
                                                             modulo="Rutina" 
                                                             closeModal={closeModalFileType} 
                                                             exportToPDF={async () => {
-                                                                const result = await handleExportRoutine(routine.idRoutine);
+                                                                const result = await handleExportRoutine();
                                                                 result?.exportToPDF();
                                                             }}
                                                             exportToExcel={async () => {
-                                                                const result = await handleExportRoutine(routine.idRoutine);
+                                                                const result = await handleExportRoutine();
                                                                 result?.exportToExcel();
                                                             }}
                                                         />
