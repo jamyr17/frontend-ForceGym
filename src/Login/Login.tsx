@@ -3,6 +3,8 @@ import type { CredencialUser } from "../shared/types/index";
 import PasswordInput from "../shared/components/PasswordInput";
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Link } from "react-router-dom";
+import { FaArrowLeft } from 'react-icons/fa';
+
 
 type LoginProps = {
     credencialUser: CredencialUser;
@@ -31,6 +33,15 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
         <div className="flex flex-col justify-center items-center h-screen bg-black">
             <main className="flex justify-center h-[550px] gap-16 p-12 w-auto bg-white rounded-lg">
                 <section className="flex flex-col h-full gap-4">
+                     <div className="w-8 sm:w-10 md:w-12 flex justify-start">
+                                  <a
+                                    href="/"
+                                    className="flex items-center text-gray-400 hover:text-yellow transition-colors duration-300"
+                                    title="Regresar"
+                                  >
+                                    <FaArrowLeft className="text-xl sm:text-2xl" />
+                                  </a>
+                                </div>
                     <header className="flex justify-center">
                         <img 
                             src="Logo.webp" 
@@ -94,7 +105,7 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
                 <aside className="w-full max-w-[500px] flex items-center justify-center bg-white rounded-r-lg overflow-hidden">
                     <div className="w-full h-full rounded-xl overflow-hidden shadow-md">
                         <img 
-                            src="Gym.webp" 
+                            src="gym copy.webp" 
                             alt="Imagen del equipo de Force GYM" 
                             className="w-full h-full max-h-[550px] object-cover object-center"
                         />

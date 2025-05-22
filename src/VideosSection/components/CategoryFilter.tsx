@@ -18,7 +18,7 @@ export const CategoryFilter = ({
       femoral: 'Femoral',
       cuadriceps: 'Cuádriceps',
       pecho: 'Pecho',
-      tricep: 'Tríceps',
+      triceps: 'Tríceps',
       hombro: 'Hombros',
       espalda: 'Espalda',
       biceps: 'Bíceps',
