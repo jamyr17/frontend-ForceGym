@@ -70,10 +70,10 @@ export const useMultiStepForm = () => {
     let action = '', result;
     const loggedUser = getAuthUser();
     
-    const isSelfEditing = loggedUser?.idUser === data.idUser;
+    const isSelfEditing = activeEditingId !== 0 && loggedUser?.idUser === data.idUser;
     const reqUser: UserDataForm & { paramLoggedIdUser?: number } = {
       ...data,
-      username: isSelfEditing ? data.username : defaultValues.username,
+      username: activeEditingId === 0 ? data.username : (isSelfEditing ? data.username : defaultValues.username),
       password: isSelfEditing ? data.password : '', 
       paramLoggedIdUser: loggedUser?.idUser
     };
