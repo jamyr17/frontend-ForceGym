@@ -89,10 +89,9 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
             maxLength: {
               value: MAXLENGTH_USERNAME,
               message: `Debe ingresar un nombre de usuario de máximo ${MAXLENGTH_USERNAME} carácteres`
-            },
-            disabled: activeEditingId !== 0 && !isSelfEditing
+            }
           })}
-          disabled={activeEditingId !== 0 && !isSelfEditing}
+          readOnly={activeEditingId !== 0 && !isSelfEditing}
         />
         
         {errors.username && <ErrorForm>{errors.username.message?.toString()}</ErrorForm>}
