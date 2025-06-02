@@ -14,7 +14,6 @@ type LoginProps = {
 };
 
 function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitting }: LoginProps) {
-    console.log('site-key: ', import.meta.env.VITE_RECAPTCHA_SITE_KEY)
     const recaptcha = useRef<ReCAPTCHA>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
