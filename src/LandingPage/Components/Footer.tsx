@@ -30,6 +30,7 @@ const Footer = () => {
               <li><a href="#galeria" className="hover:text-yellow-600 transition-colors duration-200">Galería</a></li>
               <li><a href="#tarifas" className="hover:text-yellow-600 transition-colors duration-200">Tarifas</a></li>
               <li><a href="#contacto" className="hover:text-yellow-600 transition-colors duration-200">Contacto</a></li>
+              <li><Link to="/videos-ejercicios" className="hover:text-yellow-600 transition-colors duration-200"> Videos de Ejercicios</Link></li>
             </ul>
           </div>
 
@@ -47,10 +48,10 @@ const Footer = () => {
           <div>
             <h4 className="text-white text-lg font-semibold mb-4">Redes</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-yellow-600 hover:text-white transition-colors duration-200">
+              <a href="https://www.instagram.com/forcegym_fullfitness?igsh=aWR3bTVxbXhvOGln" className="text-yellow-600 hover:text-white transition-colors duration-200">
                 <FaInstagram className="h-6 w-6" />
               </a>
-              <a href="#" className="text-yellow-600 hover:text-white transition-colors duration-200">
+              <a href="https://www.facebook.com/profile.php?id=100083292401041" className="text-yellow-600 hover:text-white transition-colors duration-200">
                 <FaFacebook className="h-6 w-6" />
               </a>
             </div>
@@ -61,39 +62,39 @@ const Footer = () => {
             <h4 className="text-white text-lg font-semibold mb-4">Desarrollado por</h4>
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <a href="https://www.linkedin.com/in/gerald-calderón-castillo-037142367/" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                <a href="https://www.linkedin.com/in/gerald-calderón-castillo-037142367/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-600 hover:text-white transition-colors duration-200">
                   <FaLinkedin className="h-5 w-5" />
                 </a>
                 <span className="text-gray-300">Gerald Calderón</span>
               </div>
               <div className="flex items-center space-x-2">
-                <a href="https://www.linkedin.com/in/kevin-venegas-bermúdez-22b314239/" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                <a href="https://www.linkedin.com/in/kevin-venegas-bermúdez-22b314239/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-600 hover:text-white transition-colors duration-200">
                   <FaLinkedin className="h-5 w-5" />
                 </a>
                 <span className="text-gray-300">Kevin Venegas</span>
               </div>
-              
+
               <div className="flex items-center space-x-2">
-                <a href="https://www.linkedin.com/in/jamyr-gonzález-garcía-96ba18309/" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                <a href="https://www.linkedin.com/in/jamyr-gonzález-garcía-96ba18309/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-600 hover:text-white transition-colors duration-200">
                   <FaLinkedin className="h-5 w-5" />
                 </a>
                 <span className="text-gray-300">Jamyr González</span>
               </div>
-              
+
               <div className="flex items-center space-x-2">
-                <a href="https://www.linkedin.com/in/jordi-francisco-rivas-beita/" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                <a href="https://www.linkedin.com/in/jordi-francisco-rivas-beita/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-600 hover:text-white transition-colors duration-200">
                   <FaLinkedin className="h-5 w-5" />
                 </a>
                 <span className="text-gray-300">Jordi Rivas</span>

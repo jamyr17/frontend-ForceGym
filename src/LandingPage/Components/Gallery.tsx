@@ -1,8 +1,16 @@
+import { useState, useRef } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
+type SliderType = {
+  slickGoTo: (slide: number) => void;
+};
+
 const Gallery = () => {
+  const sliderRef = useRef<SliderType | null>(null);
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
+
   const galleryPhotos = [
     { img: "/LandingPage/grupo-1.webp" },
     { img: "/LandingPage/grupo-2.webp" },
@@ -26,6 +34,7 @@ const Gallery = () => {
     autoplaySpeed: 3000,
     arrows: true,
     adaptiveHeight: false,
+    beforeChange: (_current: number, next: number) => setCurrentSlide(next),
     responsive: [
       {
         breakpoint: 768,
@@ -35,6 +44,13 @@ const Gallery = () => {
         }
       }
     ]
+  };
+
+  const handleThumbnailClick = (index: number) => {
+    setCurrentSlide(index);
+    if (sliderRef.current) {
+      sliderRef.current.slickGoTo(index);
+    }
   };
 
   return (
@@ -49,7 +65,16 @@ const Gallery = () => {
 
         {/* Carrusel principal */}
         <div className="mx-auto max-w-4xl">
-          <Slider {...settings}>
+          <Slider 
+            {...settings} 
+            ref={(slider) => {
+              if (slider) {
+                sliderRef.current = {
+                  slickGoTo: slider.slickGoTo,
+                };
+              }
+            }}
+          >
             {galleryPhotos.map((photo, index) => (
               <div key={index} className="px-1 focus:outline-none">
                 <div className="relative">
@@ -64,10 +89,13 @@ const Gallery = () => {
           </Slider>
         </div>
 
-        {/* Miniaturas solo para desktop */}
         <div className="hidden md:grid grid-cols-5 gap-2 mt-4">
           {galleryPhotos.map((photo, index) => (
-            <div key={index} className="rounded overflow-hidden border-2 border-transparent hover:border-yellow-500 transition-all">
+            <div 
+              key={index} 
+              className={`rounded overflow-hidden border-2 transition-all ${currentSlide === index ? 'border-yellow-500' : 'border-transparent hover:border-yellow-400'}`}
+              onClick={() => handleThumbnailClick(index)}
+            >
               <img 
                 src={photo.img} 
                 alt={`Miniatura ${index + 1}`}
