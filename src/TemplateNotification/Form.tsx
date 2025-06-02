@@ -83,6 +83,18 @@ function Form() {
         }
     }, [activeEditingId]);
 
+    useEffect(() => {
+        register("message", {
+            validate: value => {
+                if (!value || value.trim().split(/\s+/).length <= 3) {
+                    return "El mensaje debe contener más de 3 palabras";
+                }
+                return true;
+            }
+        });
+    }, [register]);
+
+
     const handleEmojiClick = (emojiData: any) => {
         const emoji = emojiData.emoji;
 
@@ -128,15 +140,25 @@ function Form() {
                 </label>
                 <select
                     id="idNotificationType"
-                    className="w-full p-3 border border-gray-100"
-                    {...register("idNotificationType")}
+                    className="w-full p-3 border border-gray-300 rounded"
+                    {...register("idNotificationType", {
+                        required: 'El tipo de notificación es obligatorio'
+                    })}
+                    aria-invalid={errors.idNotificationType ? "true" : "false"}
                 >
+                    <option value="">Seleccione un tipo de notificación</option>
                     {notificationTypes.map((noti) => (
                         <option key={noti.idNotificationType} value={noti.idNotificationType}>
                             {noti.name}
                         </option>
                     ))}
                 </select>
+                {errors.idNotificationType &&
+                    <ErrorForm>
+                        {errors.idNotificationType.message}
+                    </ErrorForm>
+                }
+
             </div>
 
             <div className="mb-5">

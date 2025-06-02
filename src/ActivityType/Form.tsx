@@ -21,7 +21,7 @@ type ClientTypeOption = {
 
 function Form() {
     const navigate = useNavigate();
-    const { typesClient } = useCommonDataStore();
+    const { clientTypes } = useCommonDataStore();
     const [feeLines, setFeeLines] = useState<{id: number, fee: Fee}[]>([{ 
         id: 1, 
         fee: { idClientType: [], amount: 0 } 
@@ -134,15 +134,15 @@ function Form() {
     // Mapear tipos de cliente para opciones
     useEffect(() => {
         const getMappedClientTypes = () => {
-            const mappedClientTypesOptions = typesClient?.map((type) => ({
-                value: type.idTypeClient,
+            const mappedClientTypesOptions = clientTypes?.map((type) => ({
+                value: type.idClientType,
                 label: type.name
             })) || [];
             setClientTypesOptions(mappedClientTypesOptions);
         };
 
         getMappedClientTypes();
-    }, [typesClient]);
+    }, [clientTypes]);
 
     // Obtener los tipos de clientes ya seleccionados en otras líneas
     const getAvailableClientTypes = (currentLineId: number): ClientTypeOption[] => {
@@ -307,19 +307,23 @@ function Form() {
                     );
                 })}
 
-                <div className="mb-5">
-                    <button
-                        type="button"
-                        onClick={addNewLine}
-                        disabled={getAvailableClientTypes(0).length === 0}
-                        className={`px-4 py-2 text-sm rounded outline-2 hover:opacity-50 ${
-                            getAvailableClientTypes(0).length === 0 ? 
-                            'cursor-not-allowed' : ' hover:cursor-pointer'
-                        }`}
-                    >
-                        + Añadir otra línea
-                    </button>
-                </div>
+                {/* Solo se pueden añadir tantas tarifas como tipos de clientes */}
+                {feeLines.length < clientTypesOptions.length && (
+                    <div className="mb-5">
+                        <button
+                            type="button"
+                            onClick={addNewLine}
+                            disabled={getAvailableClientTypes(0).length === 0}
+                            className={`px-4 py-2 text-sm rounded outline-2 hover:opacity-50 ${
+                                getAvailableClientTypes(0).length === 0 ? 
+                                'cursor-not-allowed' : ' hover:cursor-pointer'
+                            }`}
+                        >
+                            + Añadir otra línea
+                        </button>
+                    </div>
+                )}
+                
             </div>
 
             <input 

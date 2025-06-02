@@ -15,7 +15,8 @@ function DataInfo() {
         return {
             name: globalExercise?.name || `Ejercicio #${ex.idExercise}`,
             series: ex.series || 0,
-            repetitions: ex.repetitions || 0
+            repetitions: ex.repetitions || 0,
+            Note: ex.note || "Sin nota",
         };
     };
 
@@ -72,6 +73,9 @@ function DataInfo() {
                                         </div>
                                         <div>
                                             <span className="font-medium">Repeticiones:</span> {details.repetitions}
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Nota:</span> {details.Note}
                                         </div>
                                     </div>
                                 </div>

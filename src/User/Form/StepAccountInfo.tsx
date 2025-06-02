@@ -55,10 +55,10 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
           defaultValue=""
           {...register("idRole", {
             required: 'El rol es obligatorio',
-            validate: value => value !== '0' || 'Debe seleccionar un rol'
+            validate: value => value !== 0 || 'Debe seleccionar un rol'
           })}  
         >
-          <option value="">Seleccione un rol</option>
+          <option value={0}>Seleccione un rol</option>
           {roles.map((role) => (
             <option key={role.idRole} value={role.idRole}>
               {role.name}
@@ -72,11 +72,18 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
         <label htmlFor="username" className="text-sm uppercase font-bold">
           Nombre de usuario 
         </label>
+        
+        {activeEditingId !== 0 && !isSelfEditing && (
+          <p className="text-sm text-gray-500 mb-1 italic">
+            Nota: Solo puedes modificar tu propio nombre de usuario cuando editas tu perfil.
+          </p>
+        )}
+        
         <input  
           id="username"
-          className="w-full p-3 border border-gray-100"  
+          className={`w-full p-3 border ${activeEditingId !== 0 && !isSelfEditing ? 'bg-gray-100 cursor-not-allowed' : 'border-gray-100'}`}  
           type="text" 
-          placeholder="Ingrese el nombre de usuario" 
+          placeholder={activeEditingId !== 0 && !isSelfEditing ? "No editable" : "Ingrese el nombre de usuario"} 
           {...register('username', {
             required: 'El nombre de usuario es obligatorio',
             maxLength: {
@@ -84,7 +91,9 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
               message: `Debe ingresar un nombre de usuario de máximo ${MAXLENGTH_USERNAME} carácteres`
             }
           })}
+          readOnly={activeEditingId !== 0 && !isSelfEditing}
         />
+        
         {errors.username && <ErrorForm>{errors.username.message?.toString()}</ErrorForm>}
       </div>
 
@@ -117,8 +126,9 @@ export const AccountInfoStep = ({ activeEditingId, roles }: { activeEditingId: n
         type="password" 
         placeholder="Confirme la contraseña" 
         {...register('confirmPassword', {
-          validate: value => {
-            if (activeEditingId === 0 && value !== watch('password')) {
+          validate: (value) => {
+            const password = watch('password');
+            if ((activeEditingId === 0 || password) && value !== password) {
               return 'Las contraseñas no coinciden';
             }
             return true;

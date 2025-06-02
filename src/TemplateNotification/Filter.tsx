@@ -1,18 +1,18 @@
 import { IoFilterOutline } from "react-icons/io5";
-import useProductInventoryStore from "./Store";
+import { useNotificationTemplateStore } from "./Store";
 import { MdOutlineCancel } from "react-icons/md";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 
 export function FilterButton() {
-    const { filterByStatus, filterByNotificationType, showModalFilter } = useProductInventoryStore()
+    const { filterByStatus, filterByNotificationType, showModalFilter } = useNotificationTemplateStore();
     const filteringStyles = (
-        filterByStatus!='' || filterByNotificationType!=0
-    ) && ' bg-white outline-none'
+        filterByStatus !== '' || filterByNotificationType !== 0
+    ) ? ' bg-white outline-none' : '';
 
     return (
         <button
-            className={"flex items-center gap-4 text-lg uppercase outline-2 py-2 px-4 rounded-lg hover:cursor-pointer hover:bg-slate-300" + filteringStyles}
-            onClick={()=>{ showModalFilter() }}
+            className={`flex items-center gap-4 text-lg uppercase outline-2 py-2 px-4 rounded-lg hover:cursor-pointer hover:bg-slate-300${filteringStyles}`}
+            onClick={showModalFilter}
         >
             <IoFilterOutline />
             <span>Filtrar</span>
@@ -27,14 +27,20 @@ export function FilterSelect() {
         changeFilterByStatus, 
         changeFilterByNotificationType,
         clearAllFilters
-    } = useProductInventoryStore()
-    const filteredStatusSelectStyles = filterByStatus!='' && ' px-0.5 rounded-md border-2 border-yellow text-yellow'
-    const filteredNotificationTypeStyles = filterByNotificationType!=0 && ' px-0.5 border-2 border-yellow text-yellow'
+    } = useNotificationTemplateStore();
+    
     const { notificationTypes } = useCommonDataStore();
+
+    const filteredStatusSelectStyles = filterByStatus !== '' 
+        ? ' px-0.5 rounded-md border-2 border-yellow text-yellow' 
+        : '';
+    
+    const filteredNotificationTypeStyles = filterByNotificationType !== 0 
+        ? ' px-0.5 border-2 border-yellow text-yellow' 
+        : '';
 
     return (
         <div className="flex flex-col gap-4">
-            
             {/* Botón de limpiar todos */}
             <div className="flex justify-end pr-4">
                 <button
@@ -49,21 +55,21 @@ export function FilterSelect() {
             <div className="flex items-center gap-4">
                 <label htmlFor="status" className="w-20">Estado</label>
                 <select
-                    className={'border rounded-md p-2 w-52 text-center' + filteredStatusSelectStyles}
+                    className={`border rounded-md p-2 w-52 text-center${filteredStatusSelectStyles}`}
                     name="status"
                     id="status"
-                    value={filterByStatus} 
+                    value={filterByStatus}
                     onChange={(e) => {
-                        if(Number(e.target.value) === 0){
-                            changeFilterByStatus('')
-                        }else{
-                            changeFilterByStatus(e.target.value)
+                        if(e.target.value === '0') {
+                            changeFilterByStatus('');
+                        } else {
+                            changeFilterByStatus(e.target.value);
                         }
                     }}
                 >
-                    <option value={0}> Activos </option>
-                    <option value={'Inactivos'}> Inactivos </option>
-                    <option value={'Todos'}> Todos </option>
+                    <option value="0">Activos</option>
+                    <option value="Inactivos">Inactivos</option>
+                    <option value="Todos">Todos</option>
                 </select>
                 {filterByStatus && 
                     <button
@@ -75,32 +81,31 @@ export function FilterSelect() {
                 }
             </div>
     
-            {/* Filtro por Tipo de Notificacion*/}
+            {/* Filtro por Tipo de Notificación */}
             <div className="flex items-center gap-4">
-                <label htmlFor="status" className="w-20">Tipo de Notificación</label>
+                <label htmlFor="notificationType" className="w-20">Tipo de Notificación</label>
                 <select
-                    className={'border rounded-md p-2 w-52 text-center' + filteredNotificationTypeStyles}
+                    className={`border rounded-md p-2 w-52 text-center${filteredNotificationTypeStyles}`}
                     name="notificationType"
                     id="notificationType"
-                    value={filterByNotificationType} 
-                    onChange={(e) => changeFilterByNotificationType(+e.target.value)}
+                    value={filterByNotificationType}
+                    onChange={(e) => changeFilterByNotificationType(Number(e.target.value))}
                 >
                     <option value={0}>Todos</option>
-
-                    {notificationTypes.map((noti)=> (
+                    {notificationTypes.map((noti) => (
                         <option key={noti.idNotificationType} value={noti.idNotificationType}>
                             {noti.name}
                         </option>
                     ))}
                 </select>
-                {filterByNotificationType && 
+                {filterByNotificationType !== 0 && (
                     <button
                         className="text-2xl text-yellow"
                         onClick={() => changeFilterByNotificationType(0)}
                     >
                         <MdOutlineCancel className="hover:cursor-pointer" />
                     </button>
-                }
+                )}
             </div>
         </div>
     );      

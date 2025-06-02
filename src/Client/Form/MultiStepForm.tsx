@@ -3,6 +3,7 @@ import { StepContactInfo } from "./StepContactInfo";
 import { StepHealthInfo } from "./StepHealthInfo";
 import { useMultiStepForm } from "./useMultiStepForm";
 import { StepClientInfo } from "./StepPersonalInfo";
+import { StepContract } from "./StepContract";
 import { ClientFormProvider } from "./Context";
 
 const MultiStepForm = () => {
@@ -10,7 +11,7 @@ const MultiStepForm = () => {
     methods,
     step,
     genders,
-    typesClient,
+    clientTypes,
     activeEditingId,
     submitForm,
     prevStep,
@@ -22,10 +23,12 @@ const MultiStepForm = () => {
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <StepClientInfo genders={genders} typesClient={typesClient} />;
+        return <StepContract />;
       case 2:
-        return <StepContactInfo />;
+        return <StepClientInfo genders={genders} typesClient={clientTypes} />;
       case 3:
+        return <StepContactInfo />;
+      case 4:
         return <StepHealthInfo />;
       default:
         return null;
@@ -37,26 +40,34 @@ const MultiStepForm = () => {
       <ul className="flex text-center justify-around mt-6 mb-8 gap-4 text-xl font-medium">
         <button 
           type="button"   
-          className={`opacity-45 p-1 ${step == 1 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
+          className={`opacity-45 p-1 ${step === 1 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
           onClick={() => handleStepChangeByMenu(1)}
+        >
+          Contrato
+        </button>
+
+        <button 
+          type="button"
+          className={`opacity-45 p-1 ${step === 2 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
+          onClick={() => handleStepChangeByMenu(2)}
         >
           Información Personal
         </button>
 
         <button 
           type="button"
-          className={`opacity-45 p-1 ${step == 2 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
-          onClick={() => handleStepChangeByMenu(2)}
+          className={`opacity-45 p-1 ${step === 3 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
+          onClick={() => handleStepChangeByMenu(3)}
         >
-          Información de Contacto
+          Contacto
         </button>
 
         <button 
           type="button"
-          className={`opacity-45 p-1 ${step == 3 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
-          onClick={() => handleStepChangeByMenu(3)}
+          className={`opacity-45 p-1 ${step === 4 && 'opacity-100 font-bold disabled'} disabled:opacity-65 hover:border-b-2 cursor-pointer`}
+          onClick={() => handleStepChangeByMenu(4)}
         >
-          Información de Salud
+          Salud
         </button>
       </ul>
     );
@@ -99,7 +110,7 @@ const MultiStepForm = () => {
             </button>
           )}
 
-          {step < 3 ? (
+          {step < 4 ? (
             <button
               type="button"
               onClick={() => handleStepChangeByButton(nextStep)}
@@ -119,7 +130,7 @@ const MultiStepForm = () => {
     </FormProvider>
   );
 };
-
+// Al final de MultiStepForm.tsx
 export default function Form() {
   return (
     <ClientFormProvider>

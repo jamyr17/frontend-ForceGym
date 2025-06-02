@@ -10,7 +10,7 @@ import { useClientForm } from "./Context";
 
 export const useMultiStepForm = () => {
   const navigate = useNavigate();
-  const { genders, typesClient } = useCommonDataStore();
+  const { genders, clientTypes } = useCommonDataStore();
   const { clients, activeEditingId, fetchClients, addClient, updateClient, closeModalForm } = useClientStore();
   const { step, nextStep, prevStep, setCustomStep, resetForm } = useClientForm();
 
@@ -117,15 +117,16 @@ export const useMultiStepForm = () => {
       action = 'editado';
     }
 
-    handleClose();
-
     if (result.ok) {
       const result2 = await fetchClients();
       if (result2.logout) {
         setAuthHeader(null);
         setAuthUser(null);
         navigate('/login', { replace: true });
+
       } else {
+        handleClose();
+        
         await Swal.fire({
           title: `Cliente ${action}`,
           text: `Se ha ${action} el cliente`,
@@ -141,7 +142,18 @@ export const useMultiStepForm = () => {
       setAuthHeader(null);
       setAuthUser(null);
       navigate('/login');
-    }
+    } else {
+    await Swal.fire({
+      title: 'Error al guardar',
+      text: result.error || 'Ocurrió un error inesperado al guardar el cliente.',
+      icon: 'error',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#CFAD04',
+      timer: 3000,
+      timerProgressBar: true,
+      width: 500
+    });
+  }
   };
 
   const handleClose = () => {
@@ -164,9 +176,10 @@ export const useMultiStepForm = () => {
   }
 
   const inputsByStep: StepFields[] = [
-    { step: 1, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
-    { step: 2, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency'] },
-    { step: 3, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues'] }
+    { step: 1, fields: ['signatureImage']},
+    { step: 2, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
+    { step: 3, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency'] },
+    { step: 4, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues'] }
   ];
 
   const validateStepChange = async () => {
@@ -196,7 +209,7 @@ export const useMultiStepForm = () => {
     methods,
     step,
     genders,
-    typesClient,
+    clientTypes,
     activeEditingId,
     submitForm,
     handleClose,

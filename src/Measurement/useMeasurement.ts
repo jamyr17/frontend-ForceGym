@@ -10,10 +10,10 @@ export const useMeasurement = () => {
     const navigate = useNavigate();
     const { measurements, fetchMeasurements, deleteMeasurement, updateMeasurement, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useMeasurementStore();
 
-    const handleDelete = async ({ idMeasurement }: Measurement) => {
+    const handleDelete = async (measurement : Measurement) => {
         await Swal.fire({
             title: '¿Desea eliminar esta medición?',
-            text: `Está eliminando la medición con ID ${idMeasurement}`,
+            text: `Está eliminando la medición del ${formatDate(new Date(measurement.measurementDate))}`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -25,12 +25,12 @@ export const useMeasurement = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const loggedUser = getAuthUser();
-                const response = await deleteMeasurement(idMeasurement, loggedUser?.idUser as number);
+                const response = await deleteMeasurement(measurement.idMeasurement, loggedUser?.idUser as number);
 
                 if(response.ok){
                     Swal.fire({
                         title: 'Medición eliminada',
-                        text: `Se ha eliminado la medición con ID ${idMeasurement}`,
+                        text: `Se ha eliminado la medición del ${formatDate(new Date(measurement.measurementDate))}`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -72,7 +72,7 @@ export const useMeasurement = () => {
         
         await Swal.fire({
             title: '¿Desea restaurar esta medición?',
-            text: `Está restaurando la medición con ID ${measurement.idMeasurement}`,
+            text: `Está restaurando la medición del ${formatDate(new Date(measurement.measurementDate))}`,
             icon: 'question',
             showCancelButton: true,
             cancelButtonText: "Cancelar",
@@ -88,7 +88,7 @@ export const useMeasurement = () => {
                 if(response.ok){
                     Swal.fire({
                         title: 'Medición restaurada',
-                        text: `Se ha restaurado la medición con ID ${measurement.idMeasurement}`,
+                        text: `Se ha restaurado la medición del ${formatDate(new Date(measurement.measurementDate))}`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         timer: 3000,
@@ -125,31 +125,31 @@ export const useMeasurement = () => {
         name: `${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}`,
         age: calculateAge(measurements[0].client.person.birthday),
         height: measurements[0].height
-    } : null;
+    } : undefined;
     
     const tableColumn = [
         "Fecha",
-        "Peso",
+        "Peso (kg)",
         "% G.Corp", 
-        "M.M",
+        "M.M (kg)",
         "%G.Visc",
-        "Pecho",
-        "Espalda",
-        "Cintura",
-        "Cadera",
-        "Pierna D/I",
-        "Pantorrilla D/I",
-        "antebrazo",
-        "brazo"
+        "Pecho (cm)",
+        "Espalda (cm)",
+        "Cintura (cm)",
+        "Cadera (cm)",
+        "Pierna D/I (cm)",
+        "Pantorrilla D/I (cm)",
+        "Antebrazo D/I (cm)",
+        "Brazo D/I (cm)"
     ];
 
     const tableRows = measurements.map(measurement => {
         return [
-            formatDate(new Date(measurement.measurementDate)), // Fecha
-            measurement.weight, // Peso
-            measurement.bodyFatPercentage, // % Grasa Corporal
-            measurement.muscleMass, // Masa Muscular
-            measurement.visceralFatPercentage, // % Grasa Visceral
+            formatDate(new Date(measurement.measurementDate)),
+            `${measurement.weight.toFixed(1)}`, // 1 decimal para peso
+            `${measurement.bodyFatPercentage.toFixed(1)}%`, // % con 1 decimal
+            `${measurement.muscleMass.toFixed(1)}`,
+            `${measurement.visceralFatPercentage.toFixed(1)}%`,
             measurement.chestSize || "/", // Pecho
             measurement.backSize || "/", // Espalda
             measurement.waistSize || "/", // Cintura

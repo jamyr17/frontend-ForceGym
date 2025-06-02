@@ -98,7 +98,7 @@ const manageResponse = async (res: Response) => {
     }
 
     // manejo de errores
-    if ([400, 404, 405, 406, 407, 408].includes(code)) {
+    if ([400, 405, 406, 407, 408].includes(code)) {
         await Swal.fire({
             title: 'Ha ocurrido un error',
             text: 'Inténtelo de nuevo',

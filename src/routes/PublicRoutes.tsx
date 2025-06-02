@@ -4,9 +4,10 @@ import { useLogin } from '../Login/useLogin';
 import ForgotPasswordForm from '../Login/ForgotPasswordForm';
 import ChangePasswordForm from '../Login/ChangePasswordForm';
 import LandingPage from '../LandingPage/page'; // Importa tu Landing Page
+import VideoSection from '../VideosSection';
 
 function PublicRoutes() {
-    const { credencialUser, setCredencialUser, handleLoginSubmit } = useLogin();
+    const { credencialUser, setCredencialUser, handleLoginSubmit, isSubmitting } = useLogin();
     
     return (
         <Routes>
@@ -15,6 +16,10 @@ function PublicRoutes() {
                 path="/" 
                 element={<LandingPage />} 
             />
+                <Route 
+                path="/videos-ejercicios" 
+                element={<VideoSection/>} 
+            />
             <Route 
                 path="/login" 
                 element={
@@ -22,7 +27,7 @@ function PublicRoutes() {
                         credencialUser={credencialUser}
                         setCredencialUser={setCredencialUser}
                         handleLoginSubmit={handleLoginSubmit}
-                        isSubmitting={true}
+                        isSubmitting={isSubmitting}
                     />
                 } 
             />
@@ -30,6 +35,7 @@ function PublicRoutes() {
                 path="/forgot-password" 
                 element={<ForgotPasswordForm />} 
             />
+
             <Route 
                 path="/reset-password" 
                 element={<ChangePasswordForm />} 

@@ -7,9 +7,11 @@ import { useNavigate } from "react-router";
 import { exportToPDF } from "../shared/utils/pdf";
 import { exportToExcel } from "../shared/utils/excel";
 import { mapRoutineToDTO } from '../shared/types/mapper';
+import { useState } from 'react';
 
 export const useRoutine = () => {
     const navigate = useNavigate();
+    const [refreshKey, setRefreshKey] = useState(0);
     const { 
         routines,
         currentRoutine,
@@ -22,7 +24,7 @@ export const useRoutine = () => {
     const { exercise: allExercises } = useCommonDataStore();
 
     const handleDelete = async ({ idRoutine, name }: Routine) => {
-        await Swal.fire({
+        const result = await Swal.fire({
             title: '¿Desea eliminar la rutina?',
             text: `Estaría eliminando "${name}"`,
             icon: 'question',
@@ -33,37 +35,37 @@ export const useRoutine = () => {
             confirmButtonColor: '#CFAD04',
             width: 500,
             reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const loggedUser = getAuthUser();
-                if (!loggedUser?.idUser) {
-                    console.error("No user ID available");
-                    return;
-                }
-                
-                const response = await deleteRoutine(idRoutine);
-                
-                if (response?.ok) {
-                    await Swal.fire({
-                        title: 'Rutina eliminada',
-                        text: `Ha eliminado "${name}"`,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        timer: 3000,
-                        timerProgressBar: true,
-                        width: 500,
-                        confirmButtonColor: '#CFAD04'
-                    });
-                    await fetchRoutines();
-                }
-
-                if (response?.logout) {
-                    setAuthHeader(null);
-                    setAuthUser(null);
-                    navigate('/login', {replace: true});
-                }
-            } 
         });
+
+        if (result.isConfirmed) {
+            const loggedUser = getAuthUser();
+            if (!loggedUser?.idUser) {
+                console.error("No user ID available");
+                return;
+            }
+            
+            const response = await deleteRoutine(idRoutine);
+            
+            if (response?.ok) {
+                await fetchRoutines(); // Asegura que las rutinas se actualicen
+                await Swal.fire({
+                    title: 'Rutina eliminada',
+                    text: `Ha eliminado "${name}"`,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    width: 500,
+                    confirmButtonColor: '#CFAD04'
+                });
+            }
+
+            if (response?.logout) {
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', {replace: true});
+            }
+        } 
     };
 
     const handleRestore = async (routine: Routine) => {
@@ -124,19 +126,19 @@ export const useRoutine = () => {
             name: globalExercise?.name || `Ejercicio #${ex.idExercise}`,
             series: ex.series || 0,
             repetitions: ex.repetitions || 0,
+            note: ex.note || "Sin nota",
             category: globalExercise?.exerciseCategory?.name || "Sin categoría",
         };
     };
 
-    const handleExportRoutine = async (routineId: number) => {
+    const handleExportRoutine = async () => {
         try {
-            await getRoutineById(routineId);
             
             if (!currentRoutine) {
                 throw new Error('Rutina no encontrada');
             }
 
-            const exerciseHeaders = ["#", "Ejercicio", "Categoría", "Series", "Repeticiones"];
+            const exerciseHeaders = ["#", "Ejercicio", "Categoría", "Series", "Repeticiones", "Nota"];
             const exerciseRows = currentRoutine.exercises?.map((ex, index) => {
                 const details = getExerciseDetails(ex);
                 return [
@@ -144,7 +146,8 @@ export const useRoutine = () => {
                     details.name,
                     details.category,
                     details.series.toString(),
-                    details.repetitions.toString()
+                    details.repetitions.toString(),
+                    details.note
                 ];
             }) || [];
 
@@ -171,20 +174,22 @@ export const useRoutine = () => {
         }
     };
 
-    const pdfTableHeaders = ["#", "Nombre", "Ejercicios", "Series", "Reps"];
+    const pdfTableHeaders = ["#", "Nombre", "Ejercicios", "Series", "Reps", "Nota"];
     
     const pdfTableRows = routines.map((routine) => {
         const totals = routine.routineExercises?.reduce((acc, ex) => ({
             series: acc.series + (ex.series || 0),
-            reps: acc.reps + (ex.repetitions || 0)
-        }), { series: 0, reps: 0 }) || { series: 0, reps: 0 };
+            reps: acc.reps + (ex.repetitions || 0),
+            nots: acc.nots + (ex.note || "")
+        }), { series: 0, reps: 0, nots: "" }) || { series: 0, reps: 0, nots: "" };
 
         return [
             routine.idRoutine.toString(),
             routine.name,
             routine.routineExercises?.length.toString() || "0",
             totals.series.toString(),
-            totals.reps.toString()
+            totals.reps.toString(),
+            totals.nots
         ];
     });
 

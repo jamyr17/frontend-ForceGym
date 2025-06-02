@@ -175,7 +175,9 @@ export function mapRoutineToDataForm(routine: Routine): RoutineDataForm {
         exercises: routine.routineExercises.map(ex => ({
             idExercise: ex.exercise.idExercise,
             series: ex.series,
-            repetitions: ex.repetitions
+            repetitions: ex.repetitions,
+            note: ex.note,
+            categoryOrder: ex.categoryOrder
         })),
         assignments: routine.routineAssignments.map(assignment => ({
             idClient: assignment.client.idClient,
@@ -196,7 +198,9 @@ export function mapRoutineToDTO(routine: Routine): RoutineWithExercisesDTO {
         exercises: routine.routineExercises.map(re => ({
             idExercise: re.exercise.idExercise,
             series: re.series,
-            repetitions: re.repetitions
+            repetitions: re.repetitions,
+            note: re.note,
+            categoryOrder: re.categoryOrder
         })),
         assignments: routine.routineAssignments.map(ra => ({
             idClient: ra.client.idClient,

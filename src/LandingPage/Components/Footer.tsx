@@ -1,6 +1,5 @@
-import { FaUser, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaUser, FaInstagram, FaFacebook, FaLinkedin } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-
 
 const Footer = () => {
   return (
@@ -15,10 +14,9 @@ const Footer = () => {
               <FaUser className="h-6 w-6" />
             </button>
           </Link>
-
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {/* Columna 1 */}
           <div className="mb-6 sm:mb-0">
             <h3 className="text-2xl font-bold text-yellow-600 mb-4">FORCE GYM</h3>
@@ -55,6 +53,51 @@ const Footer = () => {
               <a href="#" className="text-yellow-600 hover:text-white transition-colors duration-200">
                 <FaFacebook className="h-6 w-6" />
               </a>
+            </div>
+          </div>
+
+          {/* Columna 5 - Desarrolladores */}
+          <div>
+            <h4 className="text-white text-lg font-semibold mb-4">Desarrollado por</h4>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <a href="https://www.linkedin.com/in/gerald-calderón-castillo-037142367/" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                  <FaLinkedin className="h-5 w-5" />
+                </a>
+                <span className="text-gray-300">Gerald Calderón</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <a href="https://www.linkedin.com/in/kevin-venegas-bermúdez-22b314239/" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                  <FaLinkedin className="h-5 w-5" />
+                </a>
+                <span className="text-gray-300">Kevin Venegas</span>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <a href="https://www.linkedin.com/in/jamyr-gonzález-garcía-96ba18309/" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                  <FaLinkedin className="h-5 w-5" />
+                </a>
+                <span className="text-gray-300">Jamyr González</span>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <a href="https://www.linkedin.com/in/jordi-francisco-rivas-beita/" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="text-yellow-600 hover:text-white transition-colors duration-200">
+                  <FaLinkedin className="h-5 w-5" />
+                </a>
+                <span className="text-gray-300">Jordi Rivas</span>
+              </div>
             </div>
           </div>
         </div>
