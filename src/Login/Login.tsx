@@ -1,19 +1,16 @@
-import { useRef } from "react";
 import type { CredencialUser } from "../shared/types/index";
 import PasswordInput from "../shared/components/PasswordInput";
-import ReCAPTCHA from 'react-google-recaptcha';
 import { Link } from "react-router-dom";
 import { FaArrowLeft } from 'react-icons/fa';
 
 type LoginProps = {
     credencialUser: CredencialUser;
     setCredencialUser: React.Dispatch<React.SetStateAction<CredencialUser>>;
-    handleLoginSubmit: (e: React.FormEvent, refReCaptcha: React.RefObject<ReCAPTCHA>) => void;
+    handleLoginSubmit: (e: React.FormEvent) => void;
     isSubmitting: boolean;
 };
 
 function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitting }: LoginProps) {
-    const recaptcha = useRef<ReCAPTCHA>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -21,11 +18,6 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
             ...prev,
             [name]: value
         }));
-
-        // Resetear el captcha si hay cambios después de un error
-        if (recaptcha.current?.getValue()) {
-            recaptcha.current.reset();
-        }
     };
 
     return (
@@ -53,7 +45,7 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
 
                     <form 
                         className="flex flex-col gap-4 mt-4"
-                        onSubmit={(e) => handleLoginSubmit(e, recaptcha)}
+                        onSubmit={(e) => handleLoginSubmit(e)}
                     >
                         <label htmlFor='username' className="text-lg sm:text-xl font-bold">Usuario</label>
                         <input 
@@ -78,11 +70,6 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
                             required
                             disabled={isSubmitting}
                             className="border border-gray-300 rounded"
-                        />
-
-                        <ReCAPTCHA 
-                            ref={recaptcha} 
-                            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                         />
 
                         <button 
