@@ -7,7 +7,7 @@ const Contact = () => {
         {/* Encabezado */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-yellow-400">CONTÁCT</span>ANOS
+            <span className="text-yellow-400">CONTÁCTANOS</span>
           </h2>
           <div className="w-24 h-1 bg-yellow-400 mx-auto"></div>
         </div>

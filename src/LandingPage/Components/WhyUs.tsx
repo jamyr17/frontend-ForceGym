@@ -1,192 +1,161 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-type FeatureOption = {
-  img: string;
+type CardItem = {
+  images: string[];
   title: string;
-  desc: string;
+  descriptions: string[];
 };
-
-type CoachOption = {
-  img: string;
-  name: string;
-  text: string;
-} | null;
-
-type FeatureCardProps = {
-  item: FeatureOption;
-  isCoach: boolean;
-  coach: CoachOption;
-  onPrev?: () => void;
-  onNext?: () => void;
-  onHoverStart?: () => void;
-  onHoverEnd?: () => void;
-};
-
-
-const FeatureCard = ({
-  item,
-  isCoach,
-  coach,
-  onPrev,
-  onNext,
-  onHoverStart,
-  onHoverEnd,
-}: FeatureCardProps) => {
-  const [showText, setShowText] = useState(true);
-
-  return (
-    <div 
-      className="group relative"
-      onMouseEnter={onHoverStart}
-      onMouseLeave={onHoverEnd}
-    >
-      <div className="relative h-72 sm:h-80 overflow-hidden rounded-lg transform transition-transform duration-300 group-hover:scale-105 hover:shadow-yellow-500/30 hover:shadow-lg">
-        <img
-          src={isCoach ? coach?.img : item.img}
-          alt={isCoach ? coach?.name : item.title}
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover brightness-[0.85] transition-opacity duration-500 group-hover:opacity-90"
-        />
-
-        <div className="w-full absolute inset-0 flex flex-col justify-between p-2 text-center z-10">
-          <h3 className="text-xl sm:text-2xl font-extrabold mb-2 text-yellow-400">
-            {isCoach ? coach?.name : item.title}
-          </h3>
-
-          {showText && (
-            <p className="w-full bg-black/60 py-1 px-6 rounded-sm text-white text-center text-sm sm:text-base font-semibold transition-opacity duration-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:w-4/5 sm:mx-auto">
-              {isCoach ? coach?.text : item.desc}
-            </p>
-          )}
-
-          <button
-            onClick={() => setShowText(!showText)}
-            className="absolute bottom-2 right-2 bg-white text-black p-1 rounded-full hover:bg-yellow hover:cursor-pointer transition"
-            aria-label={showText ? 'Ocultar texto' : 'Mostrar texto'}
-          >
-            {showText ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        </div>
-
-        {isCoach && onPrev && onNext && (
-          <>
-            <button
-              onClick={onPrev}
-              aria-label="Anterior entrenador"
-              className="absolute left-2 top-1/2 -translate-y-1/2 text-2xl bg-black/50 text-white p-1 rounded-full 
-                opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 
-                hover:bg-gray-200 hover:cursor-pointer hover:text-black z-20"
-            >
-              ‹
-            </button>
-            <button
-              onClick={onNext}
-              aria-label="Siguiente entrenador"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-2xl bg-black/50 text-white p-1 rounded-full 
-                opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 
-                hover:bg-gray-200 hover:cursor-pointer hover:text-black z-20"
-            >
-              ›
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const MemoizedFeatureCard = React.memo(FeatureCard);
 
 const WhyUs = () => {
-  const features: FeatureOption[] = useMemo(
+  const cardsData: CardItem[] = useMemo(
     () => [
       {
-        img: '/LandingPage/coach.webp',
-        title: 'ENTRENADORES ÉLITE',
-        desc: 'Certificados para llevarte más allá de tus límites.',
-      },
-      {
-        img: '/LandingPage/gym.webp',
         title: 'INSTALACIONES PREMIUM',
-        desc: 'Equipo y espacio diseñado para el alto rendimiento.',
+        images: [
+          '/LandingPage/gym.webp',
+          '/LandingPage/bicicleta.webp',
+          '/LandingPage/mancuerna.webp'
+        ],
+        descriptions: [
+          'Equipos de última generación para todos los niveles',
+          'Espacios diseñados para el alto rendimiento',
+          'Áreas especializadas para cada disciplina'
+        ]
       },
       {
-        img: '/LandingPage/resultados.webp',
+        title: 'ENTRENADORES ÉLITE',
+        images: [
+          '/LandingPage/coach.webp',
+          '/LandingPage/andrea.webp',
+          '/LandingPage/kimberly.webp',
+          '/LandingPage/gypsy.webp'
+        ],
+        descriptions: [
+          '',
+          'Andrea Chacón: Especialista en entrenamiento funcional',
+          'Kimberly Chacón: Experta en consultas personalizadas',
+          'Gipsy López: Nutricionista y entrenadora certificada'
+        ]
+      },
+      {
         title: 'RESULTADOS GARANTIZADOS',
-        desc: 'Seguimiento personalizado para maximizar tu potencial.',
-      },
+        images: [
+          '/LandingPage/resultados.webp',
+          '/LandingPage/resultados-2.webp',
+          '/LandingPage/resultados-3.webp'
+        ],
+        descriptions: [
+          'Seguimiento personalizado de tu progreso',
+          'Tecnología para medir tus avances',
+          'Planes adaptados a tus objetivos'
+        ]
+      }
     ],
     []
   );
 
-  const coachesInfo: CoachOption[] = useMemo(
-    () => [
-      {
-        img: '/LandingPage/coach.webp',
-        name: 'ENTRENADORES ÉLITE',
-        text: 'Certificados para llevarte más allá de tus límites.',
-      },
-      {
-        img: '/LandingPage/coach-1.webp',
-        name: 'Andrea Chacón',
-        text: 'Encargada de las rutinas de entrenamiento y planificación física.',
-      },
-      {
-        img: '/LandingPage/coach-2.webp',
-        name: 'Kimberly Chacón',
-        text: 'Encargada administrativa y también atiende consultas personalizadas.',
-      },
-      {
-        img: '/LandingPage/coach-3.webp',
-        name: 'Gipsy López',
-        text: 'Apoya en entrenamientos y responde dudas sobre nutrición y bienestar.',
-      },
-    ],
-    []
+  const [currentIndices, setCurrentIndices] = useState(
+    cardsData.map(() => 0)
   );
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-  const [currentCoachIndex, setCurrentCoachIndex] = useState(0);
+  const navigate = useCallback((cardIndex: number, direction: 'next' | 'prev') => {
+    setCurrentIndices(prev => {
+      const newIndices = [...prev];
+      const currentMax = cardsData[cardIndex].images.length - 1;
+      
+      if (direction === 'next') {
+        newIndices[cardIndex] = newIndices[cardIndex] === currentMax ? 0 : newIndices[cardIndex] + 1;
+      } else {
+        newIndices[cardIndex] = newIndices[cardIndex] === 0 ? currentMax : newIndices[cardIndex] - 1;
+      }
+      
+      return newIndices;
+    });
+  }, [cardsData]);
 
-  const nextCoach = useCallback(() => {
-    setCurrentCoachIndex((prev) => (prev + 1) % coachesInfo.length);
-  }, [coachesInfo.length]);
+  const goToImage = useCallback((cardIndex: number, imgIndex: number) => {
+    setCurrentIndices(prev => {
+      const newIndices = [...prev];
+      newIndices[cardIndex] = imgIndex;
+      return newIndices;
+    });
+  }, []);
 
-  const prevCoach = useCallback(() => {
-    setCurrentCoachIndex((prev) =>
-      prev === 0 ? coachesInfo.length - 1 : prev - 1
-    );
-  }, [coachesInfo.length]);
+  // Efecto para el carrusel automático solo en hover
+  useEffect(() => {
+    const intervals: NodeJS.Timeout[] = [];
+    
+    cardsData.forEach((_, cardIndex) => {
+      if (hoveredCard === cardIndex) {
+        const interval = setInterval(() => {
+          navigate(cardIndex, 'next');
+        }, 3000); // 3 segundos
+        intervals.push(interval);
+      }
+    });
+
+    return () => {
+      intervals.forEach(interval => clearInterval(interval));
+    };
+  }, [cardsData, navigate, hoveredCard]);
 
   return (
-    <section className="py-16 md:py-24 bg-black">
+    <section className="py-12 md:py-20 bg-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 md:mb-20">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 md:mb-4">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3">
             ¿POR QUÉ <span className="text-yellow-500">FORCE GYM</span>?
           </h2>
-          <div className="w-16 md:w-20 h-1 bg-yellow-500 mx-auto"></div>
+          <div className="w-14 md:w-16 h-1 bg-yellow-500 mx-auto"></div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {features.map((item, index) => {
-            const isCoach = item.title === 'ENTRENADORES ÉLITE';
-            const coach = isCoach ? coachesInfo[currentCoachIndex] : null;
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {cardsData.map((card, cardIndex) => (
+            <div 
+              key={cardIndex} 
+              className="relative h-80 sm:h-96 rounded-xl overflow-hidden bg-gray-900 shadow-lg hover:shadow-yellow-500/30 transition-shadow"
+              onMouseEnter={() => setHoveredCard(cardIndex)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              {/* Contenedor de imágenes con transición */}
+              <div className="relative w-full h-full overflow-hidden">
+                {card.images.map((image, imgIndex) => (
+                  <img
+                    key={imgIndex}
+                    src={image}
+                    alt={`${card.title} ${imgIndex + 1}`}
+                    className={`absolute w-full h-full object-cover brightness-75 transition-opacity duration-700 ${currentIndices[cardIndex] === imgIndex ? 'opacity-100' : 'opacity-0'}`}
+                  />
+                ))}
+              </div>
 
-            return (
-              <MemoizedFeatureCard
-                key={index}
-                item={item}
-                isCoach={isCoach}
-                coach={coach}
-                onPrev={isCoach ? prevCoach : undefined}
-                onNext={isCoach ? nextCoach : undefined}
-                onHoverStart={undefined}
-                onHoverEnd={isCoach ? () => setCurrentCoachIndex(0) : undefined}
-              />
-            );
-          })}
+              {/* Overlay de texto */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end pb-8 pt-4 px-4">
+                <h3 className="text-xl md:text-2xl font-bold text-yellow-400 mb-1">
+                  {card.title}
+                </h3>
+                <p className="text-white text-sm md:text-base mb-4">
+                  {card.descriptions[currentIndices[cardIndex]]}
+                </p>
+
+                {/* Indicadores de posición (puntos de navegación) */}
+                <div className="flex justify-center space-x-2 mt-2">
+                  {card.images.map((_, imgIndex) => (
+                    <button
+                      key={imgIndex}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToImage(cardIndex, imgIndex);
+                      }}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${currentIndices[cardIndex] === imgIndex ? 'bg-yellow-500 w-6' : 'bg-white/50 hover:bg-white/70'}`}
+                      aria-label={`Ir a imagen ${imgIndex + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
