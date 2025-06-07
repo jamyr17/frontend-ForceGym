@@ -66,7 +66,7 @@ export function FilterSelect() {
     const filteredBirthDateRangeStyles = (filterByBirthDateRangeMin !== null && filterByBirthDateRangeMax !== null)  && ' px-0.5 border-yellow text-yellow';
     const filteredClientTypeSelectStyles = filterByClientType !== -1 && ' px-0.5 border-yellow text-yellow';
 
-    const { typesClient } = useCommonDataStore();
+    const { clientTypes } = useCommonDataStore();
     const filters = [
         { label: "Diabetes", state: filterByDiabetes, changeState: changeFilterByDiabetes },
         { label: "Hipertensión", state: filterByHypertension, changeState: changeFilterByHypertension },
@@ -111,17 +111,17 @@ export function FilterSelect() {
             </div>
 
             <div className="flex items-center gap-4">
-                <label htmlFor="idTypeClient" className="w-20">Tipo de Cliente</label>
+                <label htmlFor="idClientType" className="w-20">Tipo de Cliente</label>
                 <select
-                    id="idTypeClient"
+                    id="idClientType"
                     className={"border rounded-md p-2 w-78 text-center" + filteredClientTypeSelectStyles}
                     value={filterByClientType}
                     onChange={(e) => changeFilterByClientType(+e.target.value)}
                 >
                     <option value={-1}>Todos</option>
 
-                    {typesClient.map((type)=> (
-                        <option key={type.idTypeClient} value={type.idTypeClient}>
+                    {clientTypes.map((type)=> (
+                        <option key={type.idClientType} value={type.idClientType}>
                             {type.name}
                         </option>
                     ))}
