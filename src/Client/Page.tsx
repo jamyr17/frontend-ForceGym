@@ -182,7 +182,7 @@ function ClientManagement() {
                                 <td className="py-2">{client.person.identificationNumber}</td>
                                 <td className="py-2">{client.person.name + ' ' + client.person.firstLastName + ' ' + client.person.secondLastName}</td> 
                                 <td className="py-2">{formatDate(new Date(client.registrationDate))}</td>
-                                <td className="py-2">{client.typeClient.name}</td>
+                                <td className="py-2">{client.clientType.name}</td>
                                 {filterByStatus && (
                                 <td>
                                     {client.isDeleted ? (

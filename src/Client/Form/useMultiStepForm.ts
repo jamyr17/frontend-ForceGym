@@ -17,7 +17,7 @@ export const useMultiStepForm = () => {
   const getDefaultValues = (): ClientDataForm => ({
     idClient: 0,
     idUser: 0,
-    idTypeClient: 0,
+    idClientType: 0,
     registrationDate: new Date(),
     expirationMembershipDate: new Date(),
     phoneNumberContactEmergency: '',
@@ -62,7 +62,7 @@ export const useMultiStepForm = () => {
     return {
       idClient: activeClient.idClient,
       idUser: activeClient.user.idUser,
-      idTypeClient: activeClient.typeClient.idTypeClient,
+      idClientType: activeClient.clientType.idClientType,
       registrationDate: formatToYYYYMMDD(activeClient.registrationDate),
       expirationMembershipDate: activeClient.expirationMembershipDate,
       phoneNumberContactEmergency: activeClient.phoneNumberContactEmergency,
@@ -163,7 +163,7 @@ export const useMultiStepForm = () => {
   };
 
   type FormField =
-    | "idClient" | "idUser" | "idTypeClient" | "registrationDate"
+    | "idClient" | "idUser" | "idClientType" | "registrationDate"
     | "phoneNumberContactEmergency" | "nameEmergencyContact" | "signatureImage" | "isDeleted"
     | "idHealthQuestionnaire" | "diabetes" | "hypertension" | "muscleInjuries"
     | "boneJointIssues" | "balanceLoss" | "cardiovascularDisease" | "breathingIssues"
@@ -177,7 +177,7 @@ export const useMultiStepForm = () => {
 
   const inputsByStep: StepFields[] = [
     { step: 1, fields: ['signatureImage']},
-    { step: 2, fields: ['idTypeClient', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
+    { step: 2, fields: ['idClientType', 'identificationNumber', 'name', 'firstLastName', 'secondLastName', 'birthday', 'idGender'] },
     { step: 3, fields: ['phoneNumber', 'email', 'registrationDate', 'nameEmergencyContact', 'phoneNumberContactEmergency'] },
     { step: 4, fields: ['diabetes', 'hypertension', 'muscleInjuries', 'boneJointIssues', 'balanceLoss', 'cardiovascularDisease', 'breathingIssues'] }
   ];

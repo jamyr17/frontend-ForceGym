@@ -55,7 +55,7 @@ export type ClientType = {
     isDeleted: number
 }
 export type TypeClient = {
-    idTypeClient: number
+    idClientType: number
     name: string
     dailyCharge: number
     weeklyCharge: number
@@ -175,7 +175,7 @@ export type Client = {
     idClient: number
     user: User
     person: Person
-    typeClient: TypeClient
+    clientType: ClientType
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
     expirationMembershipDate: string | Date
@@ -214,7 +214,7 @@ export type MeasurementDataForm = Omit<Measurement, 'client'> & {
     idClient: number
 }
 
-export type ClientDataForm = Omit<Client, 'user' | 'person' | 'typeClient' | 'healthQuestionnaire'| 'registrationDate'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<TypeClient, 'idTypeClient'> & {
+export type ClientDataForm = Omit<Client, 'user' | 'person' | 'clientType' | 'healthQuestionnaire'| 'registrationDate'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<ClientType, 'idClientType'> & {
     idGender: number
     registrationDate: string | Date
 }

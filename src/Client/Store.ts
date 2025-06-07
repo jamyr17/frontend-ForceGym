@@ -156,7 +156,7 @@ export const useClientStore = create<ClientStore>()(
                 filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
             }
             if(state.filterByClientType != 0){
-                filters += `&filterByTypeClient=${state.filterByClientType}`;
+                filters += `&filterByClientType=${state.filterByClientType}`;
             }
 
             const result = await getData(
