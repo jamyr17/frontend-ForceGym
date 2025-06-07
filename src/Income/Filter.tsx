@@ -43,7 +43,7 @@ export function FilterSelect() {
     const filteredAmountRangeStyles = (filterByAmountRangeMin!=0 && filterByAmountRangeMax!=0)  && ' px-0.5 border-yellow text-yellow'
     const filteredDateRangeStyles = (filterByDateRangeMin !=null && filterByDateRangeMax!=null)  && ' px-0.5 border-yellow text-yellow'
     const filteredClientTypeSelectStyles = filterByClientType !== -1 && ' px-0.5 border-yellow text-yellow';
-    const { meansOfPayment, typesClient } = useCommonDataStore()
+    const { meansOfPayment, clientTypes } = useCommonDataStore()
 
     return (
         <div className="flex flex-col gap-4">
@@ -117,17 +117,17 @@ export function FilterSelect() {
             </div>
 
             <div className="flex items-center gap-4">
-                <label htmlFor="idTypeClient" className="w-20">Tipo de Cliente</label>
+                <label htmlFor="idClientType" className="w-20">Tipo de Cliente</label>
                 <select
-                    id="idTypeClient"
+                    id="idClientType"
                     className={"border rounded-md p-2 w-78 text-center" + filteredClientTypeSelectStyles}
                     value={filterByClientType}
                     onChange={(e) => changeFilterByClientType(+e.target.value)}
                 >
                     <option value={-1}>Todos</option>
 
-                    {typesClient.map((type)=> (
-                        <option key={type.idTypeClient} value={type.idTypeClient}>
+                    {clientTypes.map((type)=> (
+                        <option key={type.idClientType} value={type.idClientType}>
                             {type.name}
                         </option>
                     ))}

@@ -10,32 +10,32 @@ const MAXDATE_BIRTHDAY = new Date().toUTCString();
 const MINLENGTH_IDENTIFICATIONUMBER = 7;
 const MINLENGTH_NAME = 2;
 
-export const StepClientInfo = ({ genders, typesClient }: { genders: any[], typesClient: any[] }) => {
+export const StepClientInfo = ({ genders, clientTypes }: { genders: any[], clientTypes: any[] }) => {
   const { register, formState: { errors } } = useFormContext();
   
   return (
     <div className="space-y-5">
       <div>
-        <label htmlFor="idTypeClient" className="text-sm uppercase font-bold">
+        <label htmlFor="idClientType" className="text-sm uppercase font-bold">
           Tipo de Cliente
         </label>
         <select
-          id="idTypeClient"
+          id="idClientType"
           className="w-full p-3 border border-gray-100" 
           defaultValue=""
-          {...register("idTypeClient", {
+          {...register("idClientType", {
             required: "El tipo de cliente es obligatorio",
             validate: value => value !== 0 || 'Debe seleccionar un tipo de cliente'
           })}  
         >
           <option value={0}>Seleccione un tipo de cliente</option>
-          {typesClient.map((type) => (
-            <option key={type.idTypeClient} value={type.idTypeClient}>
+          {clientTypes.map((type) => (
+            <option key={type.idClientType} value={type.idClientType}>
               {type.name}
             </option>
           ))}
         </select>
-        {errors.idTypeClient && <ErrorForm>{errors.idTypeClient.message?.toString()}</ErrorForm>}
+        {errors.idClientType && <ErrorForm>{errors.idClientType.message?.toString()}</ErrorForm>}
       </div>
 
       <div>

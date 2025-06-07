@@ -116,7 +116,7 @@ export const useClient = () => {
         client.person.identificationNumber,
         `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
         formatDate(new Date(client.registrationDate)),
-        client.typeClient.name
+        client.clientType.name
     ]);
 
     return {
