@@ -1,12 +1,9 @@
-import { useRef } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
 import { MdArrowBackIosNew } from "react-icons/md";
 import Swal from 'sweetalert2';
 import { Link } from "react-router";
 import { postData } from "../shared/services/gym";
 
 function ForgotPasswordForm () {
-    const recaptcha = useRef<ReCAPTCHA>(null)
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -22,21 +19,6 @@ function ForgotPasswordForm () {
                 title: 'Correo inválido',
                 text: 'Por favor, ingresá un correo electrónico válido',
                 icon: 'warning',
-                confirmButtonText: 'OK',
-                timer: 3000,
-                timerProgressBar: true,
-                width: 300,
-                confirmButtonColor: '#CFAD04'
-            });
-            return;
-        }
-
-        const captchaValue = recaptcha.current?.getValue();
-        if (!captchaValue) {
-            await Swal.fire({
-                title: 'Acceso no autorizado',
-                text: 'Debe completar el ReCaptcha',
-                icon: 'error',
                 confirmButtonText: 'OK',
                 timer: 3000,
                 timerProgressBar: true,
@@ -119,7 +101,6 @@ function ForgotPasswordForm () {
                             className="p-2 outline-1"
                         />
 
-                        <ReCAPTCHA ref={recaptcha} sitekey={`${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`} />
                         <button type="submit" className="text-1xl mt-4 py-2 bg-black text-white rounded-4xl transition-all hover:bg-yellow hover:text-black hover:cursor-pointer">Enviar</button>
                     </form>                    
                 </section>
