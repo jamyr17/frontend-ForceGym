@@ -103,7 +103,6 @@ export function mapClientToDataForm(client: Client): ClientDataForm {
         idClient: client.idClient,
         idUser: client.user.idUser,
         idClientType: client.clientType.idClientType,
-        clientType: client.clientType, // Add the missing clientType property
         registrationDate: client.registrationDate,
         expirationMembershipDate: client.expirationMembershipDate,
         phoneNumberContactEmergency: client.phoneNumberContactEmergency,
