@@ -3,7 +3,7 @@ import { useCommonDataStore } from "../shared/CommonDataStore";
 
 function DataInfo() {
     const { activityTypes, activeEditingId } = useActivityTypeStore();
-    const { typesClient } = useCommonDataStore();
+    const { clientTypes } = useCommonDataStore();
     
     if (!activeEditingId) return <></>;
 
@@ -11,7 +11,7 @@ function DataInfo() {
     if (!activityType) return <></>;
 
     const getClientTypeName = (id: number) => {
-        const clientType = typesClient.find(type => type.idTypeClient === id);
+        const clientType = clientTypes.find(type => type.idClientType === id);
         return clientType ? clientType.name : `Tipo ${id}`;
     };
 

@@ -202,27 +202,7 @@ function DataInfo() {
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE</strong></p>
-                    <p>{client.typeClient.name}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR DÍA</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.dailyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR SEMANA</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.weeklyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR QUINCENA</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.biweeklyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR MES</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.monthlyCharge)}</p>
+                    <p>{client.clientType.name}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
