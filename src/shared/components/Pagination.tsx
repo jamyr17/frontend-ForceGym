@@ -50,6 +50,7 @@ function Pagination({ page, size, totalRecords, onSizeChange, onPageChange } : P
                         className="rounded-md shadow hover:bg-slate-400 hover:cursor-pointer hover:text-black disabled:opacity-40"
                         onClick={() => { onPageChange(page-1) }}
                         disabled={page - 1 <= 0}
+                        aria-label="Anterior"
                     >
                         <MdOutlineArrowBackIos />
                     </button>
@@ -62,6 +63,7 @@ function Pagination({ page, size, totalRecords, onSizeChange, onPageChange } : P
                         className="rounded-md shadow hover:bg-slate-400 hover:cursor-pointer hover:text-black disabled:opacity-40"
                         onClick={() => { onPageChange(page+1) }}
                         disabled={page === totalPages}
+                        aria-label="Siguiente"
                     >
                         <MdArrowForwardIos />
                     </button>
