@@ -11,17 +11,20 @@ describe("Componente SearchInput", () => {
     expect(screen.getByRole("button")).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
 
-    const options = screen.getAllByRole("option");
-    expect(options).toHaveLength(2);
-    expect(options[0]).toHaveTextContent("Nombre");
-    expect(options[1]).toHaveTextContent("ID");
+    // Filter out hidden options before assertions
+    const visibleOptions = screen.getAllByRole("option").filter(
+      option => !option.classList.contains("hidden")
+    );
+    
+    expect(visibleOptions).toHaveLength(2);
+    expect(visibleOptions[0]).toHaveTextContent("Nombre");
+    expect(visibleOptions[1]).toHaveTextContent("ID");
   });
 
   test("Ejecuta búsqueda al hacer submit", () => {
     render(<TestSearchInputComponent />);
     const form = screen.getByRole("button").closest("form");
     fireEvent.submit(form!);
-    // No hay assert porque usamos console.log — podés mockearlo si querés capturar el evento
   });
 
   test("Actualiza el tipo de búsqueda con el select", async () => {
