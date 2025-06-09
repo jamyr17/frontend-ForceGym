@@ -8,7 +8,7 @@
     "preview": "vite preview",
     "dev": "vite",
     "vercel-build": "npm run build",
-    "test": "jest --ui",
+    "test": "jest",
     "cov": "jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'"
   },
   "dependencies": {
