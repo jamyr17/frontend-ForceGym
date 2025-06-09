@@ -32,17 +32,24 @@ jobs:
         run: npm test
         env:
           CI: true
+          
+      # Set Git identity
+      - name: Set Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       # Merge to master if tests pass
       - name: Merge to master
         if: success()
-        run: |
-          git checkout master
-          git merge --no-ff DevelopQA -m "Automated merge from DevelopQA to master after passing tests"
-          git push origin master
         env:
-          # Use GitHub token for authentication
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin
+          git checkout master
+          git merge --no-ff origin/Develop-QA -m "Automated merge from Develop-QA to master after passing tests"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} master
+
 
       # Send success email
       - name: Send success email
