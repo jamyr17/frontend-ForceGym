@@ -2,13 +2,13 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
+    "module": "nodenext",
     "target": "es5",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "types": ["node", "jest"]
   },
   "types": ["node", "jest", "@testing-library/jest-dom"],
