@@ -37,8 +37,9 @@ jobs:
       - name: Merge to master
         if: success()
         run: |
+          git fetch origin
           git checkout master
-          git merge --no-ff DevelopQA -m "Automated merge from DevelopQA to master after passing tests"
+          git merge --no-ff origin/Develop-QA -m "Automated merge from Develop-QA to master after passing tests"
           git push origin master
         env:
           # Use GitHub token for authentication
