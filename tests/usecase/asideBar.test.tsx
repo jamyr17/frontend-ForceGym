@@ -59,5 +59,6 @@ describe('AsideBar Component', () => {
     expect(sidebar).toHaveClass('w-14');
     expect(screen.queryByText('Menú')).not.toBeInTheDocument();
     console.log('Hello CI/CD');
+    console.log('Hello CI/CD');
   });
 });
