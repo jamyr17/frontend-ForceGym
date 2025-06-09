@@ -6,27 +6,21 @@ import { MdOutlineCancel } from "react-icons/md";
 
 function DataInfo() {
     const { clients, activeEditingId } = useClientStore();
-    if (!activeEditingId) return <></>;
 
     const client = clients.find(client => client.idClient === activeEditingId);
-    if (!client) return <></>;
 
-    // Función para validar y normalizar la firma
     const getValidSignature = useCallback(() => {
-        if (!client.signatureImage) return <></>;
+        if (!client?.signatureImage) return null;
 
         try {
-            // Caso 1: Ya es una data URI válida
             if (client.signatureImage.startsWith('data:image/png;base64,')) {
                 return client.signatureImage;
             }
 
-            // Caso 2: Es base64 sin prefijo
             if (/^[A-Za-z0-9+/=]+$/.test(client.signatureImage)) {
                 return `data:image/png;base64,${client.signatureImage}`;
             }
 
-            // Caso 3: Contiene caracteres especiales (URL encoded)
             const decoded = decodeURIComponent(client.signatureImage);
             if (decoded.startsWith('data:image')) {
                 return decoded;
@@ -41,13 +35,12 @@ function DataInfo() {
 
     const validSignature = getValidSignature();
 
-    // Función para descargar la firma
     const handleDownload = useCallback(() => {
-        if (!validSignature) return;
+        if (!validSignature || !client) return;
 
         try {
             const link = document.createElement('a');
-            link.href = validSignature as string;
+            link.href = validSignature;
             link.download = `firma-${client.person.identificationNumber}.png`;
             document.body.appendChild(link);
             link.click();
@@ -56,6 +49,8 @@ function DataInfo() {
             console.error('Error al descargar firma:', error);
         }
     }, [validSignature, client]);
+
+    if (!activeEditingId || !client) return <></>;
 
     // Renderizado de la firma
     const renderSignature = () => {
@@ -77,8 +72,8 @@ function DataInfo() {
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE</strong></p>
                     <p>{
-                        client.person.name + ' ' + 
-                        client.person.firstLastName + ' ' + 
+                        client.person.name + ' ' +
+                        client.person.firstLastName + ' ' +
                         client.person.secondLastName
                     }</p>
                 </div>
@@ -92,7 +87,7 @@ function DataInfo() {
                     <p><strong>FECHA DE NACIMIENTO</strong></p>
                     <p>{formatDate(new Date(client.person.birthday))}</p>
                 </div>
-                
+
             </div>
 
             <div className="flex flex-col gap-2">
@@ -108,12 +103,12 @@ function DataInfo() {
                     <p>{formatNullable(client.phoneNumberContactEmergency)}</p>
                 </div>
 
-                
+
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE DEL CONTACTO EMERGENCIA</strong></p>
                     <p>{formatNullable(client.nameEmergencyContact)}</p>
                 </div>
-                
+
             </div>
 
             <div className="flex flex-col gap-2">
@@ -128,7 +123,7 @@ function DataInfo() {
                             <> <MdOutlineCancel className="text-red-400" /> No </>
                         )}
                     </p>
-                </div> 
+                </div>
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>HIPERTENSIÓN</strong></p>
@@ -151,7 +146,7 @@ function DataInfo() {
                         )}
                     </p>
                 </div>
-                
+
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>PROBLEMAS ARTICULARES</strong></p>
                     <p className="flex text-center items-center gap-4">
@@ -202,42 +197,22 @@ function DataInfo() {
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>NOMBRE</strong></p>
-                    <p>{client.typeClient.name}</p>
+                    <p>{client.clientType.name}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR DÍA</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.dailyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR SEMANA</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.weeklyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR QUINCENA</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.biweeklyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PRECIO POR MES</strong></p>
-                    <p>{formatAmountToCRC(client.typeClient.monthlyCharge)}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                <p><strong>FIRMA DEL CLIENTE</strong></p>
-                {client.signatureImage ? (
-                    <div className="border border-gray-300 p-2 rounded-md">
-                    <img 
-                        src={client.signatureImage} 
-                        alt="Firma del cliente"
-                        className="max-w-full h-auto"
-                    />
-                    </div>
-                ) : (
-                    <p className="text-gray-500">No hay firma registrada</p>
-                )}
+                    <p><strong>FIRMA DEL CLIENTE</strong></p>
+                    {client.signatureImage ? (
+                        <div className="border border-gray-300 p-2 rounded-md">
+                            <img
+                                src={client.signatureImage}
+                                alt="Firma del cliente"
+                                className="max-w-full h-auto"
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No hay firma registrada</p>
+                    )}
                 </div>
             </div>
         </div>

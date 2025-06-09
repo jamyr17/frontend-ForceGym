@@ -25,7 +25,7 @@ const MultiStepForm = () => {
       case 1:
         return <StepContract />;
       case 2:
-        return <StepClientInfo genders={genders} typesClient={clientTypes} />;
+        return <StepClientInfo genders={genders} clientTypes={clientTypes} />;
       case 3:
         return <StepContactInfo />;
       case 4:

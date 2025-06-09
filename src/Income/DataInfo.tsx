@@ -50,7 +50,7 @@ function DataInfo() {
 
                 <div className="flex flex-col gap-2 text-lg">
                     <p><strong>TIPO </strong></p>
-                    <p>{economicIncome.client.typeClient.name}</p>
+                    <p>{economicIncome.client.clientType.name}</p>
                 </div>
 
                 <div className="flex flex-col gap-2 text-lg">

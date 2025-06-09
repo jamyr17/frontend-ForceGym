@@ -121,7 +121,7 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
                 filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`
             }
             if (state.filterByClientType != -1){
-                filters += `&filterByTypeClient=${state.filterByClientType}`
+                filters += `&filterByClientType=${state.filterByClientType}`
             }
 
             const result = await getData(

@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import SignatureCanvas from 'react-signature-canvas';
 import ErrorForm from '../../shared/components/ErrorForm';
 
 const CONTRACT_TEXT = `
 Con la firma del presente contrato, se aceptan los términos y condiciones estipulados a continuación:
--Force Gym es un Gimnasio Tradicional, en el cual pueden realizarse ejercicios con pesas, discos, barras y máquinas. Por tanto; no están permitidos “El powerlifting” o cualquier otro que conlleve levantar la mayor cantidad de peso posible y altere el orden del establecimiento. 
+-Force Gym es un Gimnasio Tradicional, en el cual pueden realizarse ejercicios con pesas, discos, barras y máquinas. Por tanto; no están permitidos "El powerlifting" o cualquier otro que conlleve levantar la mayor cantidad de peso posible y altere el orden del establecimiento. 
 -Force Gym no será responsable de los problemas de salud que pueda sufrir a consecuencia del uso de sus instalaciones. Con la suscripción del presente contrato se declara que está en buenas condiciones para la realización de ejercicio físico. Será responsabilidad del usuario realizarse periódicamente las debidas evaluaciones médicas mediante las cuales se certifique que su estado de salud es adecuado para la práctica de ejercicio físico.
 -El usuario deberá seguir las indicaciones de los instructores durante la clase o sesión de entrenamiento, Force Gym quedará exonerado de responsabilidad, en caso de producirse un accidente por la indebida manipulación de los equipos y elementos que se encuentren dentro de las instalaciones.
 -Force Gym no se hace responsable de los objetos personales que puedan extraviarse dentro de las instalaciones.
@@ -18,46 +18,27 @@ Con la firma del presente contrato, se aceptan los términos y condiciones estip
 -El incumplimiento de estos términos y condiciones podrá dar lugar, según la gravedad, a la expulsión de las instalaciones.
 `;
 
-
 export const StepContract = () => {
   const { 
     setValue, 
-    watch, 
-    formState: { errors }, 
-    trigger,
-    register 
+    formState: { errors } 
   } = useFormContext();
   
   const sigCanvasRef = useRef<SignatureCanvas>(null);
-  const signature = watch('signatureImage');
-
-  register('signatureImage', {
-    required: 'Debe proporcionar su firma para continuar',
-    validate: {
-      hasSignature: () => 
-        !sigCanvasRef.current?.isEmpty() || 'La firma es requerida'
-    }
-  });
-
-  useEffect(() => {
-    trigger('signatureImage');
-  }, [signature, trigger]);
 
   const handleClear = () => {
     sigCanvasRef.current?.clear();
-    setValue('signatureImage', '', { shouldValidate: true });
+    setValue('signatureImage', '');
   };
 
   const handleSignatureEnd = () => {
-    if (!sigCanvasRef.current?.isEmpty()) {
-      if (sigCanvasRef.current) {
-        const signatureData = sigCanvasRef.current
-          .getTrimmedCanvas()
-          .toDataURL('image/png');
-        setValue('signatureImage', signatureData, { shouldValidate: true });
-      }
+    if (sigCanvasRef.current && !sigCanvasRef.current.isEmpty()) {
+      const signatureData = sigCanvasRef.current
+        .getTrimmedCanvas()
+        .toDataURL('image/png');
+      setValue('signatureImage', signatureData);
     } else {
-      setValue('signatureImage', '', { shouldValidate: true });
+      setValue('signatureImage', '');
     }
   };
 
