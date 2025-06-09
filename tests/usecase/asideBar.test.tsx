@@ -58,5 +58,6 @@ describe('AsideBar Component', () => {
     // Sidebar should be closed (w-14) and "Menú" text should be gone
     expect(sidebar).toHaveClass('w-14');
     expect(screen.queryByText('Menú')).not.toBeInTheDocument();
+    console.log('Hello CI/CD');
   });
 });
