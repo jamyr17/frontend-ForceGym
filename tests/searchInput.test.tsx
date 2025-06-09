@@ -25,6 +25,8 @@ describe("Componente SearchInput", () => {
     render(<TestSearchInputComponent />);
     const form = screen.getByRole("button").closest("form");
     fireEvent.submit(form!);
+
+    // No hay assert porque usamos console.log — podés mockearlo si querés capturar el evento
   });
 
   test("Actualiza el tipo de búsqueda con el select", async () => {
