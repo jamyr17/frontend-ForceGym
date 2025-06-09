@@ -88,6 +88,7 @@ function AsideBar() {
     <>
       <aside
         id="sidebar"
+        data-testid='asidebar-comp'
         className={`md:flex text-md flex-col fixed items-center justify-between pt-6 pb-6 bg-black text-white h-full transition-all duration-300 z-50 ${
           isOpen ? 'w-56 px-2' : 'w-14'
         }`}

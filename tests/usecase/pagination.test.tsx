@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import '@testing-library/jest-dom';
-import TestPaginationComponent from "./__mocks__/components/TestPaginationComponent";
+import TestPaginationComponent from "../__mocks__/components/TestPaginationComponent";
 
 describe("Componente Pagination", () => {
   test("Renderiza correctamente y muestra el rango de registros", () => {
