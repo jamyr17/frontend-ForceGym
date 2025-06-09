@@ -34,7 +34,7 @@ describe("Componente Pagination", () => {
 
     const select = screen.getByRole("combobox");
     fireEvent.change(select, { target: { value: "20" } });
-
+// Probando 
     expect(screen.getByTestId("current-size")).toHaveTextContent("Tamaño: 20");
     expect(screen.getByTestId("current-page")).toHaveTextContent("Página: 1");
     expect(screen.getByTestId("range-text")).toHaveTextContent("1-20 de 50 registros");
