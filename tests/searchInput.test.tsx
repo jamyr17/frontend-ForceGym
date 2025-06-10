@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import '@testing-library/jest-dom';
 import userEvent from "@testing-library/user-event";
 import TestSearchInputComponent from "./__mocks__/components/TestSearchInputComponent";
-
+//COMMIT
 describe("Componente SearchInput", () => {
   test("Renderiza correctamente con opciones de búsqueda", () => {
     render(<TestSearchInputComponent />);
