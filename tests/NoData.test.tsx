@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import NoData from '../src/shared/components/NoData';
-
+//commit
 describe('NoData Component', () => {
   test('muestra el mensaje específico del módulo cuando se proporciona', () => {
     render(<NoData module="ejercicios" />);
