@@ -1,23 +1,23 @@
 import { Route, Routes } from "react-router";
 import PublicRoutes from "./PublicRoutes";
 import PrivateRoutes from "./PrivateRoutes";
+import Layout from "../shared/components/Layout"; 
 
-function AppRoutes () {
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/*" element={<PublicRoutes />} />
 
-    return (
-        <Routes>
-            <Route 
-                path="/*" 
-                element={ <PublicRoutes /> } 
-            />
-
-            <Route 
-                path="gestion/*" 
-                element={ <PrivateRoutes /> }
-            />
-            
-        </Routes>
-    );
+      <Route
+        path="gestion/*"
+        element={
+          <Layout>
+            <PrivateRoutes />
+          </Layout>
+        }
+      />
+    </Routes>
+  );
 }
 
 export default AppRoutes;

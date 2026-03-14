@@ -2,8 +2,9 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { EconomicIncome, EconomicIncomeDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
-import { format } from 'date-fns';
 import { isCompleteDate } from "../shared/utils/validation";
+import { useCommonDataStore } from "../shared/CommonDataStore";
+import { formatDateForParam } from "../shared/utils/format";
 
 type EconomicIncomeStore = {
     economicIncomes: EconomicIncome[];
@@ -28,6 +29,8 @@ type EconomicIncomeStore = {
     filterByClientType: number;
 
     fetchEconomicIncomes: () => Promise<any>;
+    fetchAllActiveIncomes: () => Promise<EconomicIncome[]>;
+    fetchEconomicIncomeByActiveFilters: () => Promise<EconomicIncome[]>;
     getEconomicIncomeById: (id: number) => void;
     addEconomicIncome: (data: EconomicIncomeDataForm) => Promise<any>;
     updateEconomicIncome: (data: EconomicIncomeDataForm) => Promise<any>;
@@ -56,6 +59,7 @@ type EconomicIncomeStore = {
     showModalFileType: () => void;
     closeModalFileType: () => void;
     clearAllFilters: () => void;
+    resetEditing: () => void;
 };
 
 export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
@@ -113,8 +117,8 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
                 isCompleteDate(state.filterByDateRangeMax) &&
                 isCompleteDate(state.filterByDateRangeMin)
             ) {
-                const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
-                const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                const formattedDateMax = formatDateForParam(state.filterByDateRangeMax!);
+                const formattedDateMin = formatDateForParam(state.filterByDateRangeMin!);
                 filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
             }
             if (state.filterByMeanOfPayment != 0){
@@ -140,24 +144,122 @@ export const useEconomicIncomeStore = create<EconomicIncomeStore>()(
             return result;
         },
 
+        fetchAllActiveIncomes: async () => {
+            try {
+                // Obtener primero el total de registros activos
+                const countResult = await getData(
+                    `${import.meta.env.VITE_URL_API}economicIncome/list?filterByStatus=Activos&size=1&page=1`
+                );
+                
+                const total = countResult.data?.totalRecords ?? 0;
+                if (total === 0) return [];
+                
+                // Obtener todos los registros activos
+                const result = await getData(
+                    `${import.meta.env.VITE_URL_API}economicIncome/list?filterByStatus=Activos&size=${total}&page=1`
+                );
+                
+                return result.data?.economicIncomes ?? [];
+            } catch (error) {
+                console.error('Error al cargar todos los ingresos:', error);
+                return [];
+            }
+        },
+
+        fetchEconomicIncomeByActiveFilters: async () => {
+            const state = useEconomicIncomeStore.getState();
+
+            const params: string[] = [];
+
+            // helper para manejar fechas (formatea si es Date)
+            const formatIfDate = (v: any) => {
+                if (!v) return null;
+                try {
+                    // isCompleteDate ya existe en el store, pero solo necesitamos detectar Date
+                    if (v instanceof Date) return formatDateForParam(v);
+                    return v;
+                } catch {
+                    return v;
+                }
+            }
+
+            const minDate = formatIfDate(state.filterByDateRangeMin);
+            const maxDate = formatIfDate(state.filterByDateRangeMax);
+
+            if (minDate) params.push(`filterByDateRangeMin=${minDate}`);
+            if (maxDate) params.push(`filterByDateRangeMax=${maxDate}`);
+
+            if (state.filterByMeanOfPayment && state.filterByMeanOfPayment !== 0)
+                params.push(`filterByMeanOfPayment=${state.filterByMeanOfPayment}`);
+
+            if (typeof state.filterByClientType === 'number' && state.filterByClientType !== -1)
+                params.push(`filterByClientType=${state.filterByClientType}`);
+
+            // si no hay parámetros, igual armamos la query string vacía
+            const qs = params.length ? params.join("&") : "";
+
+            // obtener totalRecords
+            const urlCount = `${import.meta.env.VITE_URL_API}economicIncome/list?${qs}`;
+
+            const responseCount = await getData(urlCount);
+
+            if (!responseCount || !responseCount.ok) {
+                console.warn('fetchEconomicIncomeByActiveFilters: backend returned not ok (count)');
+                return [];
+            }
+
+            const total = responseCount.data?.totalRecords ?? 0;
+
+            if (total === 0) {
+                // no hay datos
+                return [];
+            }
+
+            // 2) traer todos con size = total
+            const urlAll = `${import.meta.env.VITE_URL_API}economicIncome/list?page=1&size=${total}${qs ? `&${qs}` : ''}`;
+
+            const responseAll = await getData(urlAll);
+
+            if (!responseAll || !responseAll.ok) {
+                console.warn('fetchEconomicIncomeByActiveFilters: backend returned not ok (all)');
+                return [];
+            }
+
+            const incomes = responseAll.data?.economicIncomes ?? [];
+
+            return incomes;
+        },
+
+
         getEconomicIncomeById: (id) => {
             set(() => ({ activeEditingId: id }));
         },
 
         addEconomicIncome: async (data) => {
             const result = await postData(`${import.meta.env.VITE_URL_API}economicIncome/add`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         updateEconomicIncome: async (data) => {
             const result = await putData(`${import.meta.env.VITE_URL_API}economicIncome/update`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         deleteEconomicIncome: async (id, loggedIdUser) => {
             const result = await deleteData(`${import.meta.env.VITE_URL_API}economicIncome/delete/${id}`, loggedIdUser);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
+
+        resetEditing: () => set(() => ({ activeEditingId: 0 })),
 
         changeSize: (newSize) => set(() => ({ size: newSize })),
         changePage: (newPage) => set(() => ({ page: newPage })),

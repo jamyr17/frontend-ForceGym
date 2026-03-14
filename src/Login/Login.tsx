@@ -22,7 +22,6 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
             [name]: value
         }));
 
-        // Resetear el captcha si hay cambios después de un error
         if (recaptcha.current?.getValue()) {
             recaptcha.current.reset();
         }
@@ -31,18 +30,8 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
     return (
         <div className="flex flex-col justify-center items-center min-h-screen bg-black p-4">
             <main className="flex flex-col lg:flex-row justify-between w-full max-w-6xl bg-white rounded-lg overflow-hidden">
-                {/* Sección del formulario */}
                 <section className="w-full lg:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col">
-                    <div className="w-8 sm:w-10 md:w-12 flex justify-start">
-                        <a
-                            href="/"
-                            className="flex items-center text-gray-400 hover:text-yellow transition-colors duration-300"
-                            title="Regresar"
-                        >
-                            <FaArrowLeft className="text-xl sm:text-2xl" />
-                        </a>
-                    </div>
-                    
+
                     <header className="flex justify-center my-4 sm:my-6">
                         <img 
                             src="Logo.webp" 
@@ -80,10 +69,14 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
                             className="border border-gray-300 rounded"
                         />
 
-                        <ReCAPTCHA 
-                            ref={recaptcha} 
-                            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                        />
+                        <div className="flex justify-center sm:justify-start w-full">
+                            <div className="transform scale-[0.85] origin-left sm:scale-100">
+                                <ReCAPTCHA 
+                                    ref={recaptcha} 
+                                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                                />
+                            </div>
+                        </div>
 
                         <button 
                             type="submit" 
@@ -103,10 +96,19 @@ function Login({ credencialUser, setCredencialUser, handleLoginSubmit, isSubmitt
                                 ¿Olvidó su contraseña?
                             </Link>
                         </div>
+
+                        <div className="text-center mt-4 pt-4 border-t border-gray-300">
+                            <Link
+                                to="/cliente"
+                                className="text-sm sm:text-base text-black font-semibold hover:text-yellow flex items-center justify-center gap-2"
+                            >
+                                <span>¿Eres cliente del gimnasio?</span>
+                                <span className="underline">Ingresa aquí</span>
+                            </Link>
+                        </div> 
                     </form>
                 </section>
             
-                {/* Sección de la imagen */}
                 <aside className="w-full lg:w-1/2 hidden sm:flex items-center justify-center bg-gray-100">
                     <div className="w-full h-full">
                         <img 

@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Measurement, MeasurementDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
-import { format } from 'date-fns';
 import { isCompleteDate } from "../shared/utils/validation";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 type MeasurementStore = {
     idClient: number;
@@ -50,6 +50,7 @@ type MeasurementStore = {
     showModalFileType: () => void;
     closeModalFileType: () => void;
     clearAllFilters: () => void;
+    resetEditing: () => void;
 };
 
 export const useMeasurementStore = create<MeasurementStore>()(
@@ -94,13 +95,25 @@ export const useMeasurementStore = create<MeasurementStore>()(
             }
             if (state.filterByStatus !== '') {
                 filters += `&filterByStatus=${state.filterByStatus}`;
-            }if (
-                    isCompleteDate(state.filterByDateRangeMax) &&
-                    isCompleteDate(state.filterByDateRangeMin)
-                ) {
-                    const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
-                    const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
-                    filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
+            }
+            
+            // Enviar filtros de fecha individualmente si están presentes
+            // Formatear manualmente para evitar problemas de zona horaria
+            if (isCompleteDate(state.filterByDateRangeMin)) {
+                const date = state.filterByDateRangeMin!;
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const formattedDateMin = `${year}-${month}-${day}`;
+                filters += `&filterByDateRangeMin=${formattedDateMin}`;
+            }
+            if (isCompleteDate(state.filterByDateRangeMax)) {
+                const date = state.filterByDateRangeMax!;
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const formattedDateMax = `${year}-${month}-${day}`;
+                filters += `&filterByDateRangeMax=${formattedDateMax}`;
             }
 
             const result = await getData(
@@ -125,19 +138,30 @@ export const useMeasurementStore = create<MeasurementStore>()(
                 selectedMeasurement: measurement || null,
             }));
         },
+        resetEditing: () => set(() => ({ activeEditingId: 0 })),
+
 
         addMeasurement: async (data) => {
             const result = await postData(`${import.meta.env.VITE_URL_API}measurement/add`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         updateMeasurement: async (data) => {
             const result = await putData(`${import.meta.env.VITE_URL_API}measurement/update`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         deleteMeasurement: async (id, loggedIdUser) => {
             const result = await deleteData(`${import.meta.env.VITE_URL_API}measurement/delete/${id}`, loggedIdUser);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 

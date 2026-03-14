@@ -32,6 +32,7 @@ export type Fee = {
 export type ActivityType = {
     idActivityType: number
     name: string
+    durationDays: number
     fees: Fee[]
     isDeleted: number
 }
@@ -73,7 +74,11 @@ export type ExerciseCategory = {
     idExerciseCategory: number
     name: string
     isDeleted: number
+    user: User
 }
+export type ExerciseCategoryDataForm =
+  Omit<ExerciseCategory, 'user'> & Pick<User, 'idUser'>
+
 
 export type ExerciseDifficulty = {
     idExerciseDifficulty: number
@@ -178,7 +183,7 @@ export type Client = {
     clientType: ClientType
     healthQuestionnaire: HealthQuestionnaire
     registrationDate: Date
-    expirationMembershipDate: string | Date
+    expirationMembershipDate: string | Date | null
     phoneNumberContactEmergency: string
     nameEmergencyContact: string
     signatureImage: string
@@ -192,6 +197,7 @@ export type Measurement = {
     measurementDate: Date
     weight: number
     height: number
+    bmi: number
     muscleMass: number
     bodyFatPercentage: number 
     visceralFatPercentage: number
@@ -214,9 +220,10 @@ export type MeasurementDataForm = Omit<Measurement, 'client'> & {
     idClient: number
 }
 
-export type ClientDataForm = Omit<Client, 'user' | 'person' | 'clientType' | 'healthQuestionnaire'| 'registrationDate'> & HealthQuestionnaire & Omit<Person, 'gender'> & Pick<User, 'idUser'>  & Pick<ClientType, 'idClientType'> & {
+export type ClientDataForm = Omit<Client, 'user' | 'person' | 'clientType' | 'healthQuestionnaire'| 'registrationDate'> & HealthQuestionnaire & Omit<Person, 'gender' | 'birthday'> & Pick<User, 'idUser'>  & Pick<ClientType, 'idClientType'> & {
     idGender: number
     registrationDate: string | Date
+    birthday: string | Date
 }
 
 export type ClientOptions = {
@@ -229,6 +236,7 @@ export type Exercise = {
     idExercise: number;
     name: string;
     description: string;
+    videoUrl?: string;
     difficulty: string;
     series: number;
     repetitions: number;
@@ -262,9 +270,10 @@ export type RoutineExercise = {
     idRoutineExercise?: number;
     exercise: Exercise;
     series: number;
-    repetitions: number;
+    repetitions: number | string;
     note: string;
     categoryOrder: number;
+    dayNumber?: number;
 };
 
 export type RoutineAssignment = {
@@ -291,9 +300,10 @@ export type Routine = {
 export type RoutineExerciseDTO = {
     idExercise: number; 
     series: number;
-    repetitions: number;
+    repetitions: number | string;
     note: string;
     categoryOrder: number;
+    dayNumber?: number;
 };
 
 export type RoutineAssignmentDTO = {
@@ -325,7 +335,7 @@ export type RoutineDataForm = {
     exercises: {
         idExercise: number;
         series: number;
-        repetitions: number;
+        repetitions: number | string;
         note: string;
         categoryOrder: number;
     }[];
@@ -333,4 +343,34 @@ export type RoutineDataForm = {
         idClient: number;
         assignmentDate?: string;
     }[];
+};
+
+// -----------------------------------------------------
+// Client Portal Types
+// -----------------------------------------------------
+
+export type ClientCredentials = {
+    identificationNumber: string;
+    password: string;
+};
+
+export type ClientLogin = {
+    idClient: number;
+    person: Person;
+    token: string;
+    expirationMembershipDate?: Date | string;
+    registrationDate?: Date | string;
+};
+
+export type ClientRoutine = {
+    idRoutineAssignment: number;
+    routine: Routine;
+    assignmentDate: Date;
+};
+
+export type ClientExerciseNote = {
+    idClientExerciseNote?: number;
+    idClient: number;
+    idRoutineExercise: number;
+    personalNote: string;
 };

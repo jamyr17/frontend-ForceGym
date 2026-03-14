@@ -56,6 +56,15 @@ function ChangePasswordForm () {
             })
 
             navigate("/login")
+        } else {
+            await Swal.fire({
+                title: 'Error',
+                text: result.data?.message || result.error || 'El token no es válido o ha expirado. Por favor, solicita un nuevo enlace de recuperación.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                width: 500,
+                confirmButtonColor: '#d33'
+            })
         }
     }
 
@@ -83,28 +92,28 @@ function ChangePasswordForm () {
     }, []);
 
     return (
-        <div className="flex flex-col justify-center items-center h-screen bg-black">
-            <main className="self-center text-center justify-center h-[70vh] gap-16 p-12 w-[80vh] bg-white rounded-lg">
-                <header className="flex between gap-4 items-center mb-8">
+        <div className="flex flex-col justify-center items-center min-h-screen bg-black py-4 px-3 sm:py-8 sm:px-4">
+            <main className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-white rounded-lg shadow-2xl p-4 sm:p-6 md:p-8">
+                <header className="flex items-center gap-3 mb-4 sm:mb-6">
                     <Link
                         to={"/login"}
-                        className="hover:text-yellow "
+                        className="hover:text-yellow transition-colors flex-shrink-0"
                     >
-                        <MdArrowBackIosNew/>
+                        <MdArrowBackIosNew size={20} className="sm:w-6 sm:h-6" />
                     </Link>
 
-                    <h1 className="font-bold text-xl">Cambio de contraseña</h1>
+                    <h1 className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl">Cambio de contraseña</h1>
                 </header>
 
-                <section className="flex flex-col h-full gap-4">
-                    <form className="text-left flex flex-col gap-4" onSubmit={handleSubmit(submitForm)}>
-                        <div className="mb-5">
-                            <label htmlFor="password" className="text-sm uppercase font-bold">
+                <section className="flex flex-col">
+                    <form className="text-left flex flex-col gap-3 sm:gap-4" onSubmit={handleSubmit(submitForm)}>
+                        <div>
+                            <label htmlFor="password" className="block text-xs sm:text-sm uppercase font-bold text-gray-700 mb-1.5">
                                 Nueva Contraseña
                             </label>
                             <PasswordInput     
                                 id="password"
-                                className="w-full p-3 border border-gray-100"  
+                                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm sm:text-base"  
                                 type="password" 
                                 placeholder="Ingrese la contraseña" 
                                 {...register('password', {
@@ -120,13 +129,13 @@ function ChangePasswordForm () {
                             }
                         </div>
 
-                        <div className="mb-5">
-                            <label htmlFor="confirmPassword" className="text-sm uppercase font-bold">
+                        <div>
+                            <label htmlFor="confirmPassword" className="block text-xs sm:text-sm uppercase font-bold text-gray-700 mb-1.5">
                                 Confirmar Contraseña
                             </label>
                             <PasswordInput     
                                 id="confirmPassword"
-                                className="w-full p-3 border border-gray-100"  
+                                className="w-full p-2.5 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm sm:text-base"  
                                 type="password" 
                                 placeholder="Confirme la contraseña" 
                                 {...register('confirmPassword', {
@@ -142,7 +151,7 @@ function ChangePasswordForm () {
                             }
                         </div>
 
-                        <button type="submit" className="text-1xl mt-4 py-2 bg-black text-white rounded-4xl transition-all hover:bg-yellow hover:text-black hover:cursor-pointer">Enviar</button>
+                        <button type="submit" className="w-full text-sm sm:text-base md:text-lg mt-2 sm:mt-4 py-2.5 sm:py-3 bg-black text-white rounded-lg transition-all hover:bg-yellow hover:text-black hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">Cambiar Contraseña</button>
                     </form>                    
                 </section>
             </main>

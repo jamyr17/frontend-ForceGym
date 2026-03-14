@@ -4,11 +4,11 @@ import { Client, ClientDataForm } from "../shared/types"
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication"
 import useClientStore from "./Store"
 import { useNavigate } from "react-router"
-import { formatDate } from "../shared/utils/format"
+import { formatDate, formatDateFromString } from "../shared/utils/format"
 
 export const useClient = () => {
     const navigate = useNavigate()
-    const { clients, fetchClients, deleteClient, updateClient, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientStore()
+    const { clients, fetchClients, deleteClient, deleteClientPermanently, updateClient, changeSearchTerm, changeOrderBy, changeDirectionOrderBy, directionOrderBy } = useClientStore()
 
     const handleDelete = async ({ idClient, person } : Client) => {
         await Swal.fire({
@@ -46,6 +46,55 @@ export const useClient = () => {
                     setAuthHeader(null)
                     setAuthUser(null)
                     navigate('/login', {replace: true})
+                }
+            } 
+        })
+    }
+
+    const handleDeletePermanently = async ({ idClient, person } : Client) => {
+        await Swal.fire({
+            title: '¿Desea eliminar PERMANENTEMENTE este cliente?',
+            text: `Esta acción eliminará definitivamente al cliente ${person.name} y no se podrá recuperar. Use esta opción solo para registros duplicados o ingresados por error.`,
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: "Cancelar",
+            cancelButtonColor: '#bebdbd',
+            confirmButtonText: 'Eliminar Permanentemente',
+            confirmButtonColor: '#dc2626',
+            width: 600,
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const loggedUser = getAuthUser()
+                const response = await deleteClientPermanently(idClient, loggedUser?.idUser as number)
+
+                if(response.ok){
+                    Swal.fire({
+                        title: 'Cliente eliminado permanentemente',
+                        text: `Se ha eliminado permanentemente el cliente ${person.name}`,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        width: 500,
+                        confirmButtonColor: '#CFAD04'
+                    })
+
+                    fetchClients()
+                } else if(response.logout){
+                    setAuthHeader(null)
+                    setAuthUser(null)
+                    navigate('/login', {replace: true})
+                } else {
+                    // Mostrar mensaje de error
+                    Swal.fire({
+                        title: 'No se puede eliminar',
+                        text: response.message || response.error || 'No se pudo eliminar el cliente',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        width: 600,
+                        confirmButtonColor: '#CFAD04'
+                    })
                 }
             } 
         })
@@ -115,12 +164,13 @@ export const useClient = () => {
         index + 1,
         client.person.identificationNumber,
         `${client.person.name} ${client.person.firstLastName} ${client.person.secondLastName}`,
-        formatDate(new Date(client.registrationDate)),
+        formatDateFromString(client.registrationDate),
         client.clientType.name
     ]);
 
     return {
         handleDelete,
+        handleDeletePermanently,
         handleSearch,
         handleOrderByChange, 
         handleRestore,

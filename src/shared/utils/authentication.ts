@@ -1,37 +1,39 @@
-import { User } from "../types"
-
-export const getAuthToken = () => {
-  return window.localStorage.getItem('auth_token');
-}
-  
-export const setAuthHeader = (token:string|null) => {
-    if (token !== null) {
-      window.localStorage.setItem("auth_token", token)
-    } else {
-      window.localStorage.removeItem("auth_token")
-    }
-}
+export const setAuthHeader = (token: string | null) => {
+  if (token) {
+    console.log('💾 Guardando token:', token.substring(0, 30) + '...');
+    localStorage.setItem("token", token);
+  } else {
+    console.log('🗑️ Eliminando token');
+    localStorage.removeItem("token");
+  }
+};
 
 export const getAuthUser = () => {
-  const user = window.localStorage.getItem("loggedUser")
-  return user ? (JSON.parse(user) as User) : null
-}
+  const authUser = localStorage.getItem("authUser");
+  return authUser ? JSON.parse(authUser) : null;
+};
 
-export const setAuthUser = (user: User|null) => {
-  if (user != null) {
-    window.localStorage.setItem("loggedUser", JSON.stringify(user));
+export const setAuthUser = (user: any | null) => {
+  if (user) {
+    console.log('💾 Guardando usuario:', user.username || user.person?.name);
+    localStorage.setItem("authUser", JSON.stringify(user));
   } else {
-    window.localStorage.removeItem("loggedUser");
+    console.log('🗑️ Eliminando usuario');
+    localStorage.removeItem("authUser");
   }
-}
+};
 
 export const createHeaders = () => {
-  const requestHeaders = new Headers();
-  requestHeaders.append('Content-Type', 'application/json');
-
-  if(getAuthToken()!=null && getAuthToken()!=''){
-    requestHeaders.append('Authorization', `Bearer ${getAuthToken()}` )
-  }
+  const token = localStorage.getItem("token");
   
-  return requestHeaders
-}
+  if (token) {
+    console.log('🔑 Token encontrado:', token.substring(0, 30) + '...');
+  } else {
+    console.warn('⚠️ No hay token en localStorage');
+  }
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};

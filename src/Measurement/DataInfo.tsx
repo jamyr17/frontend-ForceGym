@@ -1,114 +1,95 @@
-import { formatDate } from "../shared/utils/format";
+import { formatDateFromString } from "../shared/utils/format";
 import useMeasurementStore from "./Store";
 
 function DataInfo() {
-    const { measurements, activeEditingId } = useMeasurementStore();
-    if (!activeEditingId) return <></>;
+  const { measurements, activeEditingId } = useMeasurementStore();
 
-    const measurement = measurements.find(m => m.idMeasurement === activeEditingId);
-    if (!measurement) return <></>;
-
+  if (!activeEditingId) {
     return (
-        <div className="grid grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Medición</h1>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>FECHA DE MEDICIÓN</strong></p>
-                    <p>{formatDate(new Date(measurement.measurementDate))}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PESO</strong></p>
-                    <p>{measurement.weight} kg</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>ALTURA</strong></p>
-                    <p>{measurement.height} cm</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>MÚSCULO (%)</strong></p>
-                    <p>{measurement.muscleMass} %</p>
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-8 underline">Medidas Corporales</h1>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>GRASA CORPORAL (%)</strong></p>
-                    <p>{measurement.bodyFatPercentage} %</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>GRASA VISCERAL (%)</strong></p>
-                    <p>{measurement.visceralFatPercentage} %</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>TALLA DE PECHO (cm)</strong></p>
-                    <p>{measurement.chestSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>MEDIDA DE ESPALDA (cm)</strong></p>
-                    <p>{measurement.backSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>MEDIDA DE CADERA (cm)</strong></p>
-                    <p>{measurement.hipSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>CINTURA (cm)</strong></p>
-                    <p>{measurement.waistSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PIERNA IZQUIERDA (cm)</strong></p>
-                    <p>{measurement.leftLegSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PIERNA DERECHA (cm)</strong></p>
-                    <p>{measurement.rightLegSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PANTORRILLA IZQUIERDA (cm)</strong></p>
-                    <p>{measurement.leftCalfSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>PANTORRILLA DERECHA (cm)</strong></p>
-                    <p>{measurement.rightCalfSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>ANTEBRAZO IZQUIERDA(cm)</strong></p>
-                    <p>{measurement.leftForeArmSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>ANTEBRAZO DERECHA (cm)</strong></p>
-                    <p>{measurement.rightForeArmSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>BRAZO IZQUIERDA(cm)</strong></p>
-                    <p>{measurement.leftArmSize}</p>
-                </div>
-
-                <div className="flex flex-col gap-2 text-lg">
-                    <p><strong>BRAZO DERECHA(cm)</strong></p>
-                    <p>{measurement.rightArmSize}</p>
-                </div>
-            </div>
-        </div>
+      <section className="w-full max-w-5xl mx-auto px-4 py-10 flex items-center justify-center">
+        <p className="text-gray-500 text-sm sm:text-base text-center">
+          No hay una medición seleccionada para mostrar.
+        </p>
+      </section>
     );
+  }
+
+  const measurement = measurements.find(
+    (m) => m.idMeasurement === activeEditingId
+  );
+
+  if (!measurement) {
+    return (
+      <section className="w-full max-w-5xl mx-auto px-4 py-10 flex items-center justify-center">
+        <p className="text-gray-500 text-sm sm:text-base text-center">
+          No se encontró la información de la medición seleccionada.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8">
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {[
+          ["Fecha", formatDateFromString(measurement.measurementDate)],
+          ["Peso", `${measurement.weight} kg`],
+          ["Altura", `${measurement.height} cm`],
+          ["Músculo", `${measurement.muscleMass} %`],
+        ].map(([label, value]) => (
+          <div
+            key={label}
+            className="bg-white rounded-xl shadow-sm border p-4 flex flex-col"
+          >
+            <span className="text-[11px] uppercase font-semibold text-gray-500">
+              {label}
+            </span>
+            <span className="text-lg font-semibold text-gray-900 mt-1">
+              {value}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <h2 className="text-yellow font-black text-xl uppercase mb-4">
+          Medidas Corporales
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            ["Grasa corporal", measurement.bodyFatPercentage + " %"],
+            ["Grasa visceral", measurement.visceralFatPercentage + " %"],
+            ["Pecho", measurement.chestSize + " cm"],
+            ["Espalda", measurement.backSize + " cm"],
+            ["Cadera", measurement.hipSize + " cm"],
+            ["Cintura", measurement.waistSize + " cm"],
+            ["Pierna izquierda", measurement.leftLegSize + " cm"],
+            ["Pierna derecha", measurement.rightLegSize + " cm"],
+            ["Pantorrilla izquierda", measurement.leftCalfSize + " cm"],
+            ["Pantorrilla derecha", measurement.rightCalfSize + " cm"],
+            ["Antebrazo izquierdo", measurement.leftForeArmSize + " cm"],
+            ["Antebrazo derecho", measurement.rightForeArmSize + " cm"],
+            ["Brazo izquierdo", measurement.leftArmSize + " cm"],
+            ["Brazo derecho", measurement.rightArmSize + " cm"],
+          ].map(([label, value]) => (
+            <div
+              key={label}
+              className="border rounded-lg p-3 flex flex-col bg-gray-50"
+            >
+              <span className="text-[11px] uppercase font-semibold text-gray-500">
+                {label}
+              </span>
+              <span className="text-base font-medium text-gray-900 mt-1">
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default DataInfo;

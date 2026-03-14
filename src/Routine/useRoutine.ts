@@ -4,21 +4,23 @@ import { useRoutineStore } from "./Store";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import { useNavigate } from "react-router";
-import { exportToPDF } from "../shared/utils/pdf";
-import { exportToExcel } from "../shared/utils/excel";
+import { exportToPDFRutinas } from "../shared/utils/pdfRutinas";
+import { exportToExcelRutinas } from "../shared/utils/excelRutina";
 import { mapRoutineToDTO } from '../shared/types/mapper';
 import { useState } from 'react';
 
 export const useRoutine = () => {
     const navigate = useNavigate();
     const [refreshKey, setRefreshKey] = useState(0);
+
     const { 
         routines,
         currentRoutine,
         fetchRoutines, 
         deleteRoutine, 
         updateRoutine,
-        getRoutineById
+        getRoutineById,
+        duplicateRoutine
     } = useRoutineStore();
 
     const { exercise: allExercises } = useCommonDataStore();
@@ -38,16 +40,10 @@ export const useRoutine = () => {
         });
 
         if (result.isConfirmed) {
-            const loggedUser = getAuthUser();
-            if (!loggedUser?.idUser) {
-                console.error("No user ID available");
-                return;
-            }
-            
             const response = await deleteRoutine(idRoutine);
             
             if (response?.ok) {
-                await fetchRoutines(); // Asegura que las rutinas se actualicen
+                await fetchRoutines();
                 await Swal.fire({
                     title: 'Rutina eliminada',
                     text: `Ha eliminado "${name}"`,
@@ -63,7 +59,7 @@ export const useRoutine = () => {
             if (response?.logout) {
                 setAuthHeader(null);
                 setAuthUser(null);
-                navigate('/login', {replace: true});
+                navigate('/login', { replace: true });
             }
         } 
     };
@@ -73,18 +69,13 @@ export const useRoutine = () => {
         if (!loggedUser?.idUser) return;
 
         const reqRoutine = {
-            ...routine, 
-            name: routine.name,
-            difficultyRoutine: {
-                name: routine.difficultyRoutine.name,
-                idDifficultyRoutine: routine.difficultyRoutine.idDifficultyRoutine
-            },
+            ...routine,
             paramLoggedIdUser: loggedUser.idUser
         };
 
-        const mappedReqRoutine = mapRoutineToDTO(reqRoutine as Routine)
-            
-        await Swal.fire({
+        const mappedReqRoutine = mapRoutineToDTO(reqRoutine as Routine);
+
+        const result = await Swal.fire({
             title: '¿Desea restaurar la rutina?',
             text: `Estaría restaurando "${routine.name}"`,
             icon: 'question',
@@ -95,74 +86,173 @@ export const useRoutine = () => {
             confirmButtonColor: '#CFAD04',
             width: 500,
             reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const response = await updateRoutine(mappedReqRoutine);
-                if (response?.ok) {
-                    await Swal.fire({
-                        title: 'Rutina restaurada',
-                        text: `Ha restaurado "${routine.name}"`,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        timer: 3000,
-                        timerProgressBar: true,
-                        width: 500,
-                        confirmButtonColor: '#CFAD04'
-                    });
-                    await fetchRoutines();
-                }
-                if (response?.logout) {
-                    setAuthHeader(null);
-                    setAuthUser(null);
-                    navigate('/login', {replace: true});
-                }
-            } 
         });
+
+        if (result.isConfirmed) {
+            const response = await updateRoutine(mappedReqRoutine);
+
+            if (response?.ok) {
+                await fetchRoutines();
+                await Swal.fire({
+                    title: 'Rutina restaurada',
+                    text: `Ha restaurado "${routine.name}"`,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    width: 500,
+                    confirmButtonColor: '#CFAD04'
+                });
+            }
+
+            if (response?.logout) {
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', { replace: true });
+            }
+        } 
+    };
+
+    const handleDuplicate = async ({ idRoutine, name }: Routine) => {
+        const result = await Swal.fire({
+            title: '¿Desea duplicar la rutina?',
+            text: `Se creará una copia de "${name}"`,
+            icon: 'question',
+            showCancelButton: true,
+            cancelButtonText: "Cancelar",
+            cancelButtonColor: '#bebdbd',
+            confirmButtonText: 'Duplicar',
+            confirmButtonColor: '#CFAD04',
+            width: 500,
+            reverseButtons: true
+        });
+
+        if (result.isConfirmed) {
+            const response = await duplicateRoutine(idRoutine);
+            
+            if (response?.ok) {
+                await fetchRoutines();
+                await Swal.fire({
+                    title: 'Rutina duplicada',
+                    text: `Se ha creado una copia de "${name}"`,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    width: 500,
+                    confirmButtonColor: '#CFAD04'
+                });
+            } else {
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo duplicar la rutina',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#d33'
+                });
+            }
+
+            if (response?.logout) {
+                setAuthHeader(null);
+                setAuthUser(null);
+                navigate('/login', { replace: true });
+            }
+        } 
     };
 
     const getExerciseDetails = (ex: RoutineExerciseDTO) => {
         const globalExercise = allExercises.find(e => e.idExercise === ex.idExercise);
+
         return {
             name: globalExercise?.name || `Ejercicio #${ex.idExercise}`,
             series: ex.series || 0,
             repetitions: ex.repetitions || 0,
             note: ex.note || "Sin nota",
-            category: globalExercise?.exerciseCategory?.name || "Sin categoría",
+            category: globalExercise?.exerciseCategory?.name || "Otros",
         };
     };
 
     const handleExportRoutine = async () => {
         try {
-            
-            if (!currentRoutine) {
-                throw new Error('Rutina no encontrada');
-            }
+            if (!currentRoutine) throw new Error("Rutina no encontrada");
 
-            const exerciseHeaders = ["#", "Ejercicio", "Categoría", "Series", "Repeticiones", "Nota"];
-            const exerciseRows = currentRoutine.exercises?.map((ex, index) => {
-                const details = getExerciseDetails(ex);
-                return [
-                    (index + 1).toString(),
-                    details.name,
-                    details.category,
-                    details.series.toString(),
-                    details.repetitions.toString(),
-                    details.note
-                ];
-            }) || [];
+            const exerciseHeaders = [
+                "Día",
+                "Categoría",
+                "Paso",
+                "Ejercicio",
+                "Series",
+                "Repeticiones",
+                "Indicaciones"
+            ];
+
+            // Agrupar ejercicios por día
+            const exercisesByDay = currentRoutine.exercises?.reduce((acc, ex) => {
+                const day = ex.dayNumber || 1;
+                if (!acc[day]) acc[day] = [];
+                acc[day].push(ex);
+                return acc;
+            }, {} as Record<number, RoutineExerciseDTO[]>) || {};
+
+            // Ordenar ejercicios dentro de cada día por categoryOrder
+            Object.keys(exercisesByDay).forEach((day) => {
+                exercisesByDay[Number(day)].sort((a, b) => {
+                    return (a.categoryOrder || 0) - (b.categoryOrder || 0);
+                });
+            });
+
+            const days = Object.keys(exercisesByDay)
+                .map(Number)
+                .sort((a, b) => a - b);
+
+            const exerciseRows: string[][] = [];
+            
+            days.forEach((day) => {
+                // Agrupar ejercicios del día por categoría manteniendo el orden de categoryOrder
+                const exercisesByCategory = exercisesByDay[day].reduce((acc, ex) => {
+                    const details = getExerciseDetails(ex);
+                    const category = details.category;
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push({ exercise: ex, details });
+                    return acc;
+                }, {} as Record<string, Array<{ exercise: RoutineExerciseDTO; details: ReturnType<typeof getExerciseDetails> }>>);
+
+                // Mantener el orden de aparición de las categorías según categoryOrder, no alfabético
+                const categories = Array.from(new Set(
+                    exercisesByDay[day].map(ex => getExerciseDetails(ex).category)
+                ));
+
+                categories.forEach((category) => {
+                    let stepCounter = 1;
+                    exercisesByCategory[category].forEach(({ details }) => {
+                        exerciseRows.push([
+                            `Día ${day}`,
+                            category,
+                            `Paso ${stepCounter++}`,
+                            details.name,
+                            `${details.series}`,
+                            `${details.repetitions}`,
+                            details.note && details.note !== "Sin nota"
+                                ? details.note
+                                : ""
+                        ]);
+                    });
+                });
+            });
 
             return {
-                exportToPDF: () => exportToPDF(
+                exportToPDF: () => exportToPDFRutinas(
                     `Rutina ${currentRoutine.name}`,
                     exerciseHeaders,
                     exerciseRows
                 ),
-                exportToExcel: () => exportToExcel(
+                exportToExcel: () => exportToExcelRutinas(
                     `Rutina ${currentRoutine.name}`,
                     exerciseHeaders,
                     exerciseRows
                 )
             };
+
         } catch (error) {
             Swal.fire({
                 title: 'Error',
@@ -179,8 +269,8 @@ export const useRoutine = () => {
     const pdfTableRows = routines.map((routine) => {
         const totals = routine.routineExercises?.reduce((acc, ex) => ({
             series: acc.series + (ex.series || 0),
-            reps: acc.reps + (ex.repetitions || 0),
-            nots: acc.nots + (ex.note || "")
+            reps: acc.reps + (Number(ex.repetitions) || 0),
+            nots: acc.nots + String(ex.note || "")
         }), { series: 0, reps: 0, nots: "" }) || { series: 0, reps: 0, nots: "" };
 
         return [
@@ -196,6 +286,7 @@ export const useRoutine = () => {
     return {
         handleDelete,
         handleRestore,
+        handleDuplicate,
         handleExportRoutine,
         pdfTableHeaders,
         pdfTableRows

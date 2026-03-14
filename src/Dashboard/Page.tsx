@@ -6,6 +6,7 @@ import { formatAmountToCRC } from "../shared/utils/format";
 import { useEconomicBalanceStore } from '../Balance/Store';
 import { useNavigate } from "react-router";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import MembershipCalendar from "./MembershipCalendar";
 
 function DashboardManagement() {
   const {
@@ -43,15 +44,25 @@ function DashboardManagement() {
     }));
 
     economicIncomes.forEach((income: any) => {
-      const monthIndex = new Date(income.registrationDate).getMonth();
-      monthlyData[monthIndex].income += income.amount;
-      monthlyData[monthIndex].balance += income.amount;
+      // Parsear fecha sin conversión de zona horaria
+      const dateStr = String(income.registrationDate);
+      const dateOnly = dateStr.split('T')[0];
+      const [year, month, day] = dateOnly.split('-').map(Number);
+      const incomeDate = new Date(year, month - 1, day);
+      
+      monthlyData[incomeDate.getMonth()].income += income.amount;
+      monthlyData[incomeDate.getMonth()].balance += income.amount;
     });
 
     economicExpenses.forEach((expense: any) => {
-      const monthIndex = new Date(expense.registrationDate).getMonth();
-      monthlyData[monthIndex].expense += expense.amount;
-      monthlyData[monthIndex].balance -= expense.amount;
+      // Parsear fecha sin conversión de zona horaria
+      const dateStr = String(expense.registrationDate);
+      const dateOnly = dateStr.split('T')[0];
+      const [year, month, day] = dateOnly.split('-').map(Number);
+      const expDate = new Date(year, month - 1, day);
+      
+      monthlyData[expDate.getMonth()].expense += expense.amount;
+      monthlyData[expDate.getMonth()].balance -= expense.amount;
     });
 
     return monthlyData;
@@ -61,9 +72,9 @@ function DashboardManagement() {
   const formatYAxis = (value: number) => `₡${value.toLocaleString('es-CR')}`;
 
   return (
-    <div className="bg-black min-h-screen text-gray-800 pl-0 md:pl-10 transition-all duration-100">
-      {/* Header */}
-      <header className="relative flex justify-center items-center py-4 mb-6 border-b border-gray-700 bg-black px-4 sm:px-6">
+<div className="bg-black min-h-screen text-gray-800 transition-all duration-100">
+        {/* Header */}
+      <header className="relative flex justify-center items-center py-4 mb-6 bg-black px-4 sm:px-6">
         <img src="/LogoBlack.jpg" alt="Logo de Force GYM" className="w-32 sm:w-40 h-auto" />
         <button
           className="p-2 rounded-full hover:bg-gray-800 absolute right-4"
@@ -184,6 +195,9 @@ function DashboardManagement() {
             </div>
           </div>
         </div>
+
+        {/* Calendario de Vencimientos */}
+        <MembershipCalendar />
       </main>
 
       {/* Notificaciones Modal */}

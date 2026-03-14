@@ -19,7 +19,7 @@ export const useMultiStepForm = () => {
     idUser: 0,
     idClientType: 0,
     registrationDate: new Date(),
-    expirationMembershipDate: new Date(),
+    expirationMembershipDate: null as any, // null hasta que se active una membresía
     phoneNumberContactEmergency: '',
     nameEmergencyContact: '',
     signatureImage: '',
@@ -43,13 +43,21 @@ export const useMultiStepForm = () => {
     phoneNumber: ''
   });
 
-  const formatToYYYYMMDD = (date: Date | string): string => {
+  const formatToYYYYMMDD = (date: Date | string | null): string => {
     if (!date) return '';
   
+    // Si ya es un string en formato YYYY-MM-DD, devolverlo directamente
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(date)) {
+      return date.split('T')[0]; // Toma solo la parte de la fecha si viene con tiempo
+    }
+    
+    // Si es un Date u otro string, parsearlo correctamente
     const d = typeof date === 'string' ? new Date(date) : date;
-    const year = d.getFullYear();
-    const month = (`0${d.getMonth() + 1}`).slice(-2);
-    const day = (`0${d.getDate()}`).slice(-2);
+    
+    // Usar getUTCFullYear, getUTCMonth, getUTCDate para evitar problemas de zona horaria
+    const year = d.getUTCFullYear();
+    const month = (`0${d.getUTCMonth() + 1}`).slice(-2);
+    const day = (`0${d.getUTCDate()}`).slice(-2);
     return `${year}-${month}-${day}`;
   };
   
@@ -63,8 +71,8 @@ export const useMultiStepForm = () => {
       idClient: activeClient.idClient,
       idUser: activeClient.user.idUser,
       idClientType: activeClient.clientType.idClientType,
-      registrationDate: formatToYYYYMMDD(activeClient.registrationDate),
-      expirationMembershipDate: activeClient.expirationMembershipDate,
+      registrationDate: formatToYYYYMMDD(activeClient.registrationDate) as any,
+      expirationMembershipDate: formatToYYYYMMDD(activeClient.expirationMembershipDate) as any,
       phoneNumberContactEmergency: activeClient.phoneNumberContactEmergency,
       nameEmergencyContact: activeClient.nameEmergencyContact,
       signatureImage: activeClient.signatureImage,
@@ -82,7 +90,7 @@ export const useMultiStepForm = () => {
       name: activeClient.person.name,
       firstLastName: activeClient.person.firstLastName,
       secondLastName: activeClient.person.secondLastName,
-      birthday: activeClient.person.birthday,
+      birthday: formatToYYYYMMDD(activeClient.person.birthday) as any,
       idGender: activeClient.person.gender.idGender,
       email: activeClient.person.email,
       phoneNumber: activeClient.person.phoneNumber
@@ -103,8 +111,32 @@ export const useMultiStepForm = () => {
     let action = '', result;
     const loggedUser = getAuthUser();
 
+    // Función para convertir fecha a formato ISO con hora al mediodía
+    const dateToISO = (dateValue: string | Date | null): string => {
+      if (!dateValue) return '';
+      
+      if (typeof dateValue === 'string') {
+        // Si es string YYYY-MM-DD, agregar hora del mediodía
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+          return `${dateValue}T12:00:00`;
+        }
+        // Si ya tiene hora, devolverlo tal cual
+        return dateValue;
+      }
+      
+      // Si es Date, convertir a ISO
+      return dateValue.toISOString();
+    };
+
     const reqClient: ClientDataForm & { paramLoggedIdUser?: number } = {
       ...data,
+      nameEmergencyContact: data.nameEmergencyContact?.trim() || 'no hay',
+      phoneNumberContactEmergency: data.phoneNumberContactEmergency?.trim() || '00000000',
+      registrationDate: dateToISO(data.registrationDate),
+      // Solo enviar expirationMembershipDate si se está editando un cliente existente
+      // Al crear nuevo cliente (activeEditingId === 0), no enviar el campo para que sea NULL en BD
+      ...(activeEditingId !== 0 && { expirationMembershipDate: dateToISO(data.expirationMembershipDate) }),
+      birthday: dateToISO(data.birthday),
       idUser: loggedUser?.idUser || 1,
       paramLoggedIdUser: loggedUser?.idUser
     };
@@ -143,16 +175,30 @@ export const useMultiStepForm = () => {
       setAuthUser(null);
       navigate('/login');
     } else {
-    await Swal.fire({
-      title: 'Error al guardar',
-      text: result.error || 'Ocurrió un error inesperado al guardar el cliente.',
-      icon: 'error',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#CFAD04',
-      timer: 3000,
-      timerProgressBar: true,
-      width: 500
-    });
+      await Swal.fire({
+        title: 'Error al guardar',
+        text: result.error || result.message || 'Ocurrió un error inesperado al guardar el cliente.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#CFAD04',
+        width: 500,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        backdrop: true,
+        customClass: {
+          container: 'swal-high-zindex'
+        },
+        didOpen: () => {
+          const container = Swal.getContainer();
+          if (container) {
+            container.style.zIndex = '99999';
+          }
+          const backdrop = document.querySelector('.swal2-container') as HTMLElement;
+          if (backdrop) {
+            backdrop.style.zIndex = '99999';
+          }
+        }
+      });
   }
   };
 

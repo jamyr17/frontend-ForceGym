@@ -3,93 +3,181 @@ import { useCommonDataStore } from "../shared/CommonDataStore";
 import { RoutineExerciseDTO } from "../shared/types";
 
 function DataInfo() {
-    const { routineToEdit } = useRoutineStore();
-    const { difficultyRoutines, exercise } = useCommonDataStore();
+  const { routineToEdit } = useRoutineStore();
+  const { difficultyRoutines, exercise } = useCommonDataStore();
 
-    if (!routineToEdit) return <div className="text-gray-500 p-4">No hay rutina seleccionada</div>;
-
-
-    const getExerciseDetails = (ex: RoutineExerciseDTO) => {
-        const globalExercise = exercise.find(e => e.idExercise === ex.idExercise);
-        
-        return {
-            name: globalExercise?.name || `Ejercicio #${ex.idExercise}`,
-            series: ex.series || 0,
-            repetitions: ex.repetitions || 0,
-            Note: ex.note || "Sin nota",
-        };
-    };
-
-    const getDifficultyName = (idDifficulty: number) => {
-        const difficulty = difficultyRoutines.find(d => d.idDifficultyRoutine === idDifficulty);
-        return difficulty?.name || `Dificultad #${idDifficulty}`;
-    };
-
-    const exercises = routineToEdit.exercises || [];
-
+  if (!routineToEdit) {
     return (
-        <div className="grid grid-cols-2 gap-6 p-4">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-4 underline">RUTINA</h1>
-
-                <div className="flex flex-col gap-4 text-lg">
-                    <div>
-                        <p className="font-semibold">Nombre:</p>
-                        <p className="text-gray-700">{routineToEdit.name}</p>
-                    </div>
-                    
-                    <div>
-                        <p className="font-semibold">Dificultad:</p>
-                        <p className="text-gray-700">
-                            {getDifficultyName(routineToEdit.difficultyRoutine.idDifficultyRoutine)}
-                        </p>
-                    </div>
-                    
-                    <div>
-                        <p className="font-semibold">Fecha:</p>
-                        <p className="text-gray-700">
-                            {new Date(routineToEdit.date).toLocaleDateString()}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-                <h1 className="text-yellow font-black text-2xl uppercase mb-4 underline">EJERCICIOS</h1>
-
-                {exercises.length > 0 ? (
-                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                        {exercises.map((ex, index) => {
-                            const details = getExerciseDetails(ex);
-                            
-                            return (
-                                <div key={`${ex.idExercise}-${index}`} className="bg-gray-50 p-3 rounded-md border">
-                                    <h4 className="font-medium text-lg text-gray-800">
-                                        {details.name}
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
-                                        <div>
-                                            <span className="font-medium">Series:</span> {details.series}
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Repeticiones:</span> {details.repetitions}
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Nota:</span> {details.Note}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div className="bg-gray-50 p-4 rounded-md border text-center">
-                        <p className="text-gray-500">No hay ejercicios en esta rutina</p>
-                    </div>
-                )}
-            </div>
-        </div>
+      <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 min-h-[260px] flex items-center justify-center">
+        <p className="text-gray-500 text-sm sm:text-base text-center">
+          No hay una rutina seleccionada para mostrar.
+        </p>
+      </section>
     );
+  }
+
+  const getExerciseDetails = (ex: RoutineExerciseDTO) => {
+    const globalExercise = exercise.find(
+      (e) => e.idExercise === ex.idExercise
+    );
+
+    return {
+      name: globalExercise?.name || `Ejercicio #${ex.idExercise}`,
+      series: ex.series || 0,
+      repetitions: ex.repetitions === 0 || ex.repetitions === '' ? 0 : ex.repetitions,
+      note: ex.note || "Sin nota",
+      category: globalExercise?.exerciseCategory?.name || "Otros",
+    };
+  };
+
+  const getDifficultyName = (idDifficulty: number) => {
+    const difficulty = difficultyRoutines.find(
+      (d) => d.idDifficultyRoutine === idDifficulty
+    );
+    return difficulty?.name || `Dificultad #${idDifficulty}`;
+  };
+
+  const exercises = routineToEdit.exercises || [];
+
+  // Agrupar ejercicios por día
+  const exercisesByDay = exercises.reduce((acc, ex) => {
+    const day = ex.dayNumber || 1;
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(ex);
+    return acc;
+  }, {} as Record<number, RoutineExerciseDTO[]>);
+
+  // Ordenar ejercicios dentro de cada día por categoryOrder
+  Object.keys(exercisesByDay).forEach((day) => {
+    exercisesByDay[Number(day)].sort((a, b) => {
+      return (a.categoryOrder || 0) - (b.categoryOrder || 0);
+    });
+  });
+
+  const days = Object.keys(exercisesByDay)
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  return (
+    <section
+      id="routine-print-section"
+      className="
+        w-full max-w-4xl mx-auto 
+        px-4 sm:px-6 py-6 
+        min-h-[260px]
+        flex flex-col gap-8
+      "
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 print:grid-cols-2">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-yellow font-black text-2xl uppercase underline">
+            Rutina
+          </h1>
+
+          <div className="flex flex-col text-sm sm:text-base">
+            <p className="font-semibold uppercase text-gray-600 text-xs">
+              Nombre
+            </p>
+            <p className="break-words">{routineToEdit.name}</p>
+          </div>
+
+          <div className="flex flex-col text-sm sm:text-base">
+            <p className="font-semibold uppercase text-gray-600 text-xs">
+              Dificultad
+            </p>
+            <p>
+              {getDifficultyName(
+                routineToEdit.difficultyRoutine.idDifficultyRoutine
+              )}
+            </p>
+          </div>
+
+          <div className="flex flex-col text-sm sm:text-base">
+            <p className="font-semibold uppercase text-gray-600 text-xs">
+              Fecha
+            </p>
+            <p>
+              {new Date(routineToEdit.date).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h1 className="text-yellow font-black text-2xl uppercase underline">
+            Ejercicios
+          </h1>
+
+          {exercises.length > 0 ? (
+            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              {days.map((day) => {
+                // Agrupar ejercicios del día por categoría manteniendo el orden de categoryOrder
+                const exercisesByCategory = exercisesByDay[day].reduce((acc, ex) => {
+                  const details = getExerciseDetails(ex);
+                  const category = details.category;
+                  if (!acc[category]) acc[category] = [];
+                  acc[category].push({ exercise: ex, details });
+                  return acc;
+                }, {} as Record<string, Array<{ exercise: RoutineExerciseDTO; details: ReturnType<typeof getExerciseDetails> }>>);
+
+                // Mantener el orden de aparición de las categorías según categoryOrder, no alfabético
+                const categories = Array.from(new Set(
+                  exercisesByDay[day].map(ex => getExerciseDetails(ex).category)
+                ));
+
+                return (
+                  <div key={day} className="space-y-3 border-l-4 border-yellow pl-3">
+                    <h3 className="font-bold text-yellow text-lg">
+                      Día {day}
+                    </h3>
+                    {categories.map((category) => (
+                      <div key={category} className="space-y-2">
+                        <h4 className="font-semibold text-gray-700 text-sm uppercase">
+                          {category}
+                        </h4>
+                        <div className="space-y-2 ml-3">
+                          {exercisesByCategory[category].map(({ exercise: ex, details }, index) => (
+                            <div
+                              key={`${ex.idExercise}-${index}`}
+                              className="bg-gray-50 p-3 rounded-md border flex flex-col gap-2"
+                            >
+                              <h5 className="font-medium text-sm sm:text-base text-gray-800 break-words">
+                                {details.name}
+                              </h5>
+
+                              <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                <div>
+                                  <span className="font-medium">Series:</span>{" "}
+                                  {details.series}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Repeticiones:</span>{" "}
+                                  {details.repetitions}
+                                </div>
+                                <div className="col-span-2">
+                                  <span className="font-medium">Nota:</span>{" "}
+                                  {details.note}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-gray-50 p-4 rounded-md border text-center">
+              <p className="text-gray-500 text-sm">
+                No hay ejercicios en esta rutina
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default DataInfo;

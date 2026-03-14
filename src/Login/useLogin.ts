@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import Swal from 'sweetalert2';
 import { postData } from "../shared/services/gym"
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication"
@@ -14,11 +14,16 @@ export const useLogin = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
-        setAuthHeader(null);
-        setAuthUser(null);
-    }, []);
+        // Solo limpiar si estamos realmente en la página de login
+        if (location.pathname === '/login' || location.pathname === '/') {
+            console.log('🔄 Limpiando sesión anterior en página de login');
+            setAuthHeader(null);
+            setAuthUser(null);
+        }
+    }, [location.pathname]);
 
     const handleLoginSubmit = async (e: React.FormEvent, refReCaptcha: React.RefObject<ReCAPTCHA>) => {
         e.preventDefault();
@@ -47,14 +52,19 @@ export const useLogin = () => {
             });
 
             if (response.data?.loggedUser) {
+                console.log('✅ Login exitoso, guardando token...');
                 setAuthHeader(response.data.loggedUser.token);
                 setAuthUser(response.data.loggedUser);
+                
+                // Verificar que se guardó correctamente
+                const savedToken = localStorage.getItem("token");
+                console.log('✔️ Token verificado en localStorage:', savedToken ? 'Guardado correctamente' : '❌ ERROR: No se guardó');
+                
                 navigate('/gestion/dashboard', { replace: true });
             } else {
                 throw new Error('Credenciales incorrectas');
             }
         } catch (error) {
-            // Cambio aqui 
             setCredencialUser({ username: '', password: '', recaptchaToken: '' });
             refReCaptcha.current?.reset();
             

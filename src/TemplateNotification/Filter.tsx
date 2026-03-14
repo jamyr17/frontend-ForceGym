@@ -5,13 +5,17 @@ import { useCommonDataStore } from "../shared/CommonDataStore";
 
 export function FilterButton() {
     const { filterByStatus, filterByNotificationType, showModalFilter } = useNotificationTemplateStore();
-    const filteringStyles = (
-        filterByStatus !== '' || filterByNotificationType !== 0
-    ) ? ' bg-white outline-none' : '';
+    
+    const hasFilters = filterByStatus !== '' || filterByNotificationType !== 0;
 
     return (
         <button
-            className={`flex items-center gap-4 text-lg uppercase outline-2 py-2 px-4 rounded-lg hover:cursor-pointer hover:bg-slate-300${filteringStyles}`}
+            className={`
+                flex items-center gap-3 text-base sm:text-lg uppercase py-2 px-4 
+                rounded-lg transition-all
+                ${hasFilters ? "bg-white border border-yellow text-yellow" : "bg-gray-200"}
+                hover:bg-gray-300
+            `}
             onClick={showModalFilter}
         >
             <IoFilterOutline />
@@ -41,7 +45,6 @@ export function FilterSelect() {
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Botón de limpiar todos */}
             <div className="flex justify-end pr-4">
                 <button
                     className="text-yellow border border-yellow px-3 py-1 rounded-md hover:bg-yellow hover:text-black transition-all"
@@ -51,7 +54,6 @@ export function FilterSelect() {
                 </button>
             </div>
 
-            {/* Filtro por Estado */}
             <div className="flex items-center gap-4">
                 <label htmlFor="status" className="w-20">Estado</label>
                 <select
@@ -81,7 +83,6 @@ export function FilterSelect() {
                 }
             </div>
     
-            {/* Filtro por Tipo de Notificación */}
             <div className="flex items-center gap-4">
                 <label htmlFor="notificationType" className="w-20">Tipo de Notificación</label>
                 <select

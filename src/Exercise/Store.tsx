@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Exercise, ExerciseDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 
 type ExerciseStore = {
@@ -44,6 +45,7 @@ type ExerciseStore = {
     showModalInfo: () => void;
     closeModalInfo: () => void;
     clearAllFilters: () => void;
+    resetEditing: () => void;
 };
 
 export const useExerciseStore = create<ExerciseStore>()(
@@ -58,7 +60,7 @@ export const useExerciseStore = create<ExerciseStore>()(
         totalRecords: 0,
         orderBy: "",
         directionOrderBy: "DESC",
-        searchType: 1,
+        searchType: 2,
         searchTerm: "",
         filterByStatus: "",
         filterByDifficulty: "",
@@ -111,19 +113,29 @@ export const useExerciseStore = create<ExerciseStore>()(
         getExerciseById: (id) => {
             set(() => ({ activeEditingId: id }));
         },
+        resetEditing: () => set(() => ({ activeEditingId: 0 })),
 
         addExercise: async (data) => {
             const result = await postData(`${import.meta.env.VITE_URL_API}exercise/add`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         updateExercise: async (data) => {
             const result = await putData(`${import.meta.env.VITE_URL_API}exercise/update/${data.idExercise}`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         deleteExercise: async (id, loggedIdUser) => {
             const result = await deleteData(`${import.meta.env.VITE_URL_API}exercise/delete/${id}?deletedByUser=${loggedIdUser}`, null);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
         

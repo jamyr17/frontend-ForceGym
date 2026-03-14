@@ -3,21 +3,25 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import Select from 'react-select';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { ExerciseCategory, RoutineDataForm, RoutineWithExercisesDTO } from "../shared/types";
 import ErrorForm from "../shared/components/ErrorForm";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 import useRoutineStore from "./Store";
 import { useCommonDataStore } from "../shared/CommonDataStore";
 import clsx from "clsx";
+import SearchSelect from "../shared/components/SearchSelect";
 
 type SelectedExercise = {
   idExercise: number;
   name: string;
   series: number;
-  repetitions: number;
+  repetitions: number | string;
   note: string;
   category: string;
   categoryId: number;
+  dayNumber: number;
+  categoryOrder?: number;
 };
 
 type ClientOption = {
@@ -56,57 +60,77 @@ function Form() {
   const [selectedExercises, setSelectedExercises] = useState<SelectedExercise[]>([]);
   const [selectedClients, setSelectedClients] = useState<ClientOption[]>([]);
   const [loading, setLoading] = useState(true);
-  const [draggedCategoryId, setDraggedCategoryId] = useState<number | null>(null);
-  const [dragOverCategoryId, setDragOverCategoryId] = useState<number | null>(null);
-  const [orderedCategories, setOrderedCategories] = useState(exerciseCategories);
-  const handleDragStart = (categoryId: number) => {
-    setDraggedCategoryId(categoryId);
-  };
+  const [orderedCategories, setOrderedCategories] = useState<ExerciseCategory[]>([]);
+  const [numberOfDays, setNumberOfDays] = useState<number>(1);
+  const [activeDay, setActiveDay] = useState<number>(1);
+  // Estado para trackear qué categorías están agregadas a cada día
+  const [categoriesByDay, setCategoriesByDay] = useState<Record<number, number[]>>({ 1: [] });
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, categoryId: number) => {
-    e.preventDefault();
-    if (categoryId !== dragOverCategoryId) {
-      setDragOverCategoryId(categoryId);
+  // Agregar categoría a un día específico
+  const addCategoryToDay = (dayNumber: number, categoryId: number) => {
+    const currentCategories = categoriesByDay[dayNumber] || [];
+    
+    // Verificar si la categoría ya está agregada
+    if (currentCategories.includes(categoryId)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Categoría ya agregada',
+        text: 'Esta categoría ya está en este día',
+        confirmButtonColor: '#CFAD04'
+      });
+      return;
+    }
+
+    // Agregar categoría al día
+    setCategoriesByDay(prev => ({
+      ...prev,
+      [dayNumber]: [...currentCategories, categoryId]
+    }));
+
+    // Agregar ejercicio vacío para esta categoría en este día
+    const category = exerciseCategories.find(c => c.idExerciseCategory === categoryId);
+    if (category) {
+      const categoryOrder = currentCategories.length; // El nuevo índice es la longitud actual
+      const newExercise: SelectedExercise = {
+        idExercise: 0,
+        name: "",
+        series: 0,
+        repetitions: 0,
+        note: "",
+        category: category.name,
+        categoryId: category.idExerciseCategory,
+        dayNumber: dayNumber,
+        categoryOrder: categoryOrder
+      };
+      
+      setSelectedExercises(prev => [...prev, newExercise]);
     }
   };
 
-  const handleDragLeave = () => {
-    setDragOverCategoryId(null);
-  };
-const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number) => {
-  e.preventDefault();
-  
-  if (!draggedCategoryId || draggedCategoryId === targetCategoryId) {
-    setDragOverCategoryId(null);
-    setDraggedCategoryId(null);
-    return;
-  }
+  // Remover categoría de un día específico
+  const removeCategoryFromDay = (dayNumber: number, categoryId: number) => {
+    Swal.fire({
+      title: '¿Eliminar categoría?',
+      text: 'Se eliminarán todos los ejercicios de esta categoría en este día',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#CFAD04'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Remover categoría del tracking
+        setCategoriesByDay(prev => ({
+          ...prev,
+          [dayNumber]: (prev[dayNumber] || []).filter(id => id !== categoryId)
+        }));
 
-    setOrderedCategories(prev => {
-      const draggedIndex = prev.findIndex(c => c.idExerciseCategory === draggedCategoryId);
-      const targetIndex = prev.findIndex(c => c.idExerciseCategory === targetCategoryId);
-      
-      if (draggedIndex === -1 || targetIndex === -1) return prev;
-      
-      const newCategories = [...prev];
-      const [removed] = newCategories.splice(draggedIndex, 1);
-      newCategories.splice(targetIndex, 0, removed);
-      
-      // Actualiza el categoryOrder de los ejercicios en tiempo real (opcional)
-      setSelectedExercises(currentExercises => 
-        currentExercises.map(ex => {
-          const newCategoryOrder = newCategories.findIndex(
-            cat => cat.idExerciseCategory === ex.categoryId
-          );
-          return newCategoryOrder >= 0 ? { ...ex, categoryOrder: newCategoryOrder } : ex;
-        })
-      );
-      
-      return newCategories;
+        // Remover ejercicios de esta categoría en este día
+        setSelectedExercises(prev =>
+          prev.filter(ex => !(ex.categoryId === categoryId && ex.dayNumber === dayNumber))
+        );
+      }
     });
-
-    setDragOverCategoryId(null);
-    setDraggedCategoryId(null);
   };
 
   useEffect(() => {
@@ -128,31 +152,13 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
     loadData();
   }, [fetchExerciseCategories, fetchAllClients, fetchRoutines]);
 
+  // Ya no agregamos categorías automáticamente
   useEffect(() => {
-    if (exerciseCategories.length > 0) {
-      const initialExercises = exerciseCategories.map(category => ({
-        idExercise: 0,
-        name: "",
-        series: 0,
-        repetitions: 0,
-        note: "",
-        category: category.name,
-        categoryId: category.idExerciseCategory
-      }));
-      setSelectedExercises(initialExercises);
-    }
-  }, [exerciseCategories]);
-  
-  useEffect(() => {
-    setOrderedCategories(exerciseCategories);
-  }, [exerciseCategories]);
-  useEffect(() => {
-    if (activeEditingId && !loading && routineToEdit) {
+    if (activeEditingId && !loading && routineToEdit && exercise.length > 0) {
       setValue('idRoutine', routineToEdit.idRoutine);
       setValue('name', routineToEdit.name);
       setValue('idDifficultyRoutine', routineToEdit.difficultyRoutine?.idDifficultyRoutine || 0);
 
-      // Cargar clientes asignados (código existente)
       if (routineToEdit.assignments?.length > 0) {
         const clientOptions = routineToEdit.assignments.map(assignment => {
           const client = allClients.find(c => c.value === assignment.idClient);
@@ -163,9 +169,8 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
         });
         setSelectedClients(clientOptions);
       }
-      
+
       if (routineToEdit.exercises?.length > 0 && exercise.length > 0) {
-        // 1. Obtener categorías USADAS en los ejercicios
         const usedCategories = routineToEdit.exercises.reduce((acc, ex) => {
           const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
           const category = exerciseData?.exerciseCategory;
@@ -185,7 +190,7 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
               })
               .map(ex => ex.categoryOrder)
           );
-          
+
           const minOrderB = Math.min(
             ...routineToEdit.exercises
               .filter(ex => {
@@ -198,14 +203,12 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
           return minOrderA - minOrderB;
         });
 
-        // 3. Añadir categorías NO USADAS al final
         const unusedCategories = exerciseCategories.filter(
           cat => !usedCategories.some(used => used.idExerciseCategory === cat.idExerciseCategory)
         );
 
         setOrderedCategories([...sortedUsedCategories, ...unusedCategories]);
 
-        // 4. Cargar ejercicios
         const loadedExercises = routineToEdit.exercises.map(ex => {
           const exerciseData = exercise.find(e => e.idExercise === ex.idExercise);
           const category = exerciseData?.exerciseCategory;
@@ -217,27 +220,52 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
             repetitions: ex.repetitions || 0,
             note: ex.note || "Sin nota",
             category: category?.name || "Sin categoría",
-            categoryId: category?.idExerciseCategory || 0
+            categoryId: category?.idExerciseCategory || 0,
+            dayNumber: ex.dayNumber || 1,
+            categoryOrder: ex.categoryOrder
           };
         });
 
-        // 5. Añadir placeholders para categorías vacías
-        const emptyCategories = unusedCategories.map(cat => ({
-          idExercise: 0,
-          name: "",
-          series: 0,
-          repetitions: 0,
-          note: "",
-          category: cat.name,
-          categoryId: cat.idExerciseCategory
-        }));
+        // Calcular el número máximo de días
+        const maxDay = Math.max(...loadedExercises.map(ex => ex.dayNumber), 1);
+        setNumberOfDays(maxDay);
 
-        setSelectedExercises([...loadedExercises, ...emptyCategories]);
+        // Configurar categoriesByDay basado en las categorías usadas por día, ordenadas por categoryOrder
+        const categoriesPerDay: Record<number, number[]> = {};
+        for (let day = 1; day <= maxDay; day++) {
+          const exercisesInDay = loadedExercises.filter(ex => ex.dayNumber === day);
+          
+          // Obtener las categorías únicas con su categoryOrder mínimo
+          const categoryOrderMap = new Map<number, number>();
+          exercisesInDay.forEach(ex => {
+            const currentMin = categoryOrderMap.get(ex.categoryId);
+            if (currentMin === undefined || ex.categoryOrder! < currentMin) {
+              categoryOrderMap.set(ex.categoryId, ex.categoryOrder!);
+            }
+          });
+          
+          // Ordenar las categorías por su categoryOrder
+          const sortedCategories = Array.from(categoryOrderMap.entries())
+            .sort((a, b) => a[1] - b[1])
+            .map(entry => entry[0]);
+          
+          categoriesPerDay[day] = sortedCategories;
+        }
+        setCategoriesByDay(categoriesPerDay);
+
+        // Ordenar las categorías según su uso
+        setOrderedCategories(sortedUsedCategories);
+
+        setSelectedExercises(loadedExercises);
       }
-    } else if (!activeEditingId && !loading) {
+    } else if (
+      !activeEditingId &&
+      !loading &&
+      routineToEdit === null
+    ) {
       resetForm();
     }
-  }, [activeEditingId, loading, routineToEdit, setValue, exercise]);
+  }, [activeEditingId, loading, routineToEdit, setValue, exercise, allClients]);
 
   const submitForm = async (data: RoutineDataForm) => {
     const loggedUser = getAuthUser();
@@ -265,15 +293,18 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
       return;
     }
 
-    const invalidExercises = validExercises.filter(ex =>
-      ex.series <= 0 || ex.repetitions <= 0
-    );
+    const invalidExercises = validExercises.filter(ex => {
+      const hasInvalidSeries = ex.series <= 0;
+      const hasInvalidReps = typeof ex.repetitions === 'number' ? ex.repetitions <= 0 : ex.repetitions.trim() === '';
+      return hasInvalidSeries || hasInvalidReps;
+    });
 
     if (invalidExercises.length > 0) {
       const htmlList = invalidExercises.map(ex => {
         const errors = [];
         if (ex.series <= 0) errors.push('Series');
-        if (ex.repetitions <= 0) errors.push('Repeticiones');
+        const hasInvalidReps = typeof ex.repetitions === 'number' ? ex.repetitions <= 0 : ex.repetitions.trim() === '';
+        if (hasInvalidReps) errors.push('Repeticiones');
         return `<strong>${ex.name}</strong>: ${errors.join(' y ')}`;
       }).join('<br>');
 
@@ -300,17 +331,20 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
       difficultyRoutine: {
         idDifficultyRoutine: data.idDifficultyRoutine
       },
-      exercises: orderedCategories.flatMap((category, index) => { // Usa 'index' en lugar de currentCategoryIndex
+      exercises: Object.entries(categoriesByDay).flatMap(([day, categoryIds]) => {
+        return categoryIds.flatMap((categoryId, categoryIndex) => {
           return selectedExercises
-            .filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise > 0)
+            .filter(ex => ex.categoryId === categoryId && ex.idExercise > 0 && ex.dayNumber === Number(day))
             .map(ex => ({
               idExercise: ex.idExercise,
               series: ex.series,
               repetitions: ex.repetitions,
               note: ex.note,
-              categoryOrder: index // Usamos el índice actual del flatMap
+              categoryOrder: categoryIndex,
+              dayNumber: Number(day)
             }));
-        }),
+        });
+      }),
       assignments: selectedClients.map(client => ({
         idClient: client.value,
         assignmentDate: new Date().toISOString()
@@ -318,7 +352,7 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
       isDeleted: 0,
       paramLoggedIdUser: loggedUser?.idUser
     };
-    
+
     try {
       let result;
       let action = '';
@@ -374,22 +408,10 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
       isDeleted: 0
     });
     setSelectedClients([]);
-    
-    // Resetear al orden original pero manteniendo cualquier orden previo
-    if (exerciseCategories.length > 0) {
-      setOrderedCategories([...exerciseCategories]); // Copia para evitar mutaciones
-      setSelectedExercises(
-        exerciseCategories.map(category => ({
-          idExercise: 0,
-          name: "",
-          series: 0,
-          repetitions: 0,
-          note: "",
-          category: category.name,
-          categoryId: category.idExerciseCategory
-        }))
-      );
-    }
+    setSelectedExercises([]);
+    setNumberOfDays(1);
+    setActiveDay(1);
+    setCategoriesByDay({ 1: [] });
   };
 
   const handleLogout = () => {
@@ -482,7 +504,9 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
         repetitions: 0,
         note: "",
         category: category.name,
-        categoryId: category.idExerciseCategory
+        categoryId: category.idExerciseCategory,
+        dayNumber: activeDay,
+        categoryOrder: (categoriesByDay[activeDay] || []).indexOf(categoryId)
       }
     ]);
   };
@@ -505,7 +529,44 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
   const getExercisesForCategory = (categoryId: number) => {
     return selectedExercises
       .map((ex, index) => ({ ...ex, index }))
-      .filter(ex => ex.categoryId === categoryId);
+      .filter(ex => ex.categoryId === categoryId && ex.dayNumber === activeDay);
+  };
+
+  const addDay = () => {
+    const newDayNumber = numberOfDays + 1;
+    setNumberOfDays(newDayNumber);
+    
+    // Inicializar categorías vacías para el nuevo día
+    setCategoriesByDay(prev => ({
+      ...prev,
+      [newDayNumber]: []
+    }));
+    
+    setActiveDay(newDayNumber);
+  };
+
+  const removeDay = (dayToRemove: number) => {
+    if (numberOfDays <= 1) return;
+    
+    // Eliminar todos los ejercicios del día
+    setSelectedExercises(prev => prev.filter(ex => ex.dayNumber !== dayToRemove));
+    
+    // Eliminar las categorías del día
+    setCategoriesByDay(prev => {
+      const newCategoriesByDay = { ...prev };
+      delete newCategoriesByDay[dayToRemove];
+      return newCategoriesByDay;
+    });
+    
+    // Actualizar el número de días
+    setNumberOfDays(numberOfDays - 1);
+    
+    // Si el día activo era el que se eliminó, cambiar al día 1
+    if (activeDay === dayToRemove) {
+      setActiveDay(1);
+    } else if (activeDay > dayToRemove) {
+      setActiveDay(activeDay - 1);
+    }
   };
 
   return (
@@ -521,22 +582,21 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
       <input id="idRoutine" type="hidden" {...register('idRoutine')} />
       <input id="idUser" type="hidden" {...register('idUser')} />
       <input id="isDeleted" type="hidden" {...register('isDeleted')} />
-
+      
       <div className="my-5">
-        <label htmlFor="clients" className="text-sm uppercase font-bold">
-          Clientes
-        </label>
-        <Select
+        <SearchSelect
           id="clients"
-          className="w-full"
+          label="Clientes"
           options={allClients}
           value={selectedClients}
-          onChange={(selectedOptions) => setSelectedClients(selectedOptions as ClientOption[])}
+          onChange={(selectedOptions) =>
+            setSelectedClients(selectedOptions as ClientOption[])
+          }
           isMulti
           placeholder="Seleccione los clientes..."
-          noOptionsMessage={() => "No hay clientes disponibles"}
           isDisabled={loading}
         />
+
         {selectedClients.length === 0 && (
           <ErrorForm>Debe seleccionar al menos un cliente</ErrorForm>
         )}
@@ -587,64 +647,235 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
         {errors.name && <ErrorForm>{errors.name.message}</ErrorForm>}
       </div>
 
-
-      {/* Ejercicios */}
+      {/* Tabs de días */}
       <div className="mb-8">
-        <h2 className="text-lg font-bold mb-4 text-yellow">Ejercicios</h2>
-        {orderedCategories.map((category) => {
-          const categoryExercises = getExercisesForCategory(category.idExerciseCategory);
-          const isDragged = draggedCategoryId === category.idExerciseCategory;
-          const isDragOver = dragOverCategoryId === category.idExerciseCategory;
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-yellow">Días de Entrenamiento</h2>
+          <button
+            type="button"
+            onClick={addDay}
+            className="bg-yellow text-black px-4 py-2 rounded hover:bg-amber-600 transition-colors text-sm font-semibold"
+            disabled={loading}
+          >
+            + Agregar Día
+          </button>
+        </div>
+        
+        <div className="flex gap-2 flex-wrap">
+          {Array.from({ length: numberOfDays }, (_, i) => i + 1).map(day => (
+            <div key={day} className="relative group">
+              <button
+                type="button"
+                onClick={() => setActiveDay(day)}
+                className={`px-6 py-3 rounded-t-lg font-semibold transition-all ${
+                  activeDay === day
+                    ? 'bg-yellow text-black'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+                disabled={loading}
+              >
+                Día {day}
+              </button>
+              {numberOfDays > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    Swal.fire({
+                      title: '¿Eliminar día?',
+                      text: `Se eliminarán todos los ejercicios del Día ${day}`,
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonText: 'Eliminar',
+                      cancelButtonText: 'Cancelar',
+                      confirmButtonColor: '#CFAD04'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        removeDay(day);
+                      }
+                    });
+                  }}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs hover:bg-red-600"
+                  disabled={loading}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
-          return (
-            <div
-              key={category.idExerciseCategory}
-              className={`mb-8 border rounded-lg p-4 w-full max-w-[1000px] mx-auto transition-all duration-200 ${
-                isDragged ? 'opacity-10 bg-gray-300' :
-                isDragOver ? 'border-yellow-500 border-2 bg-yellow-50' :
-                'border-gray-300 bg-gray-50'
-              }`}
-              draggable
-              onDragStart={() => handleDragStart(category.idExerciseCategory)}
-              onDragOver={(e) => handleDragOver(e, category.idExerciseCategory)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, category.idExerciseCategory)}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold text-yellow">Ejercicios - Día {activeDay}</h2>
+          
+          {/* Selector para agregar categorías */}
+          <div className="flex gap-2 items-center">
+            <select
+              className="p-2 border border-gray-300 rounded text-sm bg-white"
+              value=""
+              onChange={(e) => {
+                if (e.target.value) {
+                  addCategoryToDay(activeDay, Number(e.target.value));
+                  e.target.value = "";
+                }
+              }}
+              disabled={loading}
             >
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-md font-bold text-gray-700 flex items-center">
-                  <span className="mr-2 cursor-move">↕</span>
-                  {category.name}
-                </h3>
-              </div>
+              <option value="">+ Agregar Categoría</option>
+              {exerciseCategories
+                .filter(cat => !(categoriesByDay[activeDay] || []).includes(cat.idExerciseCategory))
+                .map(cat => (
+                  <option key={cat.idExerciseCategory} value={cat.idExerciseCategory}>
+                    {cat.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Mostrar solo las categorías agregadas a este día */}
+        {(categoriesByDay[activeDay] || []).length === 0 ? (
+          <div className="text-center py-8 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+            <p>No hay categorías agregadas a este día.</p>
+            <p className="text-sm mt-2">Usa el selector de arriba para agregar categorías.</p>
+          </div>
+        ) : (
+          (categoriesByDay[activeDay] || []).map((categoryId, index) => {
+            const category = exerciseCategories.find(c => c.idExerciseCategory === categoryId);
+            if (!category) return null;
+
+            const categoryExercises = getExercisesForCategory(category.idExerciseCategory);
+            const isFirst = index === 0;
+            const isLast = index === (categoriesByDay[activeDay] || []).length - 1;
+
+            return (
+              <div
+                key={category.idExerciseCategory}
+                className="mb-8 border rounded-lg p-4 w-full max-w-[1000px] mx-auto transition-all duration-200 border-gray-300 bg-gray-50"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-md font-bold text-gray-700 flex items-center">
+                    {category.name}
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentCategoriesInDay = categoriesByDay[activeDay] || [];
+                        const currentIndex = currentCategoriesInDay.indexOf(categoryId);
+                        if (currentIndex > 0) {
+                          const newCategories = [...currentCategoriesInDay];
+                          [newCategories[currentIndex], newCategories[currentIndex - 1]] = 
+                            [newCategories[currentIndex - 1], newCategories[currentIndex]];
+                          setCategoriesByDay(prev => ({
+                            ...prev,
+                            [activeDay]: newCategories
+                          }));
+                          
+                          // Actualizar categoryOrder en los ejercicios de este día
+                          setSelectedExercises(currentExercises =>
+                            currentExercises.map(ex => {
+                              if (ex.dayNumber === activeDay) {
+                                const newCategoryOrder = newCategories.indexOf(ex.categoryId);
+                                return newCategoryOrder >= 0 ? { ...ex, categoryOrder: newCategoryOrder } : ex;
+                              }
+                              return ex;
+                            })
+                          );
+                        }
+                      }}
+                      disabled={isFirst}
+                      className={`p-2 rounded transition-colors ${
+                        isFirst
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'bg-yellow hover:bg-yellow-600 text-white hover:shadow-md'
+                      }`}
+                      title="Subir categoría"
+                    >
+                      <FaChevronUp size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentCategoriesInDay = categoriesByDay[activeDay] || [];
+                        const currentIndex = currentCategoriesInDay.indexOf(categoryId);
+                        if (currentIndex < currentCategoriesInDay.length - 1) {
+                          const newCategories = [...currentCategoriesInDay];
+                          [newCategories[currentIndex], newCategories[currentIndex + 1]] = 
+                            [newCategories[currentIndex + 1], newCategories[currentIndex]];
+                          setCategoriesByDay(prev => ({
+                            ...prev,
+                            [activeDay]: newCategories
+                          }));
+                          
+                          // Actualizar categoryOrder en los ejercicios de este día
+                          setSelectedExercises(currentExercises =>
+                            currentExercises.map(ex => {
+                              if (ex.dayNumber === activeDay) {
+                                const newCategoryOrder = newCategories.indexOf(ex.categoryId);
+                                return newCategoryOrder >= 0 ? { ...ex, categoryOrder: newCategoryOrder } : ex;
+                              }
+                              return ex;
+                            })
+                          );
+                        }
+                      }}
+                      disabled={isLast}
+                      className={`p-2 rounded transition-colors ${
+                        isLast
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'bg-yellow hover:bg-yellow-600 text-white hover:shadow-md'
+                      }`}
+                      title="Bajar categoría"
+                    >
+                      <FaChevronDown size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeCategoryFromDay(activeDay, categoryId)}
+                      className="p-2 rounded bg-red-500 hover:bg-red-600 text-white transition-colors hover:shadow-md"
+                      title="Eliminar categoría"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
 
               {categoryExercises.map(({ index, ...ex }) => {
                 const exercisesForSelect = getAvailableExercises(category.idExerciseCategory, ex.idExercise);
                 
+                // Convertir ejercicios a formato de opciones para SearchSelect
+                const exerciseOptions = exercisesForSelect.map(opt => ({
+                  value: opt.idExercise,
+                  label: opt.name
+                }));
+                
+                // Valor actual del ejercicio seleccionado
+                const selectedExerciseOption = ex.idExercise > 0
+                  ? exerciseOptions.find(opt => opt.value === ex.idExercise) || null
+                  : null;
+
                 return (
                   <div key={index} className="mb-4">
                     <div className="flex flex-wrap items-end gap-4">
-                      <div className="flex-1 min-w-[200px]">
-                        <select
-                          className={clsx(
-                            "w-full p-2 rounded text-sm h-[38px] transition-colors duration-150",
-                            ex.idExercise > 0
-                              ? "border border-yellow-400 bg-yellow-50"
-                              : "border border-gray-300 bg-white"
-                          )}
-                          value={ex.idExercise}
-                          onChange={(e) => handleExerciseChange(index, Number(e.target.value))}
-                          disabled={loading}
-                        >
-                          <option value="0">Escoja un ejercicio</option>
-                          {exercisesForSelect.map(opt => (
-                            <option 
-                              key={opt.idExercise} 
-                              value={opt.idExercise}
-                            >
-                              {opt.name}
-                            </option>
-                          ))}
-                        </select>
+                      <div className={clsx(
+                        "flex-1 min-w-[200px]",
+                        ex.idExercise > 0 && "rounded border-2 border-yellow-400 bg-yellow-50 p-1"
+                      )}>
+                        <SearchSelect
+                          id={`exercise-${index}`}
+                          label="Ejercicio *"
+                          options={exerciseOptions}
+                          value={selectedExerciseOption}
+                          onChange={(selectedOption) => {
+                            const exerciseId = selectedOption ? (selectedOption as { value: number }).value : 0;
+                            handleExerciseChange(index, exerciseId);
+                          }}
+                          placeholder="Buscar ejercicio..."
+                          isDisabled={loading}
+                          isClearable={false}
+                        />
                       </div>
 
                       <div className="flex items-end gap-3">
@@ -655,8 +886,8 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                               type="number"
                               min="1"
                               className="w-full p-2 border border-gray-300 rounded text-center h-[38px]"
-                              value={ex.series || "0"}
-                              onChange={(e) => updateExerciseField(index, 'series', Math.max(1, Number(e.target.value)))}
+                              value={ex.series || ""}
+                              onChange={(e) => updateExerciseField(index, 'series', e.target.value === "" ? 0 : Number(e.target.value))}
                               disabled={loading}
                             />
                             {ex.idExercise > 0 && ex.series <= 0 && (
@@ -666,21 +897,27 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="flex flex-col w-[70px]">
                           <label className="text-xs text-gray-500 mb-1">Repeticiones</label>
                           <div className="relative">
                             <input
-                              type="number"
-                              min="1"
+                              type="text"
                               className="w-full p-2 border border-gray-300 rounded text-center h-[38px]"
-                              value={ex.repetitions || "0"}
-                              onChange={(e) => updateExerciseField(index, 'repetitions', Math.max(1, Number(e.target.value)))}
+                              value={ex.repetitions || ""}
+                              onChange={(e) => {
+                                const value = e.target.value.trim();
+                                // Permitir *, números o vacío
+                                if (value === '' || value === '*' || /^\d+$/.test(value)) {
+                                  updateExerciseField(index, 'repetitions', value === '' ? 0 : (value === '*' ? '*' : Number(value)));
+                                }
+                              }}
+                              placeholder="# o *"
                               disabled={loading}
                             />
-                            {ex.idExercise > 0 && ex.repetitions <= 0 && (
+                            {ex.idExercise > 0 && (typeof ex.repetitions === 'number' ? ex.repetitions <= 0 : ex.repetitions === '') && (
                               <span className="absolute -bottom-5 left-0 right-0 text-xs text-red-500 text-center whitespace-nowrap">
-                                Mínimo 1
+                                Requerido
                               </span>
                             )}
                           </div>
@@ -709,15 +946,15 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                             onClick={() => removeExercise(index)}
                             disabled={loading}
                           >
-                            <span 
+                            <span
                               className={
-                                loading 
-                                  ? "text-gray-400 text-xl" 
+                                loading
+                                  ? "text-gray-400 text-xl"
                                   : "text-yellow-500 hover:text-yellow-700 text-xl font-bold"
                               }
-                              style={{ 
+                              style={{
                                 fontFamily: 'Arial, sans-serif',
-                                fontSize: '1.5rem',  // Tamaño personalizado
+                                fontSize: '1.5rem',  
                                 lineHeight: '1'
                               }}
                             >
@@ -731,23 +968,24 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
                 );
               })}
 
-              {getAvailableExercises(category.idExerciseCategory).length > 0 && 
-                getAvailableExercises(category.idExerciseCategory).length > 
-                  selectedExercises.filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise === 0).length && (
-                <div className="flex justify-start mt-2">
-                  <button
-                    type="button"
-                    className="text-gray-500 hover:text-yellow-600 text-sm flex items-center"
-                    onClick={() => addNewExercise(category.idExerciseCategory)}
-                    disabled={loading}
-                  >
-                    <span className="mr-1 text-lg">+</span> Agregar ejercicio
-                  </button>
-                </div>
-              )}
+              {getAvailableExercises(category.idExerciseCategory).length > 0 &&
+                getAvailableExercises(category.idExerciseCategory).length >
+                selectedExercises.filter(ex => ex.categoryId === category.idExerciseCategory && ex.idExercise === 0).length && (
+                  <div className="flex justify-start mt-2">
+                    <button
+                      type="button"
+                      className="text-gray-500 hover:text-yellow-600 text-sm flex items-center"
+                      onClick={() => addNewExercise(category.idExerciseCategory)}
+                      disabled={loading}
+                    >
+                      <span className="mr-1 text-lg">+</span> Agregar ejercicio
+                    </button>
+                  </div>
+                )}
             </div>
           );
-        })}
+        })
+        )}
       </div>
 
       <input
@@ -755,8 +993,8 @@ const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCategoryId: number
         className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors disabled:opacity-50"
         value={activeEditingId ? 'Actualizar' : 'Crear'}
         disabled={
-          loading || 
-          selectedClients.length === 0 || 
+          loading ||
+          selectedClients.length === 0 ||
           selectedExercises.filter(ex => ex.idExercise > 0).length === 0
         }
       />

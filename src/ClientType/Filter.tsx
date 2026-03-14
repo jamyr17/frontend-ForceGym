@@ -3,13 +3,19 @@ import useClientTypeStore from "./Store";
 import { MdOutlineCancel } from "react-icons/md";
 
 export function FilterButton() {
-    const { filterByStatus, showModalFilter } = useClientTypeStore()
-    const filteringStyles = filterByStatus !== '' && ' bg-white outline-none'
+    const { filterByStatus, showModalFilter } = useClientTypeStore();
+    
+    const hasFilters = filterByStatus !== "";
 
     return (
         <button
-            className={"flex items-center gap-4 text-lg uppercase outline-2 py-2 px-4 rounded-lg hover:cursor-pointer hover:bg-slate-300" + filteringStyles}
-            onClick={() => showModalFilter()}
+            className={`
+                flex items-center gap-3 text-base sm:text-lg uppercase py-2 px-4 
+                rounded-lg transition-all
+                ${hasFilters ? "bg-white border border-yellow text-yellow" : "bg-gray-200"}
+                hover:bg-gray-300
+            `}
+            onClick={showModalFilter}
         >
             <IoFilterOutline />
             <span>Filtrar</span>
@@ -27,7 +33,6 @@ export function FilterSelect() {
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Filtro por Estado */}
             <div className="flex items-center gap-4">
                 <label htmlFor="status" className="w-20">Estado</label>
                 <select

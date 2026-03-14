@@ -2,12 +2,14 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Category, CategoryDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
+import { useCommonDataStore } from "../shared/CommonDataStore";
 
 type CategoryStore = {
     categories: Category[];
     modalForm: boolean;
     modalFilter: boolean;
     modalInfo: boolean;
+    modalFileTypeDecision: boolean;
     activeEditingId: Category["idCategory"];
     size: number;
     page: number;
@@ -17,6 +19,7 @@ type CategoryStore = {
     searchType: number;
     searchTerm: string;
     filterByStatus: string;
+    isLoading: boolean;
 
     fetchCategories: () => Promise<any>;
     getCategoryById: (id: number) => void;
@@ -28,6 +31,7 @@ type CategoryStore = {
     changePage: (newPage: number) => void;
     changeOrderBy: (newOrderBy: string) => void;
     changeDirectionOrderBy: (newDirectionOrderBy: string) => void;
+    setOrder: (newOrderBy: string, newDirectionOrderBy: string) => void;
     changeSearchType: (newSearchType: number) => void;
     changeSearchTerm: (newSearchTerm: string) => void;
     changeFilterByStatus: (newFilterByStatus: string) => void;
@@ -38,15 +42,19 @@ type CategoryStore = {
     closeModalFilter: () => void;
     showModalInfo: () => void;
     closeModalInfo: () => void;
+    showModalFileType: () => void;
+    closeModalFileType: () => void;
     clearAllFilters: () => void;
+    resetEditing: () => void;
 };
 
 export const useCategoryStore = create<CategoryStore>()(
-    devtools((set) => ({
+    devtools((set, get) => ({
         categories: [],
         modalForm: false,
         modalFilter: false,
         modalInfo: false,
+        modalFileTypeDecision: false,
         activeEditingId: 0,
         size: 5,
         page: 1,
@@ -56,76 +64,181 @@ export const useCategoryStore = create<CategoryStore>()(
         searchType: 1,
         searchTerm: "",
         filterByStatus: "",
-
-        clearAllFilters: () => set(() => ({
-            searchTerm: "",
-            filterByStatus: "",
-        })),
-
         fetchCategories: async () => {
-            const state = useCategoryStore.getState();
-            let newPage = state.page;
-            let filters = `&searchType=${state.searchType}`;
+            set({ isLoading: true });
+            try {
+                const state = get();
+                let newPage = state.page;
+                
+                const params = new URLSearchParams({
+                    size: state.size.toString(),
+                    page: state.page.toString(),
+                    searchType: state.searchType.toString(),
+                });
 
-            if (state.searchTerm !== "") {
-                filters += `&searchTerm=${state.searchTerm}`;
+                if (state.searchTerm) {
+                    params.append('searchTerm', state.searchTerm);
+                }
+                if (state.orderBy) {
+                    params.append('orderBy', state.orderBy);
+                    params.append('directionOrderBy', state.directionOrderBy);
+                }
+                if (state.filterByStatus) {
+                    params.append('filterByStatus', state.filterByStatus);
+                }
+
+                const result = await getData(
+                    `${import.meta.env.VITE_URL_API}category/list?${params.toString()}`
+                );
+
+                if (result.ok) {
+                    const allCategories = result.data?.categories || [];
+                    const totalRecords = result.data?.totalRecords || allCategories.length;
+                    const totalPages = Math.max(1, Math.ceil(totalRecords / state.size));
+                    
+                    if (state.page > totalPages) {
+                        newPage = state.page - 1;
+                    }
+                    
+                    let sortedCategories = allCategories.slice();
+                    if (state.orderBy) {
+                        const key = state.orderBy as keyof typeof allCategories[0];
+                        sortedCategories.sort((a: any, b: any) => {
+                            const va = a[key];
+                            const vb = b[key];
+                            if (typeof va === 'string' && typeof vb === 'string') {
+                                return state.directionOrderBy === 'DESC' ? vb.localeCompare(va) : va.localeCompare(vb);
+                            }
+                            if (typeof va === 'number' && typeof vb === 'number') {
+                                return state.directionOrderBy === 'DESC' ? vb - va : va - vb;
+                            }
+                            return state.directionOrderBy === 'DESC'
+                                ? String(vb).localeCompare(String(va))
+                                : String(va).localeCompare(String(vb));
+                        });
+                    }
+
+                    const startIndex = (newPage - 1) * state.size;
+                    const endIndex = startIndex + state.size;
+                    const paginatedCategories = sortedCategories.slice(startIndex, endIndex);
+                    
+                    set({
+                        categories: paginatedCategories,
+                        totalRecords: totalRecords,
+                        page: newPage,
+                        isLoading: false
+                    });
+                } else {
+                    set({ isLoading: false });
+                }
+
+                return result;
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                set({ isLoading: false });
+                return { ok: false, logout: false };
             }
-            if (state.orderBy !== "") {
-                filters += `&orderBy=${state.orderBy}&directionOrderBy=${state.directionOrderBy}`;
-            }
-            if (state.filterByStatus !== "") {
-                filters += `&filterByStatus=${state.filterByStatus}`;
-            }
-
-            const result = await getData(
-                `${import.meta.env.VITE_URL_API}category/list?size=${state.size}&page=${state.page}${filters}`
-            );
-
-            const totalPages = Math.max(1, Math.ceil(result.data.totalRecords / state.size));
-            if (state.page > totalPages) {
-                newPage = state.page-1; 
-            }
-
-            const categories = result.data?.categories ?? [];
-            const totalRecords = result.data?.totalRecords ?? 0;
-
-            set({ categories, totalRecords, page: newPage });
-            return result;
         },
 
         getCategoryById: (id) => {
-            set(() => ({ activeEditingId: id }));
+            set({ activeEditingId: id });
         },
 
         addCategory: async (data) => {
             const result = await postData(`${import.meta.env.VITE_URL_API}category/add`, data);
+            if (result.ok) {
+                get().fetchCategories();
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         updateCategory: async (data) => {
             const result = await putData(`${import.meta.env.VITE_URL_API}category/update`, data);
+            if (result.ok) {
+                get().fetchCategories();
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         deleteCategory: async (id, loggedIdUser) => {
             const result = await deleteData(`${import.meta.env.VITE_URL_API}category/delete/${id}`, loggedIdUser);
+            if (result.ok) {
+                const state = get();
+                await state.fetchCategories();
+                
+                if (state.categories.length === 0 && state.page > 1) {
+                    set({ page: state.page - 1 });
+                    get().fetchCategories(); 
+                }
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
-        changeSize: (newSize) => set(() => ({ size: newSize })),
-        changePage: (newPage) => set(() => ({ page: newPage })),
-        changeOrderBy: (newOrderBy) => set(() => ({ orderBy: newOrderBy })),
-        changeDirectionOrderBy: (newDirectionOrderBy) => set(() => ({ directionOrderBy: newDirectionOrderBy })),
-        changeSearchType: (newSearchType) => set(() => ({ searchType: newSearchType })),
-        changeSearchTerm: (newSearchTerm) => set(() => ({ searchTerm: newSearchTerm })),
-        changeFilterByStatus: (newFilterByStatus) => set(() => ({ filterByStatus: newFilterByStatus })),
+        changeSize: (newSize) => {
+            set({ 
+                size: newSize, 
+                page: 1 
+            });
+        },
+        
+        changePage: (newPage) => {
+            set({ page: newPage });
+        },
+        
+        changeOrderBy: (newOrderBy) => {
+            set({ 
+                orderBy: newOrderBy,
+                page: 1 
+            });
+        },
+        
+        changeDirectionOrderBy: (newDirectionOrderBy) => {
+            set({ directionOrderBy: newDirectionOrderBy });
+        },
+        setOrder: (newOrderBy, newDirectionOrderBy) => {
+            set({ orderBy: newOrderBy, directionOrderBy: newDirectionOrderBy, page: 1 });
+        },
+        
+        changeSearchType: (newSearchType) => {
+            set({ 
+                searchType: newSearchType,
+                page: 1 
+            });
+        },
+        
+        changeSearchTerm: (newSearchTerm) => {
+            set({ 
+                searchTerm: newSearchTerm,
+                page: 1 
+            });
+        },
+        
+        changeFilterByStatus: (newFilterByStatus) => {
+            set({ 
+                filterByStatus: newFilterByStatus,
+                page: 1 
+            });
+        },
 
-        showModalForm: () => set(() => ({ modalForm: true })),
-        closeModalForm: () => set(() => ({ modalForm: false })),
-        showModalFilter: () => set(() => ({ modalFilter: true })),
-        closeModalFilter: () => set(() => ({ modalFilter: false })),
-        showModalInfo: () => set(() => ({ modalInfo: true })),
-        closeModalInfo: () => set(() => ({ modalInfo: false })),
+        showModalForm: () => set({ modalForm: true }),
+        closeModalForm: () => set({ modalForm: false }),
+        showModalFilter: () => set({ modalFilter: true }),
+        closeModalFilter: () => set({ modalFilter: false }),
+        showModalInfo: () => set({ modalInfo: true }),
+        closeModalInfo: () => set({ modalInfo: false }),
+        showModalFileType: () => set({ modalFileTypeDecision: true }),
+        closeModalFileType: () => set({ modalFileTypeDecision: false }),
+        
+        resetEditing: () => set({ activeEditingId: 0 }),
+
+        clearAllFilters: () => set({
+            searchTerm: "",
+            filterByStatus: "",
+            page: 1
+        }),
     }))
 );
 

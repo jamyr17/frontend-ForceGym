@@ -1,615 +1,433 @@
 import { useForm } from "react-hook-form";
 import Swal from 'sweetalert2';
 import { MeasurementDataForm } from "../shared/types";
+import { mapMeasurementToDataForm } from "../shared/types/mapper";
 import ErrorForm from "../shared/components/ErrorForm";
 import useMeasurementStore from "./Store";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { formatDate } from "../shared/utils/format";
 import { getAuthUser, setAuthHeader, setAuthUser } from "../shared/utils/authentication";
 
 const MAXDATE = new Date().toUTCString()
 
 function Form() {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const idClient = location.state?.idClient;
-    
-    const { 
-        register, 
-        handleSubmit, 
-        setValue, 
-        formState: { errors }, 
-        reset 
-    } = useForm<MeasurementDataForm>({
-        defaultValues: {
-            idClient: idClient || undefined,
-            isDeleted: 0
-        }
-    });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const idClient = location.state?.idClient;
 
-    const { 
-        measurements,
-        activeEditingId, 
-        fetchMeasurements, 
-        addMeasurement, 
-        updateMeasurement, 
-        closeModalForm 
-    } = useMeasurementStore();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<MeasurementDataForm>({
+    defaultValues: {
+      idClient: idClient || undefined,
+      isDeleted: 0,
+    },
+  });
 
-    const submitForm = async (data: MeasurementDataForm) => {
+  const {
+    measurements,
+    activeEditingId,
+    fetchMeasurements,
+    addMeasurement,
+    updateMeasurement,
+    closeModalForm,
+  } = useMeasurementStore();
 
-        const loggedUser = getAuthUser();
-        const reqUser = {
-            ...data,
-            idClient: data.idClient || idClient,
-            idUser: loggedUser?.idUser,
-            paramLoggedIdUser: loggedUser?.idUser
-        };
+  const submitForm = async (data: MeasurementDataForm) => {
+    const loggedUser = getAuthUser();
 
-        console.log("📤 Datos enviados al backend:", reqUser);
-
-        let action = '', result;
-
-        if (activeEditingId === 0) {
-            result = await addMeasurement(reqUser);
-            action = 'agregado';
-        } else {
-            result = await updateMeasurement(reqUser);
-            action = 'editado';
-        }
-
-        closeModalForm();
-        reset();
-
-        if (result.ok) {
-            const result2 = await fetchMeasurements();
-
-            if (result2.logout) {
-                setAuthHeader(null);
-                setAuthUser(null);
-                navigate('/login', { replace: true });
-            } else {
-                await Swal.fire({
-                    title: `Medida ${action}`,
-                    text: `Se ha ${action} la medida`,
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    timer: 3000,
-                    timerProgressBar: true,
-                    width: 500,
-                    confirmButtonColor: '#CFAD04'
-                });
-            }
-        } else if (result.logout) {
-            setAuthHeader(null);
-            setAuthUser(null);
-            navigate('/login');
-        }
+    const reqUser = {
+      ...data,
+      idClient: data.idClient || idClient,
+      idUser: loggedUser?.idUser,
+      paramLoggedIdUser: loggedUser?.idUser,
     };
 
-    useEffect(() => {
-        if (activeEditingId) {
-            const selectedMeasurement = measurements.find(measurement => measurement.idMeasurement === activeEditingId);
+    let action = "";
+    let result;
 
-            if(selectedMeasurement){
-                setValue('idMeasurement', selectedMeasurement.idMeasurement);
-                setValue('idClient', selectedMeasurement.idClient || idClient);
-                setValue('isDeleted', selectedMeasurement.isDeleted);
-                setValue('measurementDate', selectedMeasurement.measurementDate);
-                setValue('weight', selectedMeasurement.weight);
-                setValue('height', selectedMeasurement.height);
-                setValue('muscleMass', selectedMeasurement.muscleMass);
-                setValue('bodyFatPercentage', selectedMeasurement.bodyFatPercentage);
-                setValue('visceralFatPercentage', selectedMeasurement.visceralFatPercentage);
-                setValue('chestSize', selectedMeasurement.chestSize);
-                setValue('waistSize', selectedMeasurement.waistSize);
-                setValue('leftLegSize', selectedMeasurement.leftLegSize);
-                setValue('rightLegSize', selectedMeasurement.rightLegSize);
-                setValue('leftCalfSize', selectedMeasurement.leftCalfSize);
-                setValue('rightCalfSize', selectedMeasurement.rightCalfSize);
-                setValue('leftForeArmSize', selectedMeasurement.leftForeArmSize);
-                setValue('rightForeArmSize', selectedMeasurement.rightForeArmSize);
-                setValue('leftArmSize', selectedMeasurement.leftArmSize);
-                setValue('rightArmSize', selectedMeasurement.rightArmSize);
-            }
+    if (activeEditingId === 0) {
+      result = await addMeasurement(reqUser);
+      action = "agregada";
+    } else {
+      result = await updateMeasurement(reqUser);
+      action = "editada";
+    }
+
+    closeModalForm();
+    reset();
+
+    if (result.ok) {
+      const result2 = await fetchMeasurements();
+
+      if (result2.logout) {
+        setAuthHeader(null);
+        setAuthUser(null);
+        navigate("/login", { replace: true });
+      } else {
+        await Swal.fire({
+          title: `Medida ${action}`,
+          text: `La medida fue ${action} correctamente`,
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 3000,
+          timerProgressBar: true,
+          confirmButtonColor: "#CFAD04",
+        });
+      }
+    }
+  };
+
+  // Función para calcular edad
+  const calculateAge = (birthday: Date): number => {
+    const today = new Date();
+    const birth = new Date(birthday);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  // Obtener información del cliente para mostrar edad
+  const clientInfo = measurements.length > 0 
+    ? {
+        name: `${measurements[0].client.person.name} ${measurements[0].client.person.firstLastName}`,
+        age: calculateAge(measurements[0].client.person.birthday),
+      }
+    : null;
+
+  useEffect(() => {
+    if (activeEditingId) {
+      const selected = measurements.find(
+        (m) => m.idMeasurement === activeEditingId
+      );
+      if (selected) {
+        const formData = mapMeasurementToDataForm(selected);
+        // Convertir fecha al formato YYYY-MM-DD sin problemas de zona horaria
+        let formattedDate = '';
+        if (formData.measurementDate) {
+          const date = new Date(formData.measurementDate);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          formattedDate = `${year}-${month}-${day}`;
         }
-    }, [activeEditingId]);
+        
+        const formattedData = {
+          ...formData,
+          measurementDate: formattedDate
+        };
+        Object.entries(formattedData).forEach(([key, value]) => {
+          setValue(key as any, value);
+        });
+      }
+    }
+  }, [activeEditingId]);
 
-    return (
-        <form 
-            className="bg-white rounded-lg px-5 mb-10 overflow-scroll"
-            noValidate
-            onSubmit={handleSubmit(submitForm)}
-        >
-            <legend className="uppercase text-center text-yellow text-2xl font-black border-b-2 py-2 border-yellow">
-                {activeEditingId ? 'Actualizar medida corporal' : 'Registrar medida corporal'}
-            </legend>
+  return (
+    <form
+      onSubmit={handleSubmit(submitForm)}
+      noValidate
+      className="
+        bg-white rounded-lg max-h-[80vh] overflow-y-auto 
+        px-4 sm:px-8 py-6 w-full space-y-4
+      "
+    >
+      <legend
+        className="
+          uppercase text-center text-yellow text-xl sm:text-2xl font-black 
+          border-b-2 border-yellow pb-2
+        "
+      >
+        {activeEditingId
+          ? "Actualizar medida corporal"
+          : "Registrar medida corporal"}
+      </legend>
 
-            {/* inputs ocultos para la funcionalidad de actualizar */}
-            <input  
-                id="idClient" 
-                type="hidden"
-                value={idClient}
-                {...register('idClient')}
+      {/* Información del cliente */}
+      {clientInfo && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+          <div className="flex flex-wrap justify-between items-center gap-2">
+            <div>
+              <span className="text-sm font-semibold text-gray-600">Cliente: </span>
+              <span className="text-sm font-bold text-gray-800">{clientInfo.name}</span>
+            </div>
+            <div className="bg-yellow/20 px-4 py-2 rounded-full">
+              <span className="text-sm font-semibold text-gray-600">Edad: </span>
+              <span className="text-lg font-bold text-yellow">{clientInfo.age} años</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <input type="hidden" {...register("idClient")} />
+      <input type="hidden" {...register("isDeleted")} />
+      <input type="hidden" {...register("idMeasurement")} />
+
+      {/* Fecha de medición */}
+      <div className="mb-4">
+        <label className="text-xs uppercase font-bold text-gray-700">Fecha de medición</label>
+        <input
+          type="date"
+          className="w-full p-2.5 border border-gray-300 rounded-md mt-1 text-sm"
+          {...register("measurementDate", {
+            required: "La fecha es obligatoria",
+          })}
+        />
+        {errors.measurementDate && (
+          <ErrorForm>{errors.measurementDate.message}</ErrorForm>
+        )}
+      </div>
+
+      {/* SECCIÓN: Medidas Básicas y Composición Corporal */}
+      <div className="border-t-2 border-gray-200 pt-4">
+        <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
+         Medidas Básicas y Composición
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* Peso */}
+          <div>
+            <label className="text-xs uppercase font-semibold text-gray-600">Peso <span className="text-[10px] text-gray-400">(kg)</span></label>
+            <input
+              type="number"
+              step="0.1"
+              min={1}
+              onWheel={(e) => e.currentTarget.blur()}
+              className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+              {...register("weight", {
+                required: "Requerido",
+                min: { value: 1, message: "Debe ser mayor a 0" },
+              })}
             />
-            <input  
-                id="isDeleted" 
-                type="hidden" 
-                {...register('isDeleted')}
+            {errors.weight && (
+              <ErrorForm>{errors.weight.message}</ErrorForm>
+            )}
+          </div>
+
+          {/* Altura */}
+          <div>
+            <label className="text-xs uppercase font-semibold text-gray-600">Altura <span className="text-[10px] text-gray-400">(cm)</span></label>
+            <input
+              type="number"
+              step="0.1"
+              min={1}
+              onWheel={(e) => e.currentTarget.blur()}
+              className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+              {...register("height", {
+                required: "Requerido",
+                min: { value: 1, message: "Debe ser mayor a 0" },
+              })}
             />
+            {errors.height && (
+              <ErrorForm>{errors.height.message}</ErrorForm>
+            )}
+          </div>
 
-            <div className="mb-5">
-                <label htmlFor="measurementDate" className="text-sm uppercase font-bold">
-                    Fecha de registro
-                </label>
-                <input  
-                    id="measurementDate"
-                    className="w-full p-3 border border-gray-100"  
-                    type="date" 
-                    {...register('measurementDate', {
-                        required: 'La fecha de registro es obligatoria',
-                        max: {
-                            value: MAXDATE,
-                            message: `Debe ingresar una fecha de registro de máximo ${formatDate(new Date())}`
-                        }
-                    })}
-                />
+          {/* IMC (Manual) */}
+          <div>
+            <label className="text-xs uppercase font-semibold text-gray-600">IMC</label>
+            <input
+              type="number"
+              step="0.1"
+              min={1}
+              onWheel={(e) => e.currentTarget.blur()}
+              className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+              {...register("bmi", {
+                required: "Requerido",
+                min: { value: 1, message: "Debe ser mayor a 0" },
+              })}
+            />
+            {errors.bmi && (
+              <ErrorForm>{errors.bmi.message}</ErrorForm>
+            )}
+          </div>
 
-                {/* mostrar errores del input de la fecha de nacimiento */}
-                {errors.measurementDate && 
-                    <ErrorForm>
-                        {errors.measurementDate.message}
-                    </ErrorForm>
-                }
+          {/* Masa Muscular */}
+          <div>
+            <label className="text-xs uppercase font-semibold text-gray-600">Masa Musc. <span className="text-[10px] text-gray-400">(%)</span></label>
+            <input
+              type="number"
+              step="0.1"
+              min={1}
+              onWheel={(e) => e.currentTarget.blur()}
+              className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+              {...register("muscleMass", {
+                required: "Requerido",
+                min: { value: 1, message: "Debe ser mayor a 0" },
+              })}
+            />
+            {errors.muscleMass && (
+              <ErrorForm>{errors.muscleMass.message}</ErrorForm>
+            )}
+          </div>
+
+          {/* Grasa Corporal */}
+          <div>
+            <label className="text-xs uppercase font-semibold text-gray-600">Grasa Corp. <span className="text-[10px] text-gray-400">(%)</span></label>
+            <input
+              type="number"
+              step="0.1"
+              min={1}
+              onWheel={(e) => e.currentTarget.blur()}
+              className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+              {...register("bodyFatPercentage", {
+                required: "Requerido",
+                min: { value: 1, message: "Debe ser mayor a 0" },
+              })}
+            />
+            {errors.bodyFatPercentage && (
+              <ErrorForm>{errors.bodyFatPercentage.message}</ErrorForm>
+            )}
+          </div>
+
+          {/* Grasa Visceral */}
+          <div>
+            <label className="text-xs uppercase font-semibold text-gray-600">Grasa Visc. <span className="text-[10px] text-gray-400">(%)</span></label>
+            <input
+              type="number"
+              step="0.1"
+              min={1}
+              onWheel={(e) => e.currentTarget.blur()}
+              className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+              {...register("visceralFatPercentage", {
+                required: "Requerido",
+                min: { value: 1, message: "Debe ser mayor a 0" },
+              })}
+            />
+            {errors.visceralFatPercentage && (
+              <ErrorForm>{errors.visceralFatPercentage.message}</ErrorForm>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* SECCIÓN: Medidas del Torso */}
+      <div className="border-t-2 border-gray-200 pt-4">
+        <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
+        Medidas del Torso
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            ["chestSize", "Pecho"],
+            ["backSize", "Espalda"],
+            ["waistSize", "Cintura"],
+            ["hipSize", "Cadera"],
+          ].map(([name, label]) => (
+            <div key={name}>
+              <label className="text-xs uppercase font-semibold text-gray-600">{label} <span className="text-[10px] text-gray-400">(cm)</span></label>
+              <input
+                type="number"
+                step="0.1"
+                min={1}
+                onWheel={(e) => e.currentTarget.blur()}
+                className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+                {...register(name as any, {
+                  required: "Requerido",
+                  min: { value: 1, message: "Debe ser mayor a 0" },
+                })}
+              />
+              {errors[name as keyof MeasurementDataForm] && (
+                <ErrorForm>
+                  {errors[name as keyof MeasurementDataForm]?.message as string}
+                </ErrorForm>
+              )}
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="mb-5">
-                <label htmlFor="weight" className="text-sm uppercase font-bold">
-                    Peso (KG)
-                </label>
-                <input  
-                    id="weight"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese el peso en kilogramos (KG)" 
-                    {...register('weight', {
-                        required: 'El peso es obligatorio',
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un peso valido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input deL voucher */}
-                {errors.weight && 
-                    <ErrorForm>
-                        {errors.weight.message}
-                    </ErrorForm>
-                }
+      {/* SECCIÓN: Brazos */}
+      <div className="border-t-2 border-gray-200 pt-4">
+        <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
+        Brazos
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            ["leftArmSize", "Brazo Izq."],
+            ["rightArmSize", "Brazo Der."],
+            ["leftForeArmSize", "Antebrazo Izq."],
+            ["rightForeArmSize", "Antebrazo Der."],
+          ].map(([name, label]) => (
+            <div key={name}>
+              <label className="text-xs uppercase font-semibold text-gray-600">{label} <span className="text-[10px] text-gray-400">(cm)</span></label>
+              <input
+                type="number"
+                step="0.1"
+                min={1}
+                onWheel={(e) => e.currentTarget.blur()}
+                className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+                {...register(name as any, {
+                  required: "Requerido",
+                  min: { value: 1, message: "Debe ser mayor a 0" },
+                })}
+              />
+              {errors[name as keyof MeasurementDataForm] && (
+                <ErrorForm>
+                  {errors[name as keyof MeasurementDataForm]?.message as string}
+                </ErrorForm>
+              )}
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="mb-5">
-                <label htmlFor="height" className="text-sm uppercase font-bold">
-                    Altura (CM)
-                </label>
-                <input  
-                    id="height"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la Altura en centimetros (CM)" 
-                    {...register('height', {
-                        required: 'La altura es obligatoria',
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor valido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del detalle */}
-                {errors.height && 
-                    <ErrorForm>
-                        {errors.height.message}
-                    </ErrorForm>
-                }
+      {/* SECCIÓN: Piernas */}
+      <div className="border-t-2 border-gray-200 pt-4">
+        <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
+        Piernas
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            ["leftLegSize", "Pierna Izq."],
+            ["rightLegSize", "Pierna Der."],
+            ["leftCalfSize", "Pantorrilla Izq."],
+            ["rightCalfSize", "Pantorrilla Der."],
+          ].map(([name, label]) => (
+            <div key={name}>
+              <label className="text-xs uppercase font-semibold text-gray-600">{label} <span className="text-[10px] text-gray-400">(cm)</span></label>
+              <input
+                type="number"
+                step="0.1"
+                min={1}
+                onWheel={(e) => e.currentTarget.blur()}
+                className="w-full p-2 border border-gray-300 rounded-md mt-1 text-sm"
+                {...register(name as any, {
+                  required: "Requerido",
+                  min: { value: 1, message: "Debe ser mayor a 0" },
+                })}
+              />
+              {errors[name as keyof MeasurementDataForm] && (
+                <ErrorForm>
+                  {errors[name as keyof MeasurementDataForm]?.message as string}
+                </ErrorForm>
+              )}
             </div>
+          ))}
+        </div>
+      </div>
 
-
-            <div className="mb-5">
-                <label htmlFor="muscleMass" className="text-sm uppercase font-bold">
-                    Masa Muscular
-                </label>
-                <input  
-                    id="muscleMass"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la masa muscular" 
-                    {...register('muscleMass', {
-                        required: 'La masa muscular es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.muscleMass && 
-                    <ErrorForm>
-                        {errors.muscleMass.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="bodyFatPercentage" className="text-sm uppercase font-bold">
-                    Porcentaje Grasa Corporal
-                </label>
-                <input  
-                    id="bodyFatPercentage"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la el porcentaje de grasa" 
-                    {...register('bodyFatPercentage', {
-                        required: 'El porcentaje de grasa es obligatorio', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.bodyFatPercentage && 
-                    <ErrorForm>
-                        {errors.bodyFatPercentage.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="visceralFatPercentage" className="text-sm uppercase font-bold">
-                    Porcentaje Grasa Viceral 
-                </label>
-                <input  
-                    id="visceralFatPercentage"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingresar el porcentaje de grasa viceral" 
-                    {...register('visceralFatPercentage', {
-                        required: 'El porcentaje de grasa viceral es obligatorio', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.visceralFatPercentage && 
-                    <ErrorForm>
-                        {errors.visceralFatPercentage.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="chestSize" className="text-sm uppercase font-bold">
-                    Medida del pecho
-                </label>
-                <input  
-                    id="chestSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida del pecho" 
-                    {...register('chestSize', {
-                        required: 'La medida del pecho es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.chestSize && 
-                    <ErrorForm>
-                        {errors.chestSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="backSize" className="text-sm uppercase font-bold">
-                    Medida de la espalda
-                </label>
-                <input  
-                    id="backSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la espalda" 
-                    {...register('backSize', {
-                        required: 'La medida de la espalda es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.backSize && 
-                    <ErrorForm>
-                        {errors.backSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="hipSize" className="text-sm uppercase font-bold">
-                    Medida de la cadera
-                </label>
-                <input  
-                    id="hipSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la cadera" 
-                    {...register('hipSize', {
-                        required: 'La medida de la cadera es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.hipSize && 
-                    <ErrorForm>
-                        {errors.hipSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="waistSize" className="text-sm uppercase font-bold">
-                    Medida de la cintura
-                </label>
-                <input  
-                    id="waistSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la cintura" 
-                    {...register('waistSize', {
-                        required: 'La medida de la cintura es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.waistSize && 
-                    <ErrorForm>
-                        {errors.waistSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="leftLegSize" className="text-sm uppercase font-bold">
-                    Medida de la pierna izquierda
-                </label>
-                <input  
-                    id="leftLegSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la pierna izquierda" 
-                    {...register('leftLegSize', {
-                        required: 'La medida de la pierna izquierda es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.leftLegSize && 
-                    <ErrorForm>
-                        {errors.leftLegSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="rightLegSize" className="text-sm uppercase font-bold">
-                    Medida de la pierna derecha
-                </label>
-                <input  
-                    id="rightLegSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la pierna derecha" 
-                    {...register('rightLegSize', {
-                        required: 'La medida de la pierna derecha es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.rightLegSize && 
-                    <ErrorForm>
-                        {errors.rightLegSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="leftCalfSize" className="text-sm uppercase font-bold">
-                    Medida de la pantorrilla izquierda
-                </label>
-                <input  
-                    id="leftCalfSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la pantorrilla izquierda" 
-                    {...register('leftCalfSize', {
-                        required: 'La medida de la pantorrilla izquierda es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.leftCalfSize && 
-                    <ErrorForm>
-                        {errors.leftCalfSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="rightCalfSize" className="text-sm uppercase font-bold">
-                    Medida de la pantorrilla derecha
-                </label>
-                <input  
-                    id="rightCalfSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida de la pantorrilla derecha" 
-                    {...register('rightCalfSize', {
-                        required: 'La medida de la pantorrilla derecha es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.rightCalfSize && 
-                    <ErrorForm>
-                        {errors.rightCalfSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="leftForeArmSize" className="text-sm uppercase font-bold">
-                    Medida del antebrazo izquierdo
-                </label>
-                <input  
-                    id="leftForeArmSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida del antebrazo izquierdo" 
-                    {...register('leftForeArmSize', {
-                        required: 'La medida del antebrazo izquierdo es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.leftForeArmSize && 
-                    <ErrorForm>
-                        {errors.leftForeArmSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="rightForeArmSize" className="text-sm uppercase font-bold">
-                    Medida del antebrazo derecho
-                </label>
-                <input  
-                    id="rightForeArmSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida del antebrazo derecho " 
-                    {...register('rightForeArmSize', {
-                        required: 'La medida del antebrazo derecho es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.rightForeArmSize && 
-                    <ErrorForm>
-                        {errors.rightForeArmSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="leftArmSize" className="text-sm uppercase font-bold">
-                    Medida del brazo izquierdo
-                </label>
-                <input  
-                    id="leftArmSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida del brazo izquierdo"
-                    {...register('leftArmSize', {
-                        required: 'La medida del brazo izquierdo es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.leftArmSize && 
-                    <ErrorForm>
-                        {errors.leftArmSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <div className="mb-5">
-                <label htmlFor="rightArmSize" className="text-sm uppercase font-bold">
-                    Medida del brazo derecho
-                </label>
-                <input  
-                    id="rightArmSize"
-                    className="w-full p-3 border border-gray-100"  
-                    type="number" 
-                    placeholder="Ingrese la medida del brazo derecho"
-                    {...register('rightArmSize', {
-                        required: 'La medida del brazo derecho es obligatoria', 
-                        min: {
-                            value: 1,
-                            message: `Debe ingresar un valor válido`
-                        }
-                    })}
-                />
-
-                {/* mostrar errores del input del monto */}
-                {errors.rightArmSize && 
-                    <ErrorForm>
-                        {errors.rightArmSize.message}
-                    </ErrorForm>
-                }
-            </div>
-
-            <input type="submit" className="bg-yellow w-full p-3 text-white uppercase font-bold hover:bg-amber-600 cursor-pointer transition-colors" value={activeEditingId ? 'Actualizar' : 'Registrar'} />
-        </form> 
-    );
+      <input
+        type="submit"
+        value={activeEditingId ? "Actualizar" : "Registrar"}
+        className="
+          bg-yellow text-black w-full p-3 rounded-md 
+          uppercase font-bold hover:bg-amber-500 mt-6 
+          transition-colors cursor-pointer
+        "
+      />
+    </form>
+  );
 }
 
 export default Form;

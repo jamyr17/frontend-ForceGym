@@ -1,10 +1,25 @@
 export const formatDate = (date: Date) => {
-    const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
     return new Intl.DateTimeFormat('es-ES', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
     }).format(localDate);
+}
+
+// Formatea fechas desde strings sin problemas de zona horaria
+export const formatDateFromString = (dateString: string | Date | null): string => {
+    if (!dateString) return 'Sin fecha';
+    
+    // Si es un string, extraer directamente año, mes y día
+    if (typeof dateString === 'string') {
+        const dateOnly = dateString.split('T')[0]; // Toma solo YYYY-MM-DD
+        const [year, month, day] = dateOnly.split('-');
+        return `${day}/${month}/${year}`;
+    }
+    
+    // Si es un Date, usar formatDate normal
+    return formatDate(dateString);
 }
 
 export const formatDateForParam = (date: Date): string => {
@@ -15,14 +30,15 @@ export const formatDateForParam = (date: Date): string => {
     return `${year}-${month}-${day}`;
 }
 
+// Convierte un string de fecha YYYY-MM-DD a Date local (sin conversión UTC)
+export const dateFromString = (dateString: string): Date => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+}
+
 export const formatCurrentDateWithHourForTitle = () => {
     const now = new Date();
-        
-    // Ajustar a hora del pais
-    const offsetCR = -6; 
-    now.setHours(now.getUTCHours() + offsetCR);
     
-    // Formatear la fecha
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -34,12 +50,7 @@ export const formatCurrentDateWithHourForTitle = () => {
 
 export const formatCurrentDateForDocument = () => {
     const now = new Date();
-        
-    // Ajustar a hora del pais
-    const offsetCR = -6; 
-    now.setHours(now.getUTCHours() + offsetCR);
     
-    // Formatear la fecha c
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0'); 
     const year = now.getFullYear();
@@ -49,12 +60,7 @@ export const formatCurrentDateForDocument = () => {
 
 export const formatCurrentHourForDocument = () => {
     const now = new Date();
-        
-    // Ajustar a hora del pais
-    const offsetCR = -6; 
-    now.setHours(now.getUTCHours() + offsetCR);
     
-    // Formatear la fecha 
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
         
@@ -64,6 +70,10 @@ export const formatCurrentHourForDocument = () => {
 export const formatAmountToCRC = (amount: number) => {
     return `CRC ${amount.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
   };  
+
+export const formatAmountForExcel = (amount: number) => {
+    return `₡${amount.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+  };
 
 export const formatNullable = (value: any, fallback = "No disponible") => {
     return value === null || value === undefined || value === "" ? fallback : value;

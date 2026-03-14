@@ -2,8 +2,9 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { EconomicExpense, EconomicExpenseDataForm } from "../shared/types";
 import { deleteData, getData, postData, putData } from "../shared/services/gym";
-import { format } from 'date-fns';
 import { isCompleteDate } from "../shared/utils/validation";
+import { useCommonDataStore } from "../shared/CommonDataStore";
+import { formatDateForParam } from "../shared/utils/format";
 
 type EconomicExpenseStore = {
     economicExpenses: EconomicExpense[];
@@ -28,6 +29,7 @@ type EconomicExpenseStore = {
     filterByCategory: number;
 
     fetchEconomicExpenses: () => Promise<any>;
+    fetchEconomicExpenseByActiveFilters: () => Promise<EconomicExpense[]>;
     getEconomicExpenseById: (id: number) => void;
     addEconomicExpense: (data: EconomicExpenseDataForm) => Promise<any>;
     updateEconomicExpense: (data: EconomicExpenseDataForm) => Promise<any>;
@@ -55,7 +57,7 @@ type EconomicExpenseStore = {
     closeModalInfo: () => void;
     showModalFileType: () => void;
     closeModalFileType: () => void;
-    
+    resetEditing: () => void;
     clearAllFilters: () => void;
 };
 
@@ -78,7 +80,7 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
         filterByAmountRangeMax: 0,
         filterByAmountRangeMin: 0,
         filterByDateRangeMax: null,
-        filterByDateRangeMin: null ,
+        filterByDateRangeMin: null,
         filterByMeanOfPayment: 0,
         filterByCategory: -1,
 
@@ -88,11 +90,10 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
             filterByAmountRangeMax: 0,
             filterByAmountRangeMin: 0,
             filterByDateRangeMax: null,
-            filterByDateRangeMin: null ,
+            filterByDateRangeMin: null,
             filterByMeanOfPayment: 0,
             filterByCategory: -1,
         })),
-
 
         fetchEconomicExpenses: async () => {
             const state = useEconomicExpenseStore.getState();
@@ -115,15 +116,15 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
                 isCompleteDate(state.filterByDateRangeMax) &&
                 isCompleteDate(state.filterByDateRangeMin)
             ) {
-                const formattedDateMax = format(state.filterByDateRangeMax!, 'yyyy-MM-dd');
-                const formattedDateMin = format(state.filterByDateRangeMin!, 'yyyy-MM-dd');
+                const formattedDateMax = formatDateForParam(state.filterByDateRangeMax!);
+                const formattedDateMin = formatDateForParam(state.filterByDateRangeMin!);
                 filters += `&filterByDateRangeMax=${formattedDateMax}&filterByDateRangeMin=${formattedDateMin}`;
             }
-            if (state.filterByMeanOfPayment != 0){
-                filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`
+            if (state.filterByMeanOfPayment != 0) {
+                filters += `&filterByMeanOfPayment=${state.filterByMeanOfPayment}`;
             }
-            if(state.filterByCategory != -1){
-                filters += `&filterByCategory=${state.filterByCategory}`
+            if (state.filterByCategory != -1) {
+                filters += `&filterByCategory=${state.filterByCategory}`;
             }
 
             const result = await getData(
@@ -132,32 +133,115 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
 
             const totalPages = Math.max(1, Math.ceil(result.data.totalRecords / state.size));
             if (state.page > totalPages) {
-                newPage = state.page-1; 
+                newPage = state.page - 1;
             }
 
-            const expenses = result.data?.economicExpenses ?? []
-            const totalRecords = result.data?.totalRecords ?? 0
+            const expenses = result.data?.economicExpenses ?? [];
+            const totalRecords = result.data?.totalRecords ?? 0;
 
-            set({ economicExpenses: [...expenses], totalRecords: totalRecords, page: newPage });
+            set({ economicExpenses: [...expenses], totalRecords, page: newPage });
             return result;
         },
+
+        fetchEconomicExpenseByActiveFilters: async () => {
+            const state = useEconomicExpenseStore.getState();
+
+            const params: string[] = [];
+
+            const formatIfDate = (v: any) => {
+                if (!v) return null;
+                try {
+                    if (v instanceof Date) return formatDateForParam(v);
+                    return v;
+                } catch {
+                    return v;
+                }
+            };
+
+            const minDate = formatIfDate(state.filterByDateRangeMin);
+            const maxDate = formatIfDate(state.filterByDateRangeMax);
+
+            if (minDate) params.push(`filterByDateRangeMin=${minDate}`);
+            if (maxDate) params.push(`filterByDateRangeMax=${maxDate}`);
+
+            if (state.filterByStatus) params.push(`filterByStatus=${state.filterByStatus}`);
+
+            if (state.filterByAmountRangeMin && state.filterByAmountRangeMax) {
+                params.push(`filterByAmountRangeMin=${state.filterByAmountRangeMin}`);
+                params.push(`filterByAmountRangeMax=${state.filterByAmountRangeMax}`);
+            }
+
+            if (state.filterByMeanOfPayment && state.filterByMeanOfPayment !== 0) {
+                params.push(`filterByMeanOfPayment=${state.filterByMeanOfPayment}`);
+            }
+
+            if (state.filterByCategory !== -1) {
+                params.push(`filterByCategory=${state.filterByCategory}`);
+            }
+
+            const qs = params.length ? params.join("&") : "";
+
+            // obtener totalRecords
+            const urlCount = `${import.meta.env.VITE_URL_API}economicExpense/list?${qs}`;
+
+            const responseCount = await getData(urlCount);
+
+            if (!responseCount || !responseCount.ok) {
+                console.warn("⚠️ Backend no respondió correctamente en el conteo.");
+                return [];
+            }
+
+            const total = responseCount.data?.totalRecords ?? 0;
+            console.log("📊 Expense totalRecords:", total);
+
+            if (total === 0) return [];
+
+            // traer TODOS los registros
+            const urlAll =
+                `${import.meta.env.VITE_URL_API}economicExpense/list?page=1&size=${total}` +
+                (qs ? `&${qs}` : "");
+
+            console.log("🔗 Expense URL (all):", urlAll);
+
+            const responseAll = await getData(urlAll);
+
+            if (!responseAll || !responseAll.ok) {
+                console.warn("⚠️ Backend no respondió correctamente al traer todos los datos.");
+                return [];
+            }
+
+            const expenses = responseAll.data?.economicExpenses ?? [];
+
+            return expenses;
+        },
+
 
         getEconomicExpenseById: (id) => {
             set(() => ({ activeEditingId: id }));
         },
+        resetEditing: () => set(() => ({ activeEditingId: 0 })),
 
         addEconomicExpense: async (data) => {
             const result = await postData(`${import.meta.env.VITE_URL_API}economicExpense/add`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         updateEconomicExpense: async (data) => {
             const result = await putData(`${import.meta.env.VITE_URL_API}economicExpense/update`, data);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
         deleteEconomicExpense: async (id, loggedIdUser) => {
             const result = await deleteData(`${import.meta.env.VITE_URL_API}economicExpense/delete/${id}`, loggedIdUser);
+            if (result?.ok) {
+                await useCommonDataStore.getState().refreshAllCommonData();
+            }
             return result;
         },
 
@@ -182,7 +266,7 @@ export const useEconomicExpenseStore = create<EconomicExpenseStore>()(
         showModalInfo: () => set(() => ({ modalInfo: true })),
         closeModalInfo: () => set(() => ({ modalInfo: false })),
         showModalFileType: () => set(() => ({ modalFileTypeDecision: true })),
-        closeModalFileType: () => set(() => ({ modalFileTypeDecision: false }))
+        closeModalFileType: () => set(() => ({ modalFileTypeDecision: false })),
     }))
 );
 

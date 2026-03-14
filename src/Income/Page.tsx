@@ -1,160 +1,266 @@
-import { MdOutlineFileDownload } from "react-icons/md";
+import { Plus, Download } from "lucide-react";
 import Modal from "../shared/components/Modal";
 import ModalFilter from "../shared/components/ModalFilter";
 import SearchInput from "../shared/components/SearchInput";
-import { useEconomicIncomeStore } from './Store'
+import Layout from "../shared/components/Layout";
+
+import { useEconomicIncomeStore } from "./Store";
 import { useNavigate } from "react-router";
 import { useEconomicIncome } from "./useIncome";
+
 import Form from "./Form";
 import FileTypeDecision from "../shared/components/ModalFileType";
-import IncomeDashboard from './IncomeDashboard';
-import { exportToPDF } from "../shared/utils/pdf";
-import { exportToExcel } from "../shared/utils/excel";
-import IncomeTable from './IncomeTable';
+import IncomeDashboard from "./IncomeDashboard";
+import IncomeTable from "./IncomeTable";
+
+import { exportToPDFGeneralLazy, exportToExcelLazy } from "../shared/utils/lazyExports";
+
 import { useEffect, useState } from "react";
 import { FilterButton, FilterSelect } from "./Filter";
 import { setAuthHeader, setAuthUser } from "../shared/utils/authentication";
+import { EconomicIncome } from "../shared/types";
 
-function EconomicIncomeManagement() {
-    const {
-        economicIncomes,
-        modalForm,
-        modalFilter,
-        modalInfo,
-        modalFileTypeDecision,
-        page,
-        size,
-        totalRecords,
-        orderBy,
-        directionOrderBy,
-        searchType,
-        searchTerm,
-        filterByStatus,
-        fetchEconomicIncomes,
-        getEconomicIncomeById,
-        changePage,
-        changeSize,
-        changeSearchType,
-        showModalForm,
-        showModalInfo,
-        closeModalForm,
-        closeModalFilter,
-        closeModalInfo,
-        showModalFileType,
-        closeModalFileType
-    } = useEconomicIncomeStore()
-    
-    const { handleDelete, handleSearch, handleOrderByChange, handleRestore, pdfTableHeaders, pdfTableRows } = useEconomicIncome()
-    const navigate = useNavigate()
-    const [showDashboard, setShowDashboard] = useState(false);
+export default function EconomicIncomeManagement() {
+  const {
+    economicIncomes,
+    modalForm,
+    modalFilter,
+    modalInfo,
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const { logout } = await fetchEconomicIncomes()
+    page,
+    size,
+    totalRecords,
+    orderBy,
+    directionOrderBy,
+    searchType,
+    searchTerm,
 
-            if(logout){
-                setAuthHeader(null)
-                setAuthUser(null)
-                navigate('/login')
-            }    
-        }
-        
-        fetchData()
-    }, [page, size, searchType, searchTerm, orderBy, directionOrderBy, filterByStatus])
+    filterByStatus,
+    filterByAmountRangeMax,
+    filterByAmountRangeMin,
+    filterByMeanOfPayment,
+    filterByDateRangeMax,
+    filterByDateRangeMin,
+    filterByClientType,
 
-    return ( 
-        <div className="bg-black min-h-screen">
-            <header className="flex ml-12 h-20 w-0.90 items-center text-black bg-yellow justify-between px-4">
-                <h1 className="text-4xl uppercase">INGRESOS</h1>
-                <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} changeSearchType={changeSearchType} >
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={1} defaultChecked={searchType===1}>Voucher</option>
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={2} defaultChecked={searchType===2}>Detalle</option>
-                    <option className="checked:bg-yellow hover:cursor-pointer hover:bg-slate-400" value={3} defaultChecked={searchType===3}>Cliente</option>
-                </SearchInput>
-                <div className="flex gap-4">
-                    <button 
-                        onClick={() => setShowDashboard(!showDashboard)}
-                        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 hover:cursor-pointer"
-                    >
-                        {showDashboard ? 'Ver Tabla' : 'Ver Dashboard'}
-                    </button>
-                    <ModalFilter modalFilter={modalFilter} closeModalFilter={closeModalFilter} FilterButton={FilterButton} FilterSelect={FilterSelect} />
-                </div>
-            </header>
+    fetchEconomicIncomes,
+    fetchAllActiveIncomes,
+    getEconomicIncomeById,
+    changePage,
+    changeSize,
+    changeSearchType,
 
-            <main className="justify-items-center ml-12 p-4">
-                <div className="flex flex-col mx-12 mt-4 bg-white text-lg w-full max-h-full overflow-scroll">
-                    <div className="flex justify-between">
-                        <Modal
-                            Button={() => (
-                                <button
-                                    className="mt-4 ml-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer"
-                                    type="button"
-                                    onClick={showModalForm}
-                                >
-                                    + Añadir
-                                </button>
-                            )}
-                            modal={modalForm}
-                            getDataById={getEconomicIncomeById}
-                            closeModal={closeModalForm}
-                            Content={Form}
-                        />
-                        
-                        {economicIncomes?.length > 0 && (
-                            <div className="flex gap-2">
-                                <Modal
-                                    Button={() => (
-                                        <button 
-                                            onClick={showModalFileType}
-                                            className="flex gap-2 items-center text-end mt-4 mr-2 px-2 py-1 hover:bg-gray-300 hover:rounded-full hover:cursor-pointer">
-                                            <MdOutlineFileDownload /> Descargar
-                                        </button>
-                                    )}
-                                    modal={modalFileTypeDecision}
-                                    getDataById={getEconomicIncomeById}
-                                    closeModal={closeModalFileType}
-                                    Content={() => 
-                                        <FileTypeDecision 
-                                            modulo="Ingresos económicos" 
-                                            closeModal={closeModalFileType} 
-                                            exportToPDF={() => exportToPDF('Ingresos', pdfTableHeaders, pdfTableRows)}
-                                            exportToExcel={() => exportToExcel('Ingresos', pdfTableHeaders, pdfTableRows)}
-                                        />
-                                    }
-                                />  
-                            </div>
-                        )}
-                    </div>
+    showModalForm,
+    showModalInfo,
+    closeModalForm,
+    closeModalFilter,
+    closeModalInfo,
+    resetEditing
+  } = useEconomicIncomeStore();
 
-                    {showDashboard ? (
-                        <IncomeDashboard economicIncomes={economicIncomes} />
-                    ) : (
-                        <IncomeTable 
-                            economicIncomes={economicIncomes}
-                            modalInfo={modalInfo}
-                            modalForm={modalForm}
-                            orderBy={orderBy}
-                            directionOrderBy={directionOrderBy}
-                            filterByStatus={Boolean(filterByStatus)}
-                            page={page}
-                            size={size}
-                            totalRecords={totalRecords}
-                            handleOrderByChange={handleOrderByChange}
-                            getEconomicIncomeById={getEconomicIncomeById}
-                            showModalInfo={showModalInfo}
-                            closeModalInfo={closeModalInfo}
-                            showModalForm={showModalForm}
-                            handleDelete={handleDelete}
-                            handleRestore={handleRestore}
-                            changePage={changePage}
-                            changeSize={changeSize}
-                        />
-                    )}
-                </div>
-            </main>
-        </div>
+  const {
+    handleDelete,
+    handleSearch,
+    handleOrderByChange,
+    handleRestore,
+    pdfTableHeaders,
+    pdfTableRows,
+    mapIncomeToRow,
+    fetchEconomicIncomeByActiveFilters
+  } = useEconomicIncome();
+
+  const navigate = useNavigate();
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [dashboardData, setDashboardData] = useState<EconomicIncome[]>([]);
+
+  // Estados para exportación
+  const [fileTypeModalOpen, setFileTypeModalOpen] = useState(false);
+  const [filteredData, setFilteredData] = useState<EconomicIncome[]>([]);
+  const [filteredRows, setFilteredRows] = useState<(string | number)[][]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { logout } = await fetchEconomicIncomes();
+      if (logout) {
+        setAuthHeader(null);
+        setAuthUser(null);
+        navigate("/login", { replace: true });
+      }
+    };
+    fetchData();
+  }, [
+    page, size, searchType, searchTerm,
+    orderBy, directionOrderBy,
+    filterByStatus, filterByAmountRangeMax, filterByAmountRangeMin,
+    filterByMeanOfPayment, filterByDateRangeMax, filterByDateRangeMin, filterByClientType
+  ]);
+
+  // Cargar datos completos para el dashboard respetando filtros activos
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      if (showDashboard) {
+        const filteredIncomes = await fetchEconomicIncomeByActiveFilters();
+        setDashboardData(filteredIncomes);
+      }
+    };
+    loadDashboardData();
+  }, [showDashboard, searchTerm, filterByStatus, filterByAmountRangeMax, filterByAmountRangeMin,
+    filterByMeanOfPayment, filterByDateRangeMax, filterByDateRangeMin, filterByClientType]);
+
+  // Export using active filters
+  const handleExport = async () => {
+    const data = await fetchEconomicIncomeByActiveFilters();
+
+    // Datos crudos
+    setFilteredData(data);
+
+    // Filas exportables
+    setFilteredRows(
+      data.length ? data.map(mapIncomeToRow) : pdfTableRows
     );
-}
 
-export default EconomicIncomeManagement;
+    setFileTypeModalOpen(true);
+  };
+
+  return (
+    <>
+      <header className="bg-yellow text-black px-4 py-4 rounded-md shadow-md">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Título */}
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl uppercase tracking-wide text-center lg:text-left">
+            Ingresos
+          </h1>
+
+          {/* SearchInput */}
+          <div className="w-full lg:w-auto lg:flex-1 lg:max-w-md">
+            <SearchInput
+              searchTerm={searchTerm}
+              handleSearch={handleSearch}
+              changeSearchType={changeSearchType}
+            >
+              <option value={1}>Voucher</option>
+              <option value={2}>Detalle</option>
+              <option value={3}>Cliente</option>
+            </SearchInput>
+          </div>
+
+          {/* Botones */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto sm:justify-center lg:justify-end">
+            <button
+              onClick={() => setShowDashboard(!showDashboard)}
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-black text-white text-sm rounded hover:bg-gray-800 transition whitespace-nowrap"
+            >
+              {showDashboard ? "Ver Tabla" : "Ver Dashboard"}
+            </button>
+
+            <ModalFilter
+              modalFilter={modalFilter}
+              closeModalFilter={closeModalFilter}
+              FilterButton={FilterButton}
+              FilterSelect={FilterSelect}
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* Export Modal */}
+      <Modal
+        Button={() => <div />}
+        getDataById={() => {}}
+        modal={fileTypeModalOpen}
+        closeModal={() => {
+          setFileTypeModalOpen(false);
+          setFilteredData([]);
+          setFilteredRows([]);
+        }}
+        Content={() => (
+          <FileTypeDecision
+            modulo="Ingresos económicos"
+            closeModal={() => {
+              setFileTypeModalOpen(false);
+              setFilteredData([]);
+              setFilteredRows([]);
+            }}
+            exportToPDF={() =>
+              exportToPDFGeneralLazy(
+                "Ingresos",
+                pdfTableHeaders,
+                filteredRows
+              )
+            }
+            exportToExcel={() =>
+              exportToExcelLazy(
+                "Ingresos",
+                pdfTableHeaders,
+                filteredRows,
+                undefined,
+                4
+              )
+            }
+          />
+        )}
+      />
+
+      <main className="mt-6">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+            <Modal
+              Button={() => (
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetEditing();
+                    showModalForm();
+                  }}
+                  className="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-300 rounded-full transition flex items-center gap-2 justify-center sm:justify-start"
+                >
+                  <Plus size={18} />
+                  Añadir
+                </button>
+              )}
+              modal={modalForm}
+              closeModal={closeModalForm}
+              getDataById={getEconomicIncomeById}
+              Content={Form}
+            />
+
+            {economicIncomes.length > 0 && (
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-300 rounded-full transition flex items-center gap-2"
+              >
+                <Download size={18} />
+                Descargar
+              </button>
+            )}
+          </div>
+
+          {showDashboard ? (
+            <IncomeDashboard economicIncomes={dashboardData} />
+          ) : (
+            <IncomeTable
+              economicIncomes={economicIncomes}
+              modalInfo={modalInfo}
+              modalForm={modalForm}
+              orderBy={orderBy}
+              directionOrderBy={directionOrderBy}
+              filterByStatus={Boolean(filterByStatus)}
+              page={page}
+              size={size}
+              totalRecords={totalRecords}
+              handleOrderByChange={handleOrderByChange}
+              getEconomicIncomeById={getEconomicIncomeById}
+              showModalInfo={showModalInfo}
+              closeModalInfo={closeModalInfo}
+              showModalForm={showModalForm}
+              handleDelete={handleDelete}
+              handleRestore={handleRestore}
+              changePage={changePage}
+              changeSize={changeSize}
+            />
+          )}
+        </div>
+      </main>
+    </>
+  );
+}
